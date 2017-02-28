@@ -112,7 +112,7 @@ public class PACOnlineExperimentRunner {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Class[] domains = { GridPathFinding.class, Pancakes.class, VacuumRobot.class };
+		Class[] domains = { Pancakes.class, GridPathFinding.class, VacuumRobot.class, DockyardRobot.class,FifteenPuzzle.class };
 		Class[] pacConditions = { TrivialPACCondition.class, RatioBasedPACCondition.class, FMinCondition.class };
 		double[] epsilons = { 0, 0.1, 0.25, 0.5, 0.75, 1 };// ,1 ,1.5};
 		double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };

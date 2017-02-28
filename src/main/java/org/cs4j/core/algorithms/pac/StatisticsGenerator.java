@@ -7,9 +7,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.collections.PackedElement;
-import org.cs4j.core.domains.GridPathFinding;
-import org.cs4j.core.domains.Pancakes;
-import org.cs4j.core.domains.VacuumRobot;
+import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 
@@ -195,7 +193,7 @@ public class StatisticsGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        Class[] domains = {GridPathFinding.class,Pancakes.class, VacuumRobot.class};
+        Class[] domains = {VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
