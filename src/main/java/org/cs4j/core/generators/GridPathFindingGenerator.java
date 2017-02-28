@@ -1,6 +1,8 @@
 package org.cs4j.core.generators;
 
 import javafx.util.Pair;
+
+import org.apache.log4j.Logger;
 import org.cs4j.core.collections.PairInt;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Utils;
@@ -14,6 +16,8 @@ import java.util.*;
  *
  */
 public class GridPathFindingGenerator extends GeneralInstancesGenerator {
+	
+	final static Logger logger = Logger.getLogger(GridPathFindingGenerator.class);
 
     private static final int MIN_START_GOAL_MANHATTAN_DISTANCE = 5000;
     private static final int MAX_TRIES_TO_SINGLE_INSTANCE = 100;
@@ -530,18 +534,19 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
     }
 
 
-    public static void mainGenerateInstaceFromPreparedMap(String args[]) throws IOException {
+    public static void mainGenerateInstaceFromPreparedMap() throws IOException {
+    	String args[] = new String[3];
         String[] outputPaths =
                 new String[]{
-                        "input/Gridpathfinding/generated/brc202d.map",
-                        "input/Gridpathfinding/generated/den400d.map",
-                        "input/Gridpathfinding/generated/ost003d.map"
+                        "input/GridPathFinding/brc202d.map",
+                        "input/GridPathFinding/den400d.map",
+                        "input/GridPathFinding/ost003d.map"
                 };
         String[] mapFiles =
                 new String[]{
-                        "input/Gridpathfinding/raw/maps/brc202d.map",
-                        "input/Gridpathfinding/raw/maps/den400d.map",
-                        "input/Gridpathfinding/raw/maps/ost003d.map"
+                        "input/GridPathFinding/raw/maps/brc202d.map",
+                        "input/GridPathFinding/raw/maps/den400d.map",
+                        "input/GridPathFinding/raw/maps/ost003d.map"
                 };
 
         /*
@@ -597,8 +602,8 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
 
     public static void main(String[] args) {
         try {
-            //GridPathFindingGenerator.mainGenerateInstancesFromMovingAISceneFiles();
-            GridPathFindingGenerator.mainGenerateMazesFromExistingMazesWithObstaclesTuning();
+            GridPathFindingGenerator.mainGenerateInstaceFromPreparedMap();
+//            GridPathFindingGenerator.mainGenerateMazesFromExistingMazesWithObstaclesTuning();
         } catch (IOException e) {
             System.out.println("[ERROR] " + e.getMessage());
         }
