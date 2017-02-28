@@ -428,7 +428,7 @@ public class MainDaniel {
 
                Path path = Paths.get(relPath + "input/GridPathFinding/"+gridName+"/"+i+".in");
                Charset charset = StandardCharsets.UTF_8;
-               String toReplace = "input/gridpathfinding/raw/maps/brc202d.map";
+               String toReplace = "input/GridPathFinding/raw/maps/brc202d.map";
                String replaceWith = relPath + "input/GridPathFinding/"+gridName;
                String content = new String(Files.readAllBytes(path), charset);
                System.out.println(content);

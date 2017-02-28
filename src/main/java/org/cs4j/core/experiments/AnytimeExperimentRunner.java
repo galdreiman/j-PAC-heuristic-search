@@ -6,6 +6,7 @@ import org.cs4j.core.algorithms.AnytimePTS;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -134,10 +135,10 @@ public class AnytimeExperimentRunner {
         for(Class domainClass : domains) {
             logger.info("Running anytime for class "+domainClass.getName());
             runner.run(domainClass, algorithm,
-                    DomainExperimentData.get(domainClass).inputPath,
-                    DomainExperimentData.get(domainClass).outputPath,
-                    DomainExperimentData.get(domainClass).fromInstance,
-                    DomainExperimentData.get(domainClass).toInstance,
+                    DomainExperimentData.get(domainClass,RunType.TEST).inputPath,
+                    DomainExperimentData.get(domainClass,RunType.TEST).outputPath,
+                    DomainExperimentData.get(domainClass,RunType.TEST).fromInstance,
+                    DomainExperimentData.get(domainClass,RunType.TEST).toInstance,
                     domainParams);
         }
     }

@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -40,7 +41,7 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
         SortedMap<Double, Double> costToCDF = computeCDF(statistics);
 
         // Dump statistics (for DEBUG)
-        dumpCDFToFile(DomainExperimentData.domainToExperimentData.get(domain.getClass()).outputPath
+        dumpCDFToFile(DomainExperimentData.get(domain.getClass(),RunType.TRAIN).outputPath
                 +"trivial-pac-statistics.csv", costToCDF);
 
         // Compute threshold

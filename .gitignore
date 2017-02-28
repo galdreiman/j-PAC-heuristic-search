@@ -6,6 +6,7 @@ libs/
 tmp/
 node_modules/
 jaxws/jaxws-client/src/main/
+.gradle/
  
 # OS Files #
 .DS_Store
@@ -23,7 +24,6 @@ rebel.xml
 *.bin
 .project
 *.prefs
-*.csv
 ######################
 # Windows
 ######################

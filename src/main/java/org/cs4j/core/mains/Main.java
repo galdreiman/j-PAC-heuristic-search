@@ -57,17 +57,17 @@ public class Main {
     }
 
     public SearchDomain createGridPathFinding(String instance) throws FileNotFoundException {
-        //InputStream is = new FileInputStream(new File("input/gridpathfinding/generated/brc202d.map/"+instance));
-        InputStream is = new FileInputStream(new File("input/gridpathfinding/generated/maze512-1-6.map/"+instance));
+        //InputStream is = new FileInputStream(new File("input/GridPathFinding/generated/brc202d.map/"+instance));
+        InputStream is = new FileInputStream(new File("input/GridPathFinding/generated/maze512-1-6.map/"+instance));
         GridPathFinding gridPathFindingInstance = new GridPathFinding(is);
         return gridPathFindingInstance;
     }
 
     public SearchDomain createGridPathFindingWithPivots(String instance) throws FileNotFoundException {
-        String pivotsFileName = "input/gridpathfinding/raw/maps/brc202d.map.pivots.pdb";
-        //String pivotsFileName = "input/gridpathfinding/raw/mazes/maze1/_maze512-1-6.map.pivots.pdb";
-        InputStream is = new FileInputStream(new File("input/gridpathfinding/generated/brc202d.map/" + instance));
-        //InputStream is = new FileInputStream(new File("input/gridpathfinding/generated/maze512-1-6.map/"+instance));
+        String pivotsFileName = "input/GridPathFinding/raw/maps/brc202d.map.pivots.pdb";
+        //String pivotsFileName = "input/GridPathFinding/raw/mazes/maze1/_maze512-1-6.map.pivots.pdb";
+        InputStream is = new FileInputStream(new File("input/GridPathFinding/generated/brc202d.map/" + instance));
+        //InputStream is = new FileInputStream(new File("input/GridPathFinding/generated/maze512-1-6.map/"+instance));
         GridPathFinding gridPathFindingInstance = new GridPathFinding(is);
         gridPathFindingInstance.setAdditionalParameter("heuristic", "dh-random-pivot");
         //problem.setAdditionalParameter("heuristic", "dh-md-average-md-if-dh-is-0");

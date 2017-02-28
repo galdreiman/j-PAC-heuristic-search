@@ -3,6 +3,7 @@ package org.cs4j.core.algorithms.pac;
 import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -24,12 +25,12 @@ public class PACUtils {
 
     public static Map<Integer,Double> getOptimalSolutions(Class domainClass)
     {
-        String inputFile = DomainExperimentData.get(domainClass).inputPath+"/optimalSolutions.in";
+        String inputFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath+"/optimalSolutions.in";
         return parseFileWithPairs(inputFile);
     }
     public static Map<Integer,Double> getInitialHValues(Class domainClass)
     {
-        String inputFile = DomainExperimentData.get(domainClass).inputPath+"/initialHValues.csv";
+        String inputFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath+"/initialHValues.csv";
         return parseFileWithPairs(inputFile);
     }
 

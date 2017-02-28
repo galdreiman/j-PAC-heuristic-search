@@ -1,6 +1,8 @@
 package org.cs4j.core.generators;
 
 import javafx.util.Pair;
+
+import org.apache.log4j.Logger;
 import org.cs4j.core.collections.PairInt;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Utils;
@@ -14,6 +16,8 @@ import java.util.*;
  *
  */
 public class GridPathFindingGenerator extends GeneralInstancesGenerator {
+	
+	final static Logger logger = Logger.getLogger(GridPathFindingGenerator.class);
 
     private static final int MIN_START_GOAL_MANHATTAN_DISTANCE = 5000;
     private static final int MAX_TRIES_TO_SINGLE_INSTANCE = 100;
@@ -359,10 +363,10 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
 
         String[] mapFiles =
                 new String[]{
-                        "input/gridpathfinding/raw/mazes/maze1/maze512-1-6-100.map",
-                        //"input/gridpathfinding/raw/mazes/maze512-2-2.map",
-                        //"input/gridpathfinding/raw/mazes/maze512-8-6.map",
-                        //"input/gridpathfinding/raw/mazes/maze512-32-8.map",
+                        "input/Gridpathfinding/raw/mazes/maze1/maze512-1-6-100.map",
+                        //"input/Gridpathfinding/raw/mazes/maze512-2-2.map",
+                        //"input/Gridpathfinding/raw/mazes/maze512-8-6.map",
+                        //"input/Gridpathfinding/raw/mazes/maze512-32-8.map",
                 };
         double obstaclesPercentages[] = new double[]{98};
 
@@ -441,14 +445,14 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
     public static void mainGenerateInstancesFromMovingAISceneFiles() throws IOException {
         Random rand = new Random();
         Map<String, String> inputOutput = new HashMap<>();
-        inputOutput.put("input/gridpathfinding/moving-ai/maze512-1-6.map.scen",
-                "input/gridpathfinding/generated/maze512-1-6");
-        inputOutput.put("input/gridpathfinding/moving-ai/maze512-2-2.map.scen",
-                "input/gridpathfinding/generated/maze512-2-2");
-        inputOutput.put("input/gridpathfinding/moving-ai/maze512-8-6.map.scen",
-                "input/gridpathfinding/generated/maze512-8-6");
-        inputOutput.put("input/gridpathfinding/moving-ai/maze512-32-8.map.scen",
-                "input/gridpathfinding/generated/maze512-32-8");
+        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-1-6.map.scen",
+                "input/Gridpathfinding/generated/maze512-1-6");
+        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-2-2.map.scen",
+                "input/Gridpathfinding/generated/maze512-2-2");
+        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-8-6.map.scen",
+                "input/Gridpathfinding/generated/maze512-8-6");
+        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-32-8.map.scen",
+                "input/Gridpathfinding/generated/maze512-32-8");
 
         // The number of instances to generate from each map
         int instancesCount = 100;
@@ -530,18 +534,19 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
     }
 
 
-    public static void mainGenerateInstaceFromPreparedMap(String args[]) throws IOException {
+    public static void mainGenerateInstaceFromPreparedMap() throws IOException {
+    	String args[] = new String[3];
         String[] outputPaths =
                 new String[]{
-                        "input/gridpathfinding/generated/brc202d.map",
-                        "input/gridpathfinding/generated/den400d.map",
-                        "input/gridpathfinding/generated/ost003d.map"
+                        "input/GridPathFinding/brc202d.map",
+                        "input/GridPathFinding/den400d.map",
+                        "input/GridPathFinding/ost003d.map"
                 };
         String[] mapFiles =
                 new String[]{
-                        "input/gridpathfinding/raw/maps/brc202d.map",
-                        "input/gridpathfinding/raw/maps/den400d.map",
-                        "input/gridpathfinding/raw/maps/ost003d.map"
+                        "input/GridPathFinding/raw/maps/brc202d.map",
+                        "input/GridPathFinding/raw/maps/den400d.map",
+                        "input/GridPathFinding/raw/maps/ost003d.map"
                 };
 
         /*
@@ -597,8 +602,8 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
 
     public static void main(String[] args) {
         try {
-            //GridPathFindingGenerator.mainGenerateInstancesFromMovingAISceneFiles();
-            GridPathFindingGenerator.mainGenerateMazesFromExistingMazesWithObstaclesTuning();
+            GridPathFindingGenerator.mainGenerateInstaceFromPreparedMap();
+//            GridPathFindingGenerator.mainGenerateMazesFromExistingMazesWithObstaclesTuning();
         } catch (IOException e) {
             System.out.println("[ERROR] " + e.getMessage());
         }

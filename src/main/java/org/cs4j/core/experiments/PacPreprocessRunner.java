@@ -16,6 +16,7 @@ import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 /**
  * This class is designed to collect statistics used for the PAC search research
@@ -118,10 +119,10 @@ public class PacPreprocessRunner {
 		for(Class domainClass : domains) {
 			logger.info("Running PacPreprocessRunner on domain "+domainClass.getSimpleName());
 			runner.run(domainClass,
-					DomainExperimentData.get(domainClass).inputPath,
-					DomainExperimentData.get(domainClass).outputPath,
-					DomainExperimentData.get(domainClass).fromInstance,
-					DomainExperimentData.get(domainClass).toInstance,
+					DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath,
+					DomainExperimentData.get(domainClass,RunType.TRAIN).outputPath,
+					DomainExperimentData.get(domainClass,RunType.TRAIN).fromInstance,
+					DomainExperimentData.get(domainClass,RunType.TRAIN).toInstance,
 					domainParams);
 		}
 	}

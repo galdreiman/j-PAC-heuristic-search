@@ -520,7 +520,7 @@ public class PTS_BEES_PHS_GeneralExperiment {
      * Fifteen Puzzle: new int[] {55, 60, 65, 70, 75, 80, 85, 90} =>
      *                 "results/fifteenpuzzle/korf100-new/pts-55-60-65-70-75-80-85-90",
      * Grids-brc202d:  new MaxCostsCreationElement(300, 20, 2000)
-     *                 "results/gridpathfinding/generated/brc202d.map/pts-300-20-2000",
+     *                 "results/GridPathFinding/generated/brc202d.map/pts-300-20-2000",
      *
      */
 
@@ -540,9 +540,9 @@ public class PTS_BEES_PHS_GeneralExperiment {
                     null,
                     // Output Path
                     //"results/vacuumrobot/generated-10-dirt/last_<alg-name>-0-5-2000",
-                    //"results/gridpathfinding/generated/ost003d.map/<alg-name>-80-5-800",
-                    //"results/gridpathfinding/generated/den400d.map/<alg-name>-100-5-800",
-                    "results/gridpathfinding/generated/brc202d.map/<alg-name>-300-5-2000",
+                    //"results/GridPathFinding/generated/ost003d.map/<alg-name>-80-5-800",
+                    //"results/GridPathFinding/generated/den400d.map/<alg-name>-100-5-800",
+                    "results/GridPathFinding/generated/brc202d.map/<alg-name>-300-5-2000",
                     // Add header
                     true);
         } catch (IOException e) {
@@ -565,9 +565,9 @@ public class PTS_BEES_PHS_GeneralExperiment {
                     // Output Path
                     //"results/dockyardrobot/generated-max-edge-2-out-of-place-30/<alg-name>-10-5-400-rerun");
                     //"results/vacuumrobot/generated-10-dirt/<alg-name>-0-5-2000-rerun");
-                    //"results/gridpathfinding/generated/ost003d.map/<alg-name>-80-5-800-rerun");
-                    "results/gridpathfinding/generated/brc202d.map/<alg-name>-300-5-2000-rerun");
-                    //"results/gridpathfinding/generated/den400d.map/<alg-name>-100-5-800-rerun");
+                    //"results/GridPathFinding/generated/ost003d.map/<alg-name>-80-5-800-rerun");
+                    "results/GridPathFinding/generated/brc202d.map/<alg-name>-300-5-2000-rerun");
+                    //"results/GridPathFinding/generated/den400d.map/<alg-name>-100-5-800-rerun");
         } catch (IOException e) {
             System.err.println(e.getMessage());
             System.exit(-1);

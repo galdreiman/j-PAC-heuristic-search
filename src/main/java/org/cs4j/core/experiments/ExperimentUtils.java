@@ -2,6 +2,7 @@ package org.cs4j.core.experiments;
 
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -63,7 +64,12 @@ public class ExperimentUtils {
 
     public static SearchDomain getSearchDomain(Class domainClass, int instance)
     {
-        String inputPath = DomainExperimentData.get(domainClass).inputPath;
+        return getSearchDomain(domainClass, instance, RunType.TRAIN); // defaul implementation - for backward competability
+    }
+    
+    public static SearchDomain getSearchDomain(Class domainClass, int instance, RunType rt)
+    {
+        String inputPath = DomainExperimentData.get(domainClass,rt).inputPath;
         Constructor constructor = ExperimentUtils.getSearchDomainConstructor(domainClass);
         return ExperimentUtils.getSearchDomain(inputPath,new HashMap<>(),constructor,instance);
     }
