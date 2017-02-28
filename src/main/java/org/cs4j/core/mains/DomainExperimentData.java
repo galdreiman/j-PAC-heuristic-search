@@ -14,18 +14,18 @@ import java.util.Map;
  */
 public class DomainExperimentData {
 	public enum RunType {
-		TRAIN, TEST, ALL;
+		TRAIN, TEST, ALL
 	}
 
 	private static final double TRAIN_PRESENTAGE = 0.5;
 	private static final int NUM_OF_INSTANCES = 100;
 
-	public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
-	public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
-    public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataAll;
+	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
+	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
+	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataAll;
 	static {
         // All instances set configuration
-        domainToExperimentDataAll = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
+        domainToExperimentDataAll = new HashMap<>();
         domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/FifteenPuzzle/states15",
                 "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(Pancakes.class, new DomainExperimentData("./input/pancakes/generated-40",
@@ -41,15 +41,15 @@ public class DomainExperimentData {
 
 
         // Training set configuration
-        int testEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);
-        int testStartIndex = testEndIndex + 1;
+        int trainEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);
+        int testStartIndex = trainEndIndex + 1;
 
-		domainToExperimentDataTrain = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
-        domainToExperimentDataTest = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
+		domainToExperimentDataTrain = new HashMap<>();
+        domainToExperimentDataTest = new HashMap<>();
 
         for(Class domainClass : domainToExperimentDataAll.keySet()){
             domainToExperimentDataTrain.put(domainClass,
-                    domainToExperimentDataAll.get(domainClass).subset(1, testEndIndex));
+                    domainToExperimentDataAll.get(domainClass).subset(1, trainEndIndex));
             domainToExperimentDataTest.put(domainClass,
                     domainToExperimentDataAll.get(domainClass).subset(testStartIndex, NUM_OF_INSTANCES));
         }
