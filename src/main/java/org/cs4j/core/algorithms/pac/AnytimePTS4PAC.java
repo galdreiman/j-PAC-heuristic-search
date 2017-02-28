@@ -1,8 +1,7 @@
 package org.cs4j.core.algorithms.pac;
 
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.AbstractAnytimeSearch;
-import org.cs4j.core.algorithms.AnytimePTS;
+import org.cs4j.core.algorithms.AnytimeSearchNode;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -15,9 +14,9 @@ import java.util.List;
  */
 public class AnytimePTS4PAC extends AnytimePACSearch {
     @Override
-    protected Comparator<Node> createNodeComparator() {
-        return new Comparator<Node>(){
-            public int compare(final Node a, final Node b) {
+    protected Comparator<AnytimeSearchNode> createNodeComparator() {
+        return new Comparator<AnytimeSearchNode>(){
+            public int compare(final AnytimeSearchNode a, final AnytimeSearchNode b) {
                 double aCost = (AnytimePTS4PAC.this.incumbentSolution - a.g) / a.h;
                 double bCost = (AnytimePTS4PAC.this.incumbentSolution - b.g) / b.h;
 
@@ -39,12 +38,11 @@ public class AnytimePTS4PAC extends AnytimePACSearch {
     // Resort OPEN before continuing the search, because the PTS evaluation function considers the incumbent solution
     public SearchResult continueSearch() {
         // Resort open according to the new incumbent @TODO: Study if this actually helps or not?
-        List<Node> openNodes = new ArrayList<Node>(this.open.size());
+        List<AnytimeSearchNode> openNodes = new ArrayList<AnytimeSearchNode>(this.open.size());
         while(this.open.size()>0)
             openNodes.add(this.open.poll());
-        for(Node node : openNodes)
+        for(AnytimeSearchNode node : openNodes)
             this.open.add(node);
-        openNodes.clear();
 
         return super.continueSearch();
     }

@@ -2,13 +2,18 @@ package org.cs4j.core.experiments;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
+import java.util.*;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
+import org.cs4j.core.AnytimeSearchAlgorithm;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
+import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 
@@ -75,6 +80,9 @@ public class PacPreprocessRunner {
 		return null;
 	}
 
+
+
+
 	private void setResultsData(SearchResult result, double[] resultsData, int i) {
 		int instanceId = i;
 		double cost=-1;
@@ -101,14 +109,13 @@ public class PacPreprocessRunner {
 		PacPreprocessRunner runner = new PacPreprocessRunner();
 		HashMap domainParams = new HashMap<>();
 		Class[] domains = {
-//			GridPathFinding.class,
+				GridPathFinding.class,
 				FifteenPuzzle.class,
 				Pancakes.class,
 				VacuumRobot.class,
 				DockyardRobot.class};
 
-		for(Class domainClass : domains)
-		{
+		for(Class domainClass : domains) {
 			logger.info("Running PacPreprocessRunner on domain "+domainClass.getSimpleName());
 			runner.run(domainClass,
 					DomainExperimentData.get(domainClass).inputPath,

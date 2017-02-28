@@ -1,6 +1,7 @@
 package org.cs4j.core.domains;
 
 
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.collections.PairInt;
@@ -11,7 +12,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
 
-public class VacuumRobot implements SearchDomain {
+public class VacuumRobot extends AbstractSearchDomain {
 
     public static final char ROBOT_START_MARKER = 'V';
     public static final char ROBOT_END_MARKER = 'E';
@@ -1255,7 +1256,7 @@ public class VacuumRobot implements SearchDomain {
     }
 
     @Override
-    public VacuumRobotState initialState() {
+    protected VacuumRobotState createInitialState() {
         VacuumRobotState vrs = new VacuumRobotState();
         vrs.robotLocation = this.map.index(this.startX, this.startY);
         vrs.remainingDirtyLocationsCount = this.maximumDirtyLocationsCount;

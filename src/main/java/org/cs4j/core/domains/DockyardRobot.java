@@ -17,6 +17,7 @@
 package org.cs4j.core.domains;
 
 
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import java.io.BufferedReader;
@@ -30,7 +31,7 @@ import java.util.Vector;
 /*
  * DockyardRobot domain
  */
-public class DockyardRobot implements SearchDomain {
+public class DockyardRobot extends AbstractSearchDomain {
 
     private Location[] initialLocation;
     private int[] goals;
@@ -358,7 +359,7 @@ public class DockyardRobot implements SearchDomain {
     }
 
     @Override
-    public DRobotState initialState() {
+    protected DRobotState createInitialState() {
         // Initialize the first state: The robot is currently on location 0 and no box is loaded
         DRobotState drs = new DRobotState(this, this.initialLocation, -1, 0);
         drs.calcHD();

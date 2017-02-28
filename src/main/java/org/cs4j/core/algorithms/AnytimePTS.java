@@ -25,10 +25,10 @@ public class AnytimePTS extends AbstractAnytimeSearch {
     @Override
     public SearchResult continueSearch() {
         // Resort open according to the new incumbent @TODO: Study if this actually helps or not?
-        List<Node> openNodes = new ArrayList<Node>(this.open.size());
+        List<AnytimeSearchNode> openNodes = new ArrayList<AnytimeSearchNode>(this.open.size());
         while(this.open.size()>0)
             openNodes.add(this.open.poll());
-        for(Node node : openNodes)
+        for(AnytimeSearchNode node : openNodes)
             this.open.add(node);
         openNodes.clear();
 
@@ -40,7 +40,7 @@ public class AnytimePTS extends AbstractAnytimeSearch {
      * Create a node comparator used by the open list to prioritize the nodes
      */
     @Override
-    protected Comparator<Node> createNodeComparator()
+    protected Comparator<AnytimeSearchNode> createNodeComparator()
     {
         return new AnytimePTS.NodeComparator();
     }
@@ -49,9 +49,9 @@ public class AnytimePTS extends AbstractAnytimeSearch {
     /**
      * The node comparator class
      */
-    public class NodeComparator implements Comparator<Node> {
+    public class NodeComparator implements Comparator<AnytimeSearchNode> {
         @Override
-        public int compare(final Node a, final Node b) {
+        public int compare(final AnytimeSearchNode a, final AnytimeSearchNode b) {
             double aCost = (AnytimePTS.this.incumbentSolution - a.g) / a.h;
             double bCost = (AnytimePTS.this.incumbentSolution - b.g) / b.h;
 

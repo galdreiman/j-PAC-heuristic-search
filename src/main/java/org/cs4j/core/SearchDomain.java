@@ -32,6 +32,16 @@ public interface SearchDomain extends SearchConfigurable {
      */
     State initialState();
 
+
+    /**
+     * Sets the initial state of the domain
+     * (this is optimal, as the domain can generate such a state also
+     * when running initialState())
+     * @param initialState the initial state to set
+     */
+    void setInitialState(State initialState);
+
+
     /**
      * Returns true if the specified state is the goal state, false otherwise.
      *

@@ -1,5 +1,6 @@
 package org.cs4j.core.domains;
 
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import java.util.HashMap;
@@ -11,7 +12,7 @@ import java.util.Map;
  * TODO: Should implement all the methods and check!!!
  *
  */
-public class RawGraph implements SearchDomain {
+public class RawGraph extends AbstractSearchDomain{
 
     /*
     RawGraphNode a = new RawGraphNode('A', 105);
@@ -108,7 +109,7 @@ public class RawGraph implements SearchDomain {
 
 
     @Override
-    public State initialState() {
+    protected State createInitialState() {
         //return a;
         return a5;
     }

@@ -55,7 +55,7 @@ public class AnytimeWAStar extends AbstractAnytimeSearch{
      * Create a node comparator used by the open list to prioritize the nodes
      */
     @Override
-    protected Comparator<Node> createNodeComparator()
+    protected Comparator<AnytimeSearchNode> createNodeComparator()
     {
         return new AnytimeWAStar.NodeComparator();
     }
@@ -63,9 +63,9 @@ public class AnytimeWAStar extends AbstractAnytimeSearch{
     /**
      * The node comparator class
      */
-    private final class NodeComparator implements Comparator<Node> {
+    private final class NodeComparator implements Comparator<AnytimeSearchNode> {
         @Override
-        public int compare(final Node a, final Node b) {
+        public int compare(final AnytimeSearchNode a, final AnytimeSearchNode b) {
             double aCost = a.g+AnytimeWAStar.this.weight*a.h;
             double bCost = b.g+AnytimeWAStar.this.weight*b.h;
 

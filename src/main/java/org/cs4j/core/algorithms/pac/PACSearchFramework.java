@@ -23,8 +23,16 @@ public class PACSearchFramework implements SearchAlgorithm {
     private static final Map<String, Class> POSSIBLE_PARAMETERS;
     private double epsilon; // Desired suboptimality
     private double delta; // Required confidence
+
     private Class pacConditionClass; // The stopping conditions used to verify a PAC solution
     private Class anytimeSearchClass; // The class of the anytime search algorithm to use
+
+    // This allows the option to set manually the anytime search algorithm and the pac condition being used
+    // instead of creating it on the fly by specifying its class
+    private AnytimeSearchAlgorithm anytimeSearchAlgorithm=null;
+    private PACCondition pacCondition=null;
+
+
 
 
     // Declare the parameters that can be tunes before running the search
@@ -93,14 +101,22 @@ public class PACSearchFramework implements SearchAlgorithm {
         return "PACSF("+this.anytimeSearchClass.getSimpleName()+","+this.pacConditionClass.getSimpleName()+")";
     }
 
+    public void setAnytimeSearchAlgorithm(AnytimeSearchAlgorithm algorithm){
+        this.anytimeSearchAlgorithm=algorithm;
+    }
+    public void setPACCondition(PACCondition condition){
+        this.pacCondition=condition;
+    }
+
+
     /**
      * This simple PAC Search framework, as described in the original PAC Search paper
      * @param domain The domain to apply the search on
      */
     @Override
     public SearchResult search(SearchDomain domain) {
-        AnytimeSearchAlgorithm anytimeSearchAlgorithm=this.createAnytimeSearchAlgorithm();
-        PACCondition pacCondition = this.createPacCondition(domain,this.epsilon,this.delta);
+        this.setupAnytimeSearchAlgorithm();
+        this.setupPacCondition(domain,this.epsilon,this.delta);
         if(anytimeSearchAlgorithm instanceof AnytimePACSearch)
             ((AnytimePACSearch)anytimeSearchAlgorithm).setPacCondition(pacCondition);
 
@@ -124,44 +140,46 @@ public class PACSearchFramework implements SearchAlgorithm {
 
 
     /**
-     * Create an anytimeSearchAlgorithm instance
+     * Setup the anytimeSearchAlgorithm, creating it if necessary
      */
-    private AnytimeSearchAlgorithm createAnytimeSearchAlgorithm()
+    private void setupAnytimeSearchAlgorithm()
     {
-        // Create the anytime search algorithm
-        try {
-            Constructor constructor = this.anytimeSearchClass.getConstructor();
-            return (AnytimeSearchAlgorithm) (constructor.newInstance());
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        if(this.anytimeSearchAlgorithm==null) {
+            try {
+                Constructor constructor = this.anytimeSearchClass.getConstructor();
+                this.anytimeSearchAlgorithm= (AnytimeSearchAlgorithm) (constructor.newInstance());
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
     /**
-     * Create an pac condition instance
+     * Setup the PAC condition, creating it if necessary
      */
-    private PACCondition createPacCondition(SearchDomain domain, double epsilon, double delta)
+    private void setupPacCondition(SearchDomain domain, double epsilon, double delta)
     {
-        // Create the anytime search algorithm
-        try {
-            Constructor constructor = this.pacConditionClass.getConstructor();
-            PACCondition pacCondition = (PACCondition) (constructor.newInstance());
-            pacCondition.setup(domain, epsilon,delta);
-            return pacCondition;
-        } catch (InstantiationException e) {
-            throw new RuntimeException(e);
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
-        } catch (NoSuchMethodException e) {
-            throw new RuntimeException(e);
+        if(this.pacCondition==null){
+            Constructor constructor = null;
+            try {
+                constructor = this.pacConditionClass.getConstructor();
+                this.pacCondition = (PACCondition) (constructor.newInstance());
+            } catch (NoSuchMethodException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
         }
+        this.pacCondition.setup(domain, epsilon,delta);
     }
 }

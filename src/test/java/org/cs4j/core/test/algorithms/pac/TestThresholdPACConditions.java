@@ -12,11 +12,8 @@ import org.cs4j.core.algorithms.pac.TrivialPACCondition;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.junit.Test;
-import org.omg.CORBA.PUBLIC_MEMBER;
 
-import java.io.FileNotFoundException;
 import java.util.List;
-import java.util.TreeMap;
 
 /**
  * Created by user on 26/02/2017.

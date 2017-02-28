@@ -17,6 +17,7 @@
 package org.cs4j.core.domains;
 
 import com.carrotsearch.hppc.LongByteHashMap;
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import java.io.BufferedReader;
@@ -36,7 +37,7 @@ import java.util.TreeMap;
  *
  * @author Matthew Hatem
  */
-public final class FifteenPuzzle implements SearchDomain {
+public final class FifteenPuzzle extends AbstractSearchDomain {
 
     private final int width = 4;
     private final int height = 4;
@@ -564,7 +565,7 @@ public final class FifteenPuzzle implements SearchDomain {
     }
 
     @Override
-    public State initialState() {
+    protected State createInitialState() {
         TileState s = this.initialStateNoHeuristic();
         // Let's calculate the heuristic values (h and d)
         double[] computedHD = this.computeHD(s);

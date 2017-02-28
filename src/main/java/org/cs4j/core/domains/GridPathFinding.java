@@ -1,7 +1,9 @@
 package org.cs4j.core.domains;
 
 import org.apache.log4j.Logger;
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
+import org.cs4j.core.algorithms.AbstractAnytimeSearch;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.collections.Pair;
 import org.cs4j.core.collections.PairInt;
@@ -18,7 +20,7 @@ import java.util.*;
  * Note: The grid is 1-based
  * </p>
  */
-public class GridPathFinding implements SearchDomain {
+public class GridPathFinding extends AbstractSearchDomain {
     final static Logger logger = Logger.getLogger(GridPathFinding.class);
     private static final int NUM_MOVES = 4;
 
@@ -1303,7 +1305,7 @@ public class GridPathFinding implements SearchDomain {
     }
 
     @Override
-    public GridPathFindingState initialState() {
+    protected GridPathFindingState createInitialState() {
         assert this.startX != -1 && this.startY != -1;
         // Assert settings are ok
         assert this._checkSettings();

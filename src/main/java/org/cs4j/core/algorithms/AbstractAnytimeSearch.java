@@ -24,12 +24,12 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
 
     // OPEN and CLOSED lists
 //    protected SearchQueue<Node> open;
-    protected SearchQueue<Node> open;//gh_heap
+    protected SearchQueue<AnytimeSearchNode> open;//gh_heap
 
-    protected Map<PackedElement, Node> closed;
+    protected Map<PackedElement, AnytimeSearchNode> closed;
 
     // Inconsistent list
-    protected Map<PackedElement, Node> incons;
+    protected Map<PackedElement, AnytimeSearchNode> incons;
 
     // The search results encompasses all the iterations run so far
     protected SearchResultImpl totalSearchResults;
@@ -71,7 +71,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
      */
     protected void _initDataStructures(boolean clearOpen, boolean clearClosed) {
         if (clearOpen) {
-            this.open = new BinHeap<Node>(this.createNodeComparator(), 0);
+            this.open = new BinHeap<AnytimeSearchNode>(this.createNodeComparator(), 0);
         }
         if (clearClosed) {
             this.closed = new HashMap<>();
@@ -82,7 +82,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     /**
      * Create a node comparator used by the open list to prioritize the nodes
      */
-    abstract protected Comparator<Node> createNodeComparator();
+    abstract protected Comparator<AnytimeSearchNode> createNodeComparator();
 
 
     /**
@@ -92,7 +92,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
      */
     protected SearchResultImpl _search() {
         // The result will be stored here
-        Node goal = null;
+        AnytimeSearchNode goal = null;
         this.result = new SearchResultImpl();
         if(this.totalSearchResults==null)
             this.totalSearchResults=this.result;
@@ -101,7 +101,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
 
          // Loop while there is no solution and there are states in the OPEN list
         SearchDomain.State childState,currentState;
-        Node currentNode, childNode, dupChildNode;
+        AnytimeSearchNode currentNode, childNode, dupChildNode;
         SearchDomain.Operator op;
         double childf,dupChildf;
         while ((goal == null) && !this.open.isEmpty()) {
@@ -129,7 +129,11 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
                 // Get it by applying the operator on the parent state
                 childState = domain.applyOperator(currentState, op);
                 // Create a search node for this state
-                childNode = new Node(childState, currentNode, currentState, op, op.reverse(currentState));
+                childNode = new AnytimeSearchNode(this.domain,
+                        childState,
+                        currentNode,
+                        currentState,
+                        op, op.reverse(currentState));
 
                 // Prune nodes over the bound
                 if (childNode.getF() >= this.incumbentSolution) {
@@ -220,7 +224,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
      * to keep track of minf
      * @param f the (admissible) f value of the node that was just added to OPEN
      */
-    private void addTofCounter(double f){
+    protected void addTofCounter(double f){
         if(this.fCounter.containsKey(f))
             this.fCounter.put(f, this.fCounter.get(f)+1);
         else
@@ -267,8 +271,8 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
      * @param domain The domain
      * @return The new solution found
      */
-    private static SearchResult.Solution constructSolution(Node goal, SearchDomain domain) {
-        Node currentNode;
+    protected static SearchResult.Solution constructSolution(AnytimeSearchNode goal, SearchDomain domain) {
+        AnytimeSearchNode currentNode;
         SearchResultImpl.SolutionImpl solution = new SearchResultImpl.SolutionImpl(domain);
         List<SearchDomain.Operator> path = new ArrayList<>();
         List<SearchDomain.State> statesPath = new ArrayList<>();
@@ -324,7 +328,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
         SearchDomain.State currentState = domain.initialState();
         // Initialize a search node using the state (contains data according to the current
         // algorithm)
-        Node initialNode = new Node(currentState);
+        AnytimeSearchNode initialNode = new AnytimeSearchNode(this.domain,currentState);
 
         // Start the search: Add the node to the OPEN and CLOSED lists
         this.open.add(initialNode);
@@ -352,7 +356,6 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     @Override
     public SearchResult continueSearch() {
         this.iteration++;
-        this._initDataStructures(false,false);
         SearchResult results = this._search();
 
         // Update total search results, which contains the effort over all the iterations
@@ -390,116 +393,4 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     @Override
     public SearchResult getTotalSearchResults() { return this.totalSearchResults; }
 
-    /**
-     * The Node is the basic data structure which is used by the algorithm during the search -
-     * OPEN and CLOSED lists contain nodes which are created from the domain states
-     */
-    public final class Node extends SearchQueueElementImpl implements BucketHeap.BucketHeapElement {
-        public double g;
-        public double h;
-        public double d;
-
-        private SearchDomain.Operator op;
-        private SearchDomain.Operator pop;
-
-        private Node parent;
-
-        private PackedElement packed;
-
-        private int[] secondaryIndex;
-
-        /**
-         * An extended constructor which receives the initial state, but also the parent of the node
-         * and operators (last and previous)
-         *
-         * @param state The state from which the node should be created
-         * @param parent The parent node
-         * @param parentState The state of the parent
-         * @param op The operator which was applied to the parent state in order to get the current
-         *           one
-         * @param pop The operator which will reverse the last applied operation which revealed the
-         *            current state
-         */
-        private Node(SearchDomain.State state, Node parent, SearchDomain.State parentState, SearchDomain.Operator op, SearchDomain.Operator pop) {
-            // The size of the key (for SearchQueueElementImpl) is 1
-            super(1);
-            this.secondaryIndex = new int[1];
-            // WHY THE COST IS OF APPLYING THE OPERATOR ON THAT NODE????
-            // SHOULDN'T IT BE ON THE PARENT???
-            // OR EVEN MAYBE WE WANT EITHER PARENT **AND** THE CHILD STATES TO PASS TO THE getCost
-            // FUNCTION IN ORDER TO GET THE OPERATOR VALUE ...
-            double cost = (op != null) ? op.getCost(state, parentState) : 0;
-            this.h = state.getH();
-            this.d = state.getD();
-            this.g = (parent != null)? parent.g + cost : cost;
-            this.parent = parent;
-            this.packed = domain.pack(state);
-            this.pop = pop;
-            this.op = op;
-        }
-
-        /**
-         * @return The computed (on the fly) value of f
-         */
-        public double getF() {
-            return this.g + this.h;
-        }
-
-        @Override
-        public double getG() {
-            return this.g;
-        }
-
-        @Override
-        public double getDepth() {
-            return 0;
-        }
-
-        @Override
-        public double getH() {
-            return this.h;
-        }
-
-        @Override
-        public double getD() {return this.d;}
-
-        @Override
-        public double getHhat() {
-            return 0;
-        }
-
-        @Override
-        public double getDhat() {
-            return 0;
-        }
-
-        @Override
-        public SearchQueueElement getParent() {return this.parent;}
-
-        /**
-         * Default constructor which creates the node from some given state
-         *
-         * {see Node(State, Node, State, Operator, Operator)}
-         *
-         * @param state The state from which the node should be created
-         */
-        private Node(SearchDomain.State state) {
-            this(state, null, null, null, null);
-        }
-
-        @Override
-        public void setSecondaryIndex(int key, int index) {
-            this.secondaryIndex[key] = index;
-        }
-
-        @Override
-        public int getSecondaryIndex(int key) {
-            return this.secondaryIndex[key];
-        }
-
-        @Override
-        public double getRank(int level) {
-            return (level == 0) ? this.getF() : this.g;
-        }
-    }
 }

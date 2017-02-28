@@ -1,6 +1,7 @@
 package org.cs4j.core.domains;
 
 import com.carrotsearch.hppc.LongByteHashMap;
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import java.io.BufferedReader;
@@ -18,7 +19,7 @@ import java.util.Map;
  * Created by user on 17/12/2015.
  *
  */
-public class TopSpin implements SearchDomain {
+public class TopSpin extends AbstractSearchDomain{
 
     private static final int INDEX_OF_PDB_INDEX = 0;
     private static final int INDEX_OF_PDB_ENTRIES_COUNT = 1;
@@ -334,7 +335,7 @@ public class TopSpin implements SearchDomain {
     }
 
     @Override
-    public State initialState() {
+    protected State createInitialState() {
         TopSpinState s = this.initialStateNoHeuristic();
         // Let's calculate the heuristic values (h and d)
         double[] computedHD = this._computeHD(s);

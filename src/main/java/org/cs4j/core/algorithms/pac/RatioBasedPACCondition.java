@@ -21,7 +21,7 @@ public class RatioBasedPACCondition extends ThresholdPACCondition {
     final static Logger logger = Logger.getLogger(RatioBasedPACCondition.class);
 
     // The h-value of the initial state
-    private double initialH;
+    protected double initialH;
 
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {

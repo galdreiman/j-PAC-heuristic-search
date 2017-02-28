@@ -1,5 +1,6 @@
 package org.cs4j.core.domains;
 
+import org.cs4j.core.AbstractSearchDomain;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import java.io.*;
@@ -12,7 +13,7 @@ import java.util.TreeMap;
  * The pancake problem is a famous search problem where the objective is to sort a sequence of
  * objects (pancakes) through a minimal number of prefix reversals (flips).
  */
-public class Pancakes implements SearchDomain {
+public class Pancakes extends AbstractSearchDomain {
 
     // The parameter k for GAP-k heuristic (means that k pancakes are ignored during heuristic calculation
     // [starting from 0])
@@ -35,7 +36,7 @@ public class Pancakes implements SearchDomain {
     protected int numCakes = 0;
 
     // The initial given state
-    private int[] init;
+    private int[] init; // @TODO: Seems redundant given that I just added this.initialState
     private Operator[] possibleOperators;
 
     private int bitsForSinglePancake;
@@ -89,6 +90,7 @@ public class Pancakes implements SearchDomain {
      * @param state The state to set as initial state
      */
     public void setInitialState(State state){
+        super.setInitialState(state);
         PancakeState s = (PancakeState) state;
         this.init = s.cakes;
     }
@@ -105,6 +107,7 @@ public class Pancakes implements SearchDomain {
         }
         new Pancakes(init);
     }
+
 
     /**
      * The constructor reads an instance of Pancakes problem from the specified input stream
@@ -213,7 +216,7 @@ public class Pancakes implements SearchDomain {
     }
 
     @Override
-    public PancakeState initialState() {
+    protected PancakeState createInitialState() {
         PancakeState s = new PancakeState(this.numCakes);
         System.arraycopy(this.init, 0, s.cakes, 0, numCakes);
         s.h = this._countGaps(s.cakes, false);
