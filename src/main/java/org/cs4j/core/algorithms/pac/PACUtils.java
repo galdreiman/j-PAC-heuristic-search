@@ -35,6 +35,52 @@ public class PACUtils {
     }
 
     /**
+     * Read from disk the h to optimal statistics for this domain
+     */
+    public static List<Tuple<Double,Double>> getHtoOptimalTuples(Class domainClass)
+    {
+        DomainExperimentData domainDetails = DomainExperimentData.get(domainClass,RunType.TRAIN);
+        String inputFile = domainDetails.inputPath+"/openBasedStatistics.csv";
+        List<Tuple<Double,Double>> tuples = new ArrayList<>();
+        String[] parts;
+
+        // Read the tuples from the statistics file
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            reader.readLine();// Headers row
+            String line = reader.readLine();
+            int instance;
+            while(line!=null) {
+                parts = line.split(",");
+                instance = Integer.parseInt(parts[0]);
+                if((instance>= domainDetails.fromInstance)&&(instance<=domainDetails.toInstance))
+                    tuples.add(new Tuple<>(Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
+
+                line = reader.readLine();
+            }
+        }
+        catch(IOException e){
+            logger.error(e);
+            throw new RuntimeException(e);
+        }
+
+        // Sort tuples according to the h values
+        tuples.sort(new Comparator<Tuple<Double, Double>>() {
+            @Override
+            public int compare(Tuple<Double, Double> o1, Tuple<Double, Double> o2) {
+                if (o1._1 < o2._1)
+                    return -1;
+                else if (o1._1 > o2._1)
+                    return 1;
+                else
+                    return 0;
+            }
+        });
+
+        return  tuples;
+    }
+
+    /**
      * Internal helper function that parses a file with 2 columsn to a map
      * @param inputFile input file
      */

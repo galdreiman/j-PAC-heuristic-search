@@ -6,7 +6,9 @@ import org.cs4j.core.algorithms.pac.OpenBasedPACCondition;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.domains.VacuumRobot;
+import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.test.algorithms.TestUtils;
 import org.junit.Test;
 
 import java.io.File;
@@ -24,30 +26,17 @@ public class TestOpenBasedPACCondition {
      */
     @Test
     public void testBuildingCDFs() throws IOException {
-        Map<Class<? extends SearchDomain>, double[]> classToHRanges = new HashMap<>();
-        classToHRanges.put(GridPathFinding.class, new double[]{10,200,Double.MAX_VALUE});
-        classToHRanges.put(Pancakes.class, new double[]{5,15,30,40,Double.MAX_VALUE});
-        classToHRanges.put(VacuumRobot.class, new double[]{5,15,50,150,Double.MAX_VALUE});
-
-
         OpenBasedPACCondition condition = new OpenBasedPACCondition();
 
-        Class[] domains = new Class[]{GridPathFinding.class};
+        Class[] domains = new Class[]{GridPathFinding.class, Pancakes.class};
         SortedMap<Double, SortedMap<Double,Double>> hRangeToCDF;
-        double[] hRanges;
-        Set<Double> observedHRanges;
+        SearchDomain domain;
         for(Class domainClass : domains) {
-            hRanges = classToHRanges.get(domainClass);
-            hRangeToCDF=condition.createCDFs(hRanges,
-                    DomainExperimentData.get(domainClass).inputPath
-                            + File.separator + "openBasedStatistics.csv");
-            Assert.assertNotNull(hRangeToCDF);
+            domain = ExperimentUtils.getSearchDomain(domainClass,1);
+            condition.setup(domain,0,0);
 
-            // Check h ranges didn't change
-            observedHRanges = hRangeToCDF.keySet();
-            Assert.assertEquals(observedHRanges.size(),hRanges.length);
-            for(int i=0;i<hRanges.length;i++)
-                Assert.assertTrue(observedHRanges.contains(hRanges[i]));
+            hRangeToCDF=condition.createCDFs();
+            Assert.assertNotNull(hRangeToCDF);
         }
     }
 }

@@ -164,9 +164,9 @@ public class StatisticsGenerator {
                     SortedMap<String, String> domainParams,
                     SortedMap<String,Object> runParams) {
         SearchDomain domain;
-        int fromInstance= DomainExperimentData.get(domainClass).fromInstance;
-        int toInstance= DomainExperimentData.get(domainClass).toInstance;
-        String inputPath = DomainExperimentData.get(domainClass).inputPath;
+        int fromInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).fromInstance;
+        int toInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).toInstance;
+        String inputPath = DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).inputPath;
         Map<Double,Double> hToOptimal;
         Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
         try {
@@ -203,7 +203,7 @@ public class StatisticsGenerator {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass).outputPath,
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
                         "StatisticsGenerator", -1, -1, null, false, true);
                 generator.printResultsHeaders(output,
                         new String[]{"InstanceID", "h", "opt"},

@@ -13,49 +13,52 @@ import java.util.Map;
  * domain
  */
 public class DomainExperimentData {
-	public static enum RunType {
-		TRAIN, TEST;
+	public enum RunType {
+		TRAIN, TEST, ALL;
 	}
 
-	private static final double TRAIN_PRESENTAGE = 0.8;
+	private static final double TRAIN_PRESENTAGE = 0.5;
 	private static final int NUM_OF_INSTANCES = 100;
-
-	private static final int TRAIN_INSTANCES = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);
-	private static final int TEST_START_INDEX = TRAIN_INSTANCES + 1;
 
 	public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
+    public static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataAll;
 	static {
+        // All instances set configuration
+        domainToExperimentDataAll = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
+        domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/FifteenPuzzle/states15",
+                "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
+        domainToExperimentDataAll.put(Pancakes.class, new DomainExperimentData("./input/pancakes/generated-40",
+                "./results/pancakes/", 1, NUM_OF_INSTANCES));
+        domainToExperimentDataAll.put(GridPathFinding.class,
+                new DomainExperimentData("./input/GridPathFinding/brc202d.map", "./results/GridPathFinding/",
+                        1, NUM_OF_INSTANCES));
+        domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
+                "./input/vacuumrobot/generated-5-dirt", "./results/VacuumRobot/", 1, NUM_OF_INSTANCES));
+        domainToExperimentDataAll.put(DockyardRobot.class,
+                new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
+                        "./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, NUM_OF_INSTANCES));
+
+
+        // Training set configuration
+        int testEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);
+        int testStartIndex = testEndIndex + 1;
+
 		domainToExperimentDataTrain = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
+        domainToExperimentDataTest = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
 
-		domainToExperimentDataTrain.put(FifteenPuzzle.class, new DomainExperimentData("./input/FifteenPuzzle/states15",
-				"./results/FifteenPuzzle/", 1, TRAIN_INSTANCES));
-		domainToExperimentDataTrain.put(Pancakes.class,
-				new DomainExperimentData("./input/pancakes/generated-40", "./results/pancakes/", 1, TRAIN_INSTANCES));
-		domainToExperimentDataTrain.put(GridPathFinding.class, new DomainExperimentData(
-				"./input/GridPathFinding/brc202d.map", "./results/GridPathFinding/", 1, TRAIN_INSTANCES));
-		domainToExperimentDataTrain.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-5-dirt", "./results/VacuumRobot/", 1, TRAIN_INSTANCES));
-		domainToExperimentDataTrain.put(DockyardRobot.class,
-				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
-						"./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, TRAIN_INSTANCES));
-
-		domainToExperimentDataTest = new HashMap<Class<? extends SearchDomain>, DomainExperimentData>();
-		domainToExperimentDataTest.put(FifteenPuzzle.class, new DomainExperimentData("./input/FifteenPuzzle/states15",
-				"./results/FifteenPuzzle/", TEST_START_INDEX, NUM_OF_INSTANCES));
-		domainToExperimentDataTest.put(Pancakes.class, new DomainExperimentData("./input/pancakes/generated-40",
-				"./results/pancakes/", TEST_START_INDEX, NUM_OF_INSTANCES));
-		domainToExperimentDataTest.put(GridPathFinding.class,
-				new DomainExperimentData("./input/GridPathFinding/brc202d.map", "./results/GridPathFinding/",
-						TEST_START_INDEX, NUM_OF_INSTANCES));
-		domainToExperimentDataTest.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-5-dirt", "./results/VacuumRobot/", TEST_START_INDEX, NUM_OF_INSTANCES));
-		domainToExperimentDataTest.put(DockyardRobot.class,
-				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
-						"./results/dockyard-robot-max-edge-2-out-of-place-30/", TEST_START_INDEX, NUM_OF_INSTANCES));
-
+        for(Class domainClass : domainToExperimentDataAll.keySet()){
+            domainToExperimentDataTrain.put(domainClass,
+                    domainToExperimentDataAll.get(domainClass).subset(1, testEndIndex));
+            domainToExperimentDataTest.put(domainClass,
+                    domainToExperimentDataAll.get(domainClass).subset(testStartIndex, NUM_OF_INSTANCES));
+        }
 	}
 
+
+    /**
+     * Get the relevant DomainExperimentData for this class of domain and run confiuratino (train,test,all)
+     */
 	public static DomainExperimentData get(Class<? extends SearchDomain> domainClass, RunType runType)  {
 		if(runType.equals(RunType.TRAIN))
 		return domainToExperimentDataTrain.get(domainClass);
@@ -65,10 +68,12 @@ public class DomainExperimentData {
 		throw new IllegalArgumentException("Trying to get unknown DomainExperimentData");
 	}
 
-	public String inputPath;
-	public String outputPath;
-	public int fromInstance;
-	public int toInstance;
+
+
+	public String inputPath; // The directory where the problem instances are
+	public String outputPath; // The directory where to output the experimental results
+	public int fromInstance; // The problem instance to start from
+	public int toInstance; // // The problem instance to finish at (inclusive)
 
 	public DomainExperimentData(String inputPath, String outputPath, int fromInstance, int toInstance) {
 		this.inputPath = inputPath;
@@ -76,4 +81,17 @@ public class DomainExperimentData {
 		this.fromInstance = fromInstance;
 		this.toInstance = toInstance;
 	}
+
+    /**
+     * Returns a new DomainExperimentData object that consists of a subset of the instances of this object.
+     * @param fromInstance from instance
+     * @param toInstance to instance
+     */
+	public DomainExperimentData subset(int fromInstance,int toInstance){
+	    return new DomainExperimentData(this.inputPath,
+                this.outputPath,
+                fromInstance,
+                toInstance);
+    }
+
 }

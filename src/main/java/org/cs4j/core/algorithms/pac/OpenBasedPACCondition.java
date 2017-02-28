@@ -3,6 +3,7 @@ package org.cs4j.core.algorithms.pac;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.mains.DomainExperimentData;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -39,13 +40,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     public void setup(SearchDomain domain, double epsilon, double delta) {
         super.setup(domain,epsilon,delta);
         this.probNotSuboptimal=1;
-        this.hToCdf = new TreeMap<>();
-
-        // Build the CDFs
-
-        PACStatistics statistics = PACUtils.getStatisticsFile(this, domain.getClass());
-        // Get the statistics
-        SortedMap<Double, Double> cdf = computeCDF(statistics);
+        this.hToCdf = this.createCDFs();
     }
 
 
@@ -58,25 +53,28 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
      * @param hToOptimalTuples the h values and their corresponding optimal values
      * @return hToCdf - maps an value to a CDF of optimal to h ratios
      */
-    public SortedMap<Double, SortedMap<Double,Double>> createCDFs(double[] hRanges,
+    public SortedMap<Double, SortedMap<Double,Double>> createCDFs(List<Double> hRanges,
                                                                   List<Tuple<Double,Double>> hToOptimalTuples){
         int i=0;int j=0;
         List<Double> ratios= new ArrayList<>();
         SortedMap<Double, SortedMap<Double,Double>> hToCDF = new TreeMap<>();
         Tuple<Double,Double> hToOptimal = hToOptimalTuples.get(i);
-        Double hRange = hRanges[j];
+        Double hRange = hRanges.get(j);
 
         do{
             // If range >= h, add opt/h to the statistics
             if(hRange>=hToOptimal._1) {
                 ratios.add(hToOptimal._2 / hToOptimal._1);
-                if(i<hToOptimalTuples.size()-1)
+                if(i<hToOptimalTuples.size()-1){
                     i++;
+                    hToOptimal = hToOptimalTuples.get(i);
+                }
                 else break; // Finished all the data
             }
             else{ // range < h, increment range
                 j++;
-                assert j<hRanges.length; // h ranges must end with Double.MAX_VALUE
+                hRange = hRanges.get(j);
+                assert j<hRanges.size(); // h ranges must end with Double.MAX_VALUE
                 hToCDF.put(hRange,PACUtils.computeCDF(ratios));
                 ratios.clear();
             }
@@ -84,66 +82,24 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         return hToCDF;
     }
 
+
     /**
      * Builds a CDF of the h-ratios, but group by according to the h ranges
      * Assumed that the given h values and hratios are correlated
      * and sorted by ascending order
      *
-     * @param hRanges sets the h bins
-     * @param inputFile the file with the h values and their corresponding optimal values
      * @return hToCdf - maps an value to a CDF of optimal to h ratios
      */
-    public SortedMap<Double, SortedMap<Double,Double>>  createCDFs(double[] hRanges, String inputFile) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        reader.readLine();// Headers row
-        List<Tuple<Double,Double>> hToOptimalTuples = new ArrayList<>();
-        String line = reader.readLine();
-        String[] parts;
-        while(line!=null){
-            parts = line.split(",");
-            hToOptimalTuples.add(new Tuple<>(Double.parseDouble(parts[1]),Double.parseDouble(parts[2])));
-            line = reader.readLine();
-        }
+    public SortedMap<Double, SortedMap<Double,Double>>  createCDFs(){
+        List<Tuple<Double,Double>> hToOptimalTuples = PACUtils.getHtoOptimalTuples(this.domain.getClass());
+        List<Double> hRanges = this.computeHRanges(hToOptimalTuples);
         return this.createCDFs(hRanges, hToOptimalTuples);
     }
 
     /**
-     * Builds a CDF of the h-ratios, but group by according to the h ranges
-     * Assumed that the given h values and hratios are correlated
-     * and sorted by ascending order
-     *
-     * @param inputFile the file with the h values and their corresponding optimal values
-     * @return hToCdf - maps an value to a CDF of optimal to h ratios
+     * Compute the bins of h values according to which to compute CDFs for the OpenBasedPACondition
      */
-    public SortedMap<Double, SortedMap<Double,Double>>  createCDFs(String inputFile) throws IOException {
-        BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-        reader.readLine();// Headers row
-        List<Tuple<Double,Double>> hToOptimalTuples = new ArrayList<>();
-        String[] parts;
-
-        // Read the tuples from the statistics file
-        String line = reader.readLine();
-        while(line!=null){
-            parts = line.split(",");
-            hToOptimalTuples.add(new Tuple<>(Double.parseDouble(parts[1]),Double.parseDouble(parts[2])));
-            line = reader.readLine();
-        }
-
-        // Choose h ranges
-
-        // Sort tuples according to the h values
-        hToOptimalTuples.sort(new Comparator<Tuple<Double, Double>>() {
-            @Override
-            public int compare(Tuple<Double, Double> o1, Tuple<Double, Double> o2) {
-                if (o1._1<o2._1)
-                    return -1;
-                else if (o1._1<o2._1)
-                    return 1;
-                else
-                    return 0;
-            }
-        });
-
+    private List<Double> computeHRanges(List<Tuple<Double, Double>> hToOptimalTuples) {
         // First pass: hRanges according by grouping at least 50 tuples together
         List<Tuple<Double,Double>> tuples = new ArrayList<>();
         SortedMap<Double, List<Tuple<Double,Double>>> hToTuples = new TreeMap<>();
@@ -153,8 +109,9 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             // Partition according to h values, but verify that at least 50 instances per partition
             if(counter>=50){
                 if(hToOpt._1!=oldH){
+                    //logger.debug("Counter="+counter+", h="+oldH);
+                    hToTuples.put(oldH,new ArrayList<>(tuples));
                     counter=0;
-                    hToTuples.put(oldH,tuples);
                     tuples.clear();;
                 }
             }
@@ -162,7 +119,11 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             oldH = hToOpt._1;
             counter++;
         }
-        hToTuples.put(oldH,tuples); // Add the leftover tuples that didn't sum up to 50 instances
+        // Put the leftovers with the last partition, under the Double.maxvalue partition
+        Double lastHRange = hToTuples.lastKey();
+        tuples.addAll(hToTuples.get(lastHRange));
+        hToTuples.remove(lastHRange);
+        hToTuples.put(Double.MAX_VALUE,tuples);
 
 
         // Second pasS: join hranges with the same average ratio
@@ -174,15 +135,24 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             tuples = hToTuples.get(h);
             averageRatio = computeAverageRatio(tuples);
             if(oldH>0){
-                if(Math.abs(oldAverage-averageRatio)>=0.1)
-                    hRanges.add(oldH);
+                // If the previous h range had almost the same average - join them
+                // @TODO: Using the average is a heuristic for having a similar distribution
+                // @TODO: Future work may be to considder distribution distances, e.g., KL divergence
+                if(Math.abs(oldAverage-averageRatio)<=0.1)
+                    hRanges.remove(oldH);
+                else
+                    oldAverage=averageRatio;
+
+                hRanges.add(h);
             }
             oldH = h;
-            oldAverage=averageRatio;
         }
 
+        // DEBUG
+        for(Double h:hRanges)
+            logger.info("h rangle = "+ h);
 
-        return this.createCDFs(hRanges, hToOptimalTuples);
+        return hRanges;
     }
 
     /**
