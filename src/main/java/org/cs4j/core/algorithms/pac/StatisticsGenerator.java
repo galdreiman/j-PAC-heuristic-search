@@ -12,6 +12,7 @@ import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.experiments.PacPreprocessRunner;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
@@ -74,9 +75,9 @@ public class StatisticsGenerator {
         OutputResult output = null;
 
         // Extract domain data
-        int fromInstance = DomainExperimentData.get(domainClass).fromInstance;
-        int toInstance = DomainExperimentData.get(domainClass).toInstance;
-        String inputPath = DomainExperimentData.get(domainClass).inputPath;
+        int fromInstance = DomainExperimentData.get(domainClass,RunType.TRAIN).fromInstance;
+        int toInstance = DomainExperimentData.get(domainClass,RunType.TRAIN).toInstance;
+        String inputPath = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath;
         Map<String, String> domainParams = new HashMap<>();
 
         // Construct a variant of A* that records also the h value of the start state
@@ -84,7 +85,7 @@ public class StatisticsGenerator {
         logger.info("Start collecting statistics");
         try {
             // Print the output headers
-            output = new OutputResult(DomainExperimentData.get(domainClass).outputPath,
+            output = new OutputResult(DomainExperimentData.get(domainClass,RunType.TRAIN).outputPath,
                     "Preprocess_", -1, -1, null, false,true);
             String[] resultColumnNames = { "InstanceID", "h*(s)", "h(s)", "h*/h" };
             String toPrint = String.join(",", resultColumnNames);
