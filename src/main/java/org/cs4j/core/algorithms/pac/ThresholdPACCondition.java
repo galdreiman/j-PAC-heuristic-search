@@ -42,7 +42,7 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
 
         // Dump statistics (for DEBUG)
         dumpCDFToFile(DomainExperimentData.get(domain.getClass(),RunType.TRAIN).outputPath
-                +"trivial-pac-statistics.csv", costToCDF);
+                +this.getClass().getSimpleName()+"-statistics.csv", costToCDF);
 
         // Compute threshold
         threshold = this.computeThreshold(epsilon,delta,costToCDF);
