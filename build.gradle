@@ -27,10 +27,28 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.0'
 }
 
-task compile {
-    doLast {
-        println 'compiling source'
+
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.mkyong.DateUtils'
     }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
+//Get dependencies from Maven central repository
+repositories {
+    mavenCentral()
+}
+
+//Project dependencies
+dependencies {
+	compile 'ch.qos.logback:logback-classic:1.1.2'
 }
 
 
