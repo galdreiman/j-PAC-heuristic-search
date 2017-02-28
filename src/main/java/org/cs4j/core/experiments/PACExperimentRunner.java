@@ -21,10 +21,16 @@ public class PACExperimentRunner {
     final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
 
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ClassNotFoundException {
         if(args[0].equals("Collect")) {
             logger.info("****************************** collecting stats for open based ");
-            collectStatisticsForOpenBased();
+            if(args.length>1){
+                Class domainClass= Class.forName(args[1]);
+                collectStatisticsForOpenBased(new Class[]{domainClass});
+            }
+            else {
+                collectStatisticsForOpenBased(new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class});
+            }
             return;
         }
         if(args[0].equals("Run")) {
@@ -34,8 +40,7 @@ public class PACExperimentRunner {
         }
     }
 
-    private static void collectStatisticsForOpenBased() {
-        Class[] domains = {VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
+    private static void collectStatisticsForOpenBased(Class[] domains) {
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
