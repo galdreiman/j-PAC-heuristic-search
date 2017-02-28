@@ -44,9 +44,9 @@ public class StatisticsGenerator {
 
         SearchResult result = psf.search(domain);
 
-        logger.info("Solution found? " + result.hasSolution());
-        for(Double h : collector.hToCount.keySet())
-            logger.info(h+","+collector.hToCount.get(h));
+        //logger.info("Solution found? " + result.hasSolution());
+        //for(Double h : collector.hToCount.keySet())
+        //  logger.info(h+","+collector.hToCount.get(h));
 
         WAStar optimalSolver = new WAStar();
         optimalSolver.setAdditionalParameter("weight","1.0");
