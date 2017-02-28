@@ -35,7 +35,13 @@ public class PACExperimentRunner {
         }
         if(args[0].equals("Run")) {
             logger.info("****************************** running threshold based ");
-            runThresholdBasedConditions(false);
+            if(args.length>1){
+                Class domainClass= Class.forName(args[1]);
+                runThresholdBasedConditions(new Class[]{domainClass},false);
+            }
+            else {
+                runThresholdBasedConditions(new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class},false);
+            }
             return;
         }
     }
@@ -64,9 +70,8 @@ public class PACExperimentRunner {
         }
     }
 
-    private static void runThresholdBasedConditions(boolean withDPS) {
+    private static void runThresholdBasedConditions(Class[] domains, boolean withDPS) {
         // Run trivial and ratio-based on all domains
-        Class[] domains = { Pancakes.class, GridPathFinding.class, VacuumRobot.class, DockyardRobot.class,FifteenPuzzle.class };
         Class[] pacConditions = { TrivialPACCondition.class, RatioBasedPACCondition.class, FMinCondition.class };
         double[] epsilons = { 0, 0.1, 0.25, 0.5, 0.75, 1 };// ,1 ,1.5};
         double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };

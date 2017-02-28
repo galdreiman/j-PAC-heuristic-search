@@ -52,8 +52,6 @@ public class TestOpenBasedPACCondition {
 
         SearchResult result = dps.search(instance);
         Assert.assertTrue(result.hasSolution());
-
-
     }
 
 

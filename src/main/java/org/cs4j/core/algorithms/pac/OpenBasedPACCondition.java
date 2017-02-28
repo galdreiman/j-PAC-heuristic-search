@@ -31,12 +31,16 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
-        return this.probNotSuboptimal<=this.delta;
+        if(this.incumbent>=0)
+            return this.probNotSuboptimal<=this.delta;
+        else
+            return false;
     }
 
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
         this.probNotSuboptimal=1;
+        this.incumbent=-1;
         super.setup(domain,epsilon,delta);
     }
 
