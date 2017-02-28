@@ -5,9 +5,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.mains.DomainExperimentData;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -29,7 +27,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 
     // Maps to a given h value the CDF for it. Every h value represents the range of h values up to it
     // sinde the last h value
-    private SortedMap<Double, SortedMap<Double,Double>> hToCdf;
+    public SortedMap<Double, SortedMap<Double,Double>> hToCdf;
 
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
@@ -38,11 +36,54 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
-        super.setup(domain,epsilon,delta);
         this.probNotSuboptimal=1;
-        this.hToCdf = this.createCDFs();
+        super.setup(domain,epsilon,delta);
     }
 
+    /**
+     * Prepare the statistics needed to run the condition
+     */
+    @Override
+    protected void prepareStatistics(){
+        this.hToCdf = this.createCDFs();
+
+        // Dump statistics (for DEBUG)
+        dumpCDFsToFile();
+    }
+
+
+    /**
+     * Dump statitics to file
+     */
+    private void dumpCDFsToFile() {
+        String outputFileName = DomainExperimentData.get(domain.getClass(), DomainExperimentData.RunType.TRAIN).outputPath
+                +this.getClass().getSimpleName()+"-statistics.csv";
+
+
+        try {
+            // Create output file and dir if does not exists already (mainly the dir makes problems if it isn't there)
+            File outputFile = new File(outputFileName);
+            if(outputFile.exists()==false){
+                outputFile.getParentFile().mkdirs();
+                outputFile.createNewFile();
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
+            writer.write("hRange, Ratio, Pr(Ratio)<=");
+            writer.newLine();
+
+            SortedMap<Double,Double> ratioToProb;
+            for(Double h : this.hToCdf.keySet()) {
+                ratioToProb = this.hToCdf.get(h);
+                for (Double ratio : ratioToProb.keySet()) {
+                    writer.write(h + "," + ratio +","+ratioToProb.get(ratio));
+                    writer.newLine();
+                }
+            }
+            writer.close();
+        }catch(IOException exception){
+            logger.error("Statistics.dumpToFile failed",exception);
+        }
+    }
 
     /**
      * Builds a CDF of the h-ratios, but group by according to the h ranges

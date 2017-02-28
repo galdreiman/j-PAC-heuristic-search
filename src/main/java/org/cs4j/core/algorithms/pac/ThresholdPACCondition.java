@@ -33,7 +33,13 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
         super.setup(domain,epsilon,delta);
+        this.prepareStatistics();
+    }
 
+    /**
+     * Prepare the statistics needed to run the condition
+     */
+    protected void prepareStatistics(){
         // Load statistics
         PACStatistics statistics = PACUtils.getStatisticsFile(this, domain.getClass());
 
@@ -47,6 +53,7 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
 
         // Compute threshold
         threshold = this.computeThreshold(epsilon,delta,costToCDF);
+        logger.info("Threshold is set to " + this.threshold);
     }
 
     @Override

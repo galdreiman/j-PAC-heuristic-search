@@ -22,11 +22,16 @@ public class PACExperimentRunner {
 
 
     public static void main(String[] args) {
-        logger.info("****************************** running threshold based ");
-        runThresholdBasedConditions();
-
-        logger.info("****************************** collecting stats for open based ");
-        collectStatisticsForOpenBased();
+        if(args[0].equals("Collect")) {
+            logger.info("****************************** collecting stats for open based ");
+            collectStatisticsForOpenBased();
+            return;
+        }
+        if(args[0].equals("Run")) {
+            logger.info("****************************** running threshold based ");
+            runThresholdBasedConditions(false);
+            return;
+        }
     }
 
     private static void collectStatisticsForOpenBased() {
@@ -54,7 +59,7 @@ public class PACExperimentRunner {
         }
     }
 
-    private static void runThresholdBasedConditions() {
+    private static void runThresholdBasedConditions(boolean withDPS) {
         // Run trivial and ratio-based on all domains
         Class[] domains = { Pancakes.class, GridPathFinding.class, VacuumRobot.class, DockyardRobot.class,FifteenPuzzle.class };
         Class[] pacConditions = { TrivialPACCondition.class, RatioBasedPACCondition.class, FMinCondition.class };
@@ -99,19 +104,22 @@ public class PACExperimentRunner {
                     }
                 }
 
-                // Run DPS on the same epsilon values
-                runParams.put("delta", -1);
-                SearchAlgorithm dps = new DP("DPS", false, false, false); // A
-                // bounded-suboptimal
-                // algorithm
-                runParams.put("searcher", dps.getClass().getSimpleName());
-                for (double epsilon : epsilons) {
-                    runParams.put("epsilon", epsilon);
-                    dps.setAdditionalParameter("weight", "" + (1 + epsilon));
-                    runner.run(domainClass, dps, DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).inputPath, output,
-                            DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).fromInstance,
-                            DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).toInstance, domainParams, runParams);
+                if(withDPS==true) {
+                    // Run DPS on the same epsilon values
+                    runParams.put("delta", -1);
+                    SearchAlgorithm dps = new DP("DPS", false, false, false); // A
+                    // bounded-suboptimal
+                    // algorithm
+                    runParams.put("searcher", dps.getClass().getSimpleName());
+                    for (double epsilon : epsilons) {
+                        runParams.put("epsilon", epsilon);
+                        dps.setAdditionalParameter("weight", "" + (1 + epsilon));
+                        runner.run(domainClass, dps, DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).inputPath, output,
+                                DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).fromInstance,
+                                DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).toInstance, domainParams, runParams);
+                    }
                 }
+
             } catch (IOException e) {
                 logger.error(e);
             } finally {
