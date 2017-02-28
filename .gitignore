@@ -24,7 +24,6 @@ rebel.xml
 *.bin
 .project
 *.prefs
-*.csv
 ######################
 # Windows
 ######################
