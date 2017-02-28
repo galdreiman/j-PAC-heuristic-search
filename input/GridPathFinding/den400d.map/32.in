@@ -1,3 +1,3 @@
-map: input/gridpathfinding/raw/maps/den400d.map
-start: 55,79
-goals: 111,218
+map: input/GridPathFinding/raw/maps/den400d.map
+start: 220,106
+goals: 17,201
