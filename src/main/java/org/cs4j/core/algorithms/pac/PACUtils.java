@@ -97,4 +97,54 @@ public class PACUtils {
         pacStatistics.instanceToOptimal= getOptimalSolutions(domainClass);
         setStatisticFile(null,domainClass,pacStatistics);
     }
+
+
+
+    /**
+     * Computes a cumulative distribution function (CDF) for a list of values
+     *
+     * @return a map of solution cost value to the corresponding CDF.
+     */
+    public static SortedMap<Double, Double> computeCDF(List<Double> values){
+        // Building the PDF (  cost -> prob. that optimal is less than or equal to cost)
+
+        // First, count how many instances were for every h value
+        SortedMap<Double, Double> pdf = new TreeMap<Double, Double>();
+        for(Double value : values){
+            if(pdf.containsKey(value)==false)
+                pdf.put(value,1.0);
+            else
+                pdf.put(value,(pdf.get(value)+1));
+        }
+
+        // Now, divide by the total number of instances, to get the "probability"
+        for(Double value : pdf.keySet())
+            pdf.put(value, pdf.get(value)/values.size());
+        return pdfToCdf(pdf);
+
+
+    }
+
+    /**
+     * Crearing a CDF for a given PDF
+     * @param pdf the given PDF
+     * @return the resulting CDF
+     */
+    public static SortedMap<Double, Double> pdfToCdf(SortedMap<Double, Double> pdf) {
+        // Building the CDF (cumulative)
+        SortedMap<Double, Double>ratioToCDF = new TreeMap<>();
+        Double oldCDFValue=0.0;
+        for(Double cost : pdf.keySet()) {
+            ratioToCDF.put(cost, pdf.get(cost) + oldCDFValue);
+            oldCDFValue = ratioToCDF.get(cost);
+        }
+
+        // Accuracy issues
+        if(oldCDFValue!=1.0){
+            assert Math.abs(oldCDFValue-1.0)<0.0001; // Verifying this is just an accuracy issue
+            ratioToCDF.put(ratioToCDF.lastKey(),1.0);
+        }
+
+        return ratioToCDF;
+    }
 }

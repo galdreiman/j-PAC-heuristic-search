@@ -1,6 +1,5 @@
 package org.cs4j.core.algorithms.pac;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
@@ -9,16 +8,14 @@ import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
-import org.cs4j.core.experiments.PacPreprocessRunner;
 import org.cs4j.core.mains.DomainExperimentData;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Created by Roni Stern on 28/02/2017.
@@ -33,10 +30,10 @@ public class StatisticsGenerator {
      * Generate the statistics for this instance
      * @param domain
      * @param anytimeSearcher
-     * @return
-     * @throws IOException
+     * @return an h to optimal map generated from random states from the search space
+     * of solving the given domain.
      */
-    public List<Double> runOnInstance(SearchDomain domain,
+    private Map<Double,Double> runOnInstance(SearchDomain domain,
                                       SearchAwarePACSearch anytimeSearcher) throws IOException {
 
 
@@ -56,63 +53,24 @@ public class StatisticsGenerator {
         WAStar optimalSolver = new WAStar();
         optimalSolver.setAdditionalParameter("weight","1.0");
         SearchDomain.State state;
+        Map<Double,Double> hToOptimal = new TreeMap<>();
         for(Double h : collector.hToRepresentativeState.keySet()){
             state = domain.unpack(collector.hToRepresentativeState.get(h));
             domain.setInitialState(state);
             result = optimalSolver.search(domain);
-            if(result.hasSolution())
-                logger.info(h+","+ result.getBestSolution().getCost());
-        }
-        return null;
-    }
-
-
-    public void generateOpenBasedStatistics(Class domainClass){
-        List<Double> resultsData;
-        SearchDomain domain;
-        SearchResult result;
-        OutputResult output = null;
-
-        // Extract domain data
-        int fromInstance = DomainExperimentData.get(domainClass).fromInstance;
-        int toInstance = DomainExperimentData.get(domainClass).toInstance;
-        String inputPath = DomainExperimentData.get(domainClass).inputPath;
-        Map<String, String> domainParams = new HashMap<>();
-
-        // Construct a variant of A* that records also the h value of the start state
-        SearchAwarePACSearch astar = new SearchAwarePACSearchImpl();
-        logger.info("Start collecting statistics");
-        try {
-            // Print the output headers
-            output = new OutputResult(DomainExperimentData.get(domainClass).outputPath,
-                    "Preprocess_", -1, -1, null, false,true);
-            String[] resultColumnNames = { "InstanceID", "h*(s)", "h(s)", "h*/h" };
-            String toPrint = String.join(",", resultColumnNames);
-            output.writeln(toPrint);
-
-            // Get the domains constructor
-            Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
-            logger.info("Start running search for " + (fromInstance - toInstance + 1) +" instances:");
-            for (int i = fromInstance; i <= toInstance; ++i) {
-                try {
-                    logger.info("Running the " + i +"'th instance");
-                    // Read domain from file
-                    domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
-                    resultsData= this.runOnInstance(domain, astar);
-                    resultsData.add(0, (double) i);
-                    output.appendNewResult(resultsData.toArray());
-                    output.newline();
-
-                } catch (OutOfMemoryError e) {
-                    logger.error("PacPreprocessRunner OutOfMemory :-( ", e);
-                    logger.error("OutOfMemory in:" + astar.getName() + " on:" + domainClass.getName());
-                }
+            if(result.hasSolution()) {
+                hToOptimal.put(h,result.getBestSolution().getCost());
             }
-        } catch (IOException e1) {
-        } finally {
-            output.close();
+            else{
+                hToOptimal.put(h,-1.0);
+            }
         }
+        return hToOptimal;
     }
+
+
+
+
     /**
      * Here we hook onto the SearchAwarePACCondition
      * class to collect a single state for every observed h-value.
@@ -158,16 +116,16 @@ public class StatisticsGenerator {
         public void setFmin(double fmin) {
             this.fmin=fmin;
             if(this.incumbent!=-1)
-                if(this.incumbent/this.fmin==1); // Only halt if optimal
-            throw new PACConditionSatisfied(this);
+                if(this.incumbent/this.fmin==1) // Only halt if optimal
+                    throw new PACConditionSatisfied(this);
         }
 
         @Override
         public void setIncumbent(double incumbent, List<AnytimeSearchNode> openNodes) {
             this.incumbent=incumbent;
             if(this.fmin!=-1)
-                if(this.incumbent/this.fmin==1); // Only halt if optimal
-            throw new PACConditionSatisfied(this);
+                if(this.incumbent/this.fmin==1) // Only halt if optimal
+                    throw new PACConditionSatisfied(this);
         }
 
         @Override
@@ -177,19 +135,87 @@ public class StatisticsGenerator {
 
         @Override
         public void setup(SearchDomain domain, double epsilon, double delta) {
-            this.hToCount = new HashedMap();
-            this.hToRepresentativeState = new HashedMap();
+            this.hToCount = new HashMap();
+            this.hToRepresentativeState = new HashMap();
             this.randomGenerator = new Random();
         }
     }
 
 
-    public static void main(String[] args) throws IOException {
-        StatisticsGenerator g = new StatisticsGenerator();
+    /**
+     * Print the headers for the experimental results into the output file
+     * @param output
+     * @param runParams
+     * @throws IOException
+     */
+    public void printResultsHeaders(OutputResult output, String[] columnHeaders,
+                                    SortedMap<String,Object> runParams) throws IOException {
+        List<String> runParamColumns = new ArrayList<>(runParams.keySet());
+        List<String> columnNames = new ArrayList();
+        for(String columnName: columnHeaders)
+            columnNames.add(columnName);
+        columnNames.addAll(runParamColumns);
+        String toPrint = String.join(",", columnNames);
+        output.writeln(toPrint);
+    }
+
+    public void run(Class domainClass,
+                    OutputResult output,
+                    SortedMap<String, String> domainParams,
+                    SortedMap<String,Object> runParams) {
+        SearchDomain domain;
+        int fromInstance= DomainExperimentData.get(domainClass).fromInstance;
+        int toInstance= DomainExperimentData.get(domainClass).toInstance;
+        String inputPath = DomainExperimentData.get(domainClass).inputPath;
+        Map<Double,Double> hToOptimal;
+        Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
+        try {
+            // search on this domain and algo and weight the 100 instances
+            for (int i = fromInstance; i <= toInstance; ++i) {
+                // Read domain from file
+                logger.info("\rGenerating statistics for " + domainClass.getName() + "\t instance " + i);
+                domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
+                hToOptimal = runOnInstance(domain,new SearchAwarePACSearchImpl());
+                logger.info("Statistics generated!");
+
+                for(Double h : hToOptimal.keySet()) {
+                    output.appendNewResult(new Object[]{i,h,hToOptimal.get(h)});
+                    output.newline();
+                }
+            }
+        } catch (IOException e) {
+            logger.error(e);
+        }
+    }
 
 
-        SearchDomain domain = ExperimentUtils.getSearchDomain(GridPathFinding.class,1);
-        SearchAwarePACSearch anytimeSearcher = new SearchAwarePACSearchImpl();
-        g.runOnInstance(domain, anytimeSearcher);
+
+    /**
+     * An example of using ExperimentRunner
+     * @param args
+     */
+    public static void main(String[] args) {
+        Class[] domains = {GridPathFinding.class,Pancakes.class, VacuumRobot.class};
+        OutputResult output=null;
+        StatisticsGenerator generator = new StatisticsGenerator();
+
+        for(Class domainClass : domains) {
+            logger.info("Running anytime for domain " + domainClass.getName());
+            try {
+                // Prepare experiment for a new domain
+                output = new OutputResult(DomainExperimentData.get(domainClass).outputPath,
+                        "StatisticsGenerator", -1, -1, null, false, true);
+                generator.printResultsHeaders(output,
+                        new String[]{"InstanceID", "h", "opt"},
+                        new TreeMap<>());
+                generator.run(domainClass,output,new TreeMap<>(),new TreeMap<>());
+                output.close();
+        }catch(IOException e){
+                logger.error(e);
+            }finally{
+                if(output!=null)
+                output.close();
+            }
+        }
     }
 }

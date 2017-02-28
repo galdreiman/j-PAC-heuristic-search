@@ -7,7 +7,7 @@ import java.nio.file.FileAlreadyExistsException;
 
 public class OutputResult {
     private String basicResultsPath;
-    private String fname;
+    public String fname;
 
     private FileWriter writer;
     private StringBuilder currentResult;
