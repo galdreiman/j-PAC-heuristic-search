@@ -22,11 +22,6 @@ public class PACExperimentRunner {
 
 
     public static void main(String[] args) {
-        logger.info("Hellow world???");
-
-        if(1==1)
-            throw new IllegalStateException();
-
         if(args[0].equals("Collect")) {
             logger.info("****************************** collecting stats for open based ");
             collectStatisticsForOpenBased();
