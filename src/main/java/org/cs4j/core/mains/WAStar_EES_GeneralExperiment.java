@@ -667,11 +667,11 @@ public class WAStar_EES_GeneralExperiment {
                     // Instances Count
                     100,
                     // Output Path
-                    //"results/gridpathfinding/generated/den400d.map/Inconsistent/generated+wnarstar+extended-random-pivot-10",
-                    //"results/gridpathfinding/generated/ost003d.map/Inconsistent/generated+wastar+extended-random-pivot-10-bpmx-fixed",
-                    "results/gridpathfinding/generated/brc202d.map/Inconsistent/generated+wastar+extended-random-pivot-10",
-                    //"results/gridpathfinding/generated/brc202d.map/Inconsistent/generated+wastar+extended-random-pivot-10-bpmx-specific-weights",
-                    //"results/gridpathfinding/generated/maze512-1-6.map/generated+wastar+extended-average-md-pivots",
+                    //"results/GridPathFinding/generated/den400d.map/Inconsistent/generated+wnarstar+extended-random-pivot-10",
+                    //"results/GridPathFinding/generated/ost003d.map/Inconsistent/generated+wastar+extended-random-pivot-10-bpmx-fixed",
+                    "results/GridPathFinding/generated/brc202d.map/Inconsistent/generated+wastar+extended-random-pivot-10",
+                    //"results/GridPathFinding/generated/brc202d.map/Inconsistent/generated+wastar+extended-random-pivot-10-bpmx-specific-weights",
+                    //"results/GridPathFinding/generated/maze512-1-6.map/generated+wastar+extended-average-md-pivots",
                     // Add header
                     true);
         } catch (IOException e) {
@@ -695,8 +695,8 @@ public class WAStar_EES_GeneralExperiment {
                     100,
                     // Output Path
                     //"results/dockyardrobot/generated-max-edge-2-out-of-place-30/generated-ees-extended",
-                    //"results/gridpathfinding/generated/maze512-1-6.map/generated+wastar+extended-80-md",
-                    //"results/gridpathfinding/generated/brc202d.map/generated+wastar+extended",
+                    //"results/GridPathFinding/generated/maze512-1-6.map/generated+wastar+extended-80-md",
+                    //"results/GridPathFinding/generated/brc202d.map/generated+wastar+extended",
                     "results/fifteenpuzzle/korf100-real/pdb78/generated-wastar+extended",
                     //"results/vacuumrobot/generated+wastar+extended",
                     // Add header

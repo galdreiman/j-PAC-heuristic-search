@@ -630,23 +630,23 @@ public class PivotsDBGenerator {
             mapToPivots = new HashMap<>();
             /*
             mapToPivots.put(
-                    "input/gridpathfinding/raw/maps/brc202d.map",
-                    "input/gridpathfinding/raw/maps/brc202d.map.pdb");
+                    "input/GridPathFinding/raw/maps/brc202d.map",
+                    "input/GridPathFinding/raw/maps/brc202d.map.pdb");
             */
 
             // Debug:
             // mapToPivots.put(
-            //        "input/gridpathfinding/raw/mine/test.map",
-            //        "input/gridpathfinding/raw/mine/test.map.pdb");
+            //        "input/GridPathFinding/raw/mine/test.map",
+            //        "input/GridPathFinding/raw/mine/test.map.pdb");
 
 
             //mapToPivots.put(
-            //        "input/gridpathfinding/raw/mazes/maze1/maze512-1-6.map",
-            //        "input/gridpathfinding/raw/mazes/maze1/maze512-1-6.map.pivots.pdb");
+            //        "input/GridPathFinding/raw/mazes/maze1/maze512-1-6.map",
+            //        "input/GridPathFinding/raw/mazes/maze1/maze512-1-6.map.pivots.pdb");
 
             mapToPivots.put(
-                    "input/gridpathfinding/raw/mazes/maze1/maze512-1-6-80.map",
-                    "input/gridpathfinding/raw/mazes/maze1/maze512-1-6-80.map.pivots.pdb");
+                    "input/GridPathFinding/raw/mazes/maze1/maze512-1-6-80.map",
+                    "input/GridPathFinding/raw/mazes/maze1/maze512-1-6-80.map.pivots.pdb");
         }
 
         int pivotsCount = 10;
@@ -684,11 +684,11 @@ public class PivotsDBGenerator {
         int pivotsCount = 10;
         String[] mapFiles =
                 new String[]{
-                        //"input/gridpathfinding/raw/mazes/maze32/maze512-32-8-80.map"
-                        "input/gridpathfinding/raw/mazes/maze1/maze512-1-6.map"
-                        //"input/gridpathfinding/raw/maps/brc202d.map",
-                        //"input/gridpathfinding/raw/maps/den400d.map",
-                        //"input/gridpathfinding/raw/maps/ost003d.map"
+                        //"input/GridPathFinding/raw/mazes/maze32/maze512-32-8-80.map"
+                        "input/GridPathFinding/raw/mazes/maze1/maze512-1-6.map"
+                        //"input/GridPathFinding/raw/maps/brc202d.map",
+                        //"input/GridPathFinding/raw/maps/den400d.map",
+                        //"input/GridPathFinding/raw/maps/ost003d.map"
                 };
         PivotsDBGenerator calculator = new PivotsDBGenerator();
         for (String mapFile : mapFiles) {

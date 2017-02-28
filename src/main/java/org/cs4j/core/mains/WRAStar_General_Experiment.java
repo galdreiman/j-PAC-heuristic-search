@@ -303,16 +303,16 @@ public class WRAStar_General_Experiment {
                     // Instances Count
                     100,
                     // Output Path
-                    //"results/gridpathfinding/generated/den400d.map/Inconsistent/generated+wrastar+extended-random-pivot-10",
-                    //"results/gridpathfinding/generated/brc202d.map/Inconsistent/generated+wrastar+extended-random-pivot-10+additional-weights",
-                    //"results/gridpathfinding/generated/ost003d.map/Inconsistent/generated+wrastar+extended-random-pivot-10-fixed",
-                    "results/gridpathfinding/generated/brc202d.map/Inconsistent/generated+wrastar+extended-random-pivot-10",
-                    //"results/gridpathfinding/generated/brc202d.map/Inconsistent/RANDOM_PIVOT_10/generated+wastar+extended-random-pivot-10-ar-at-iteration-1",
-                    //"results/gridpathfinding/generated/maze512-1-6.map/generated+wrastar+extended",
+                    //"results/GridPathFinding/generated/den400d.map/Inconsistent/generated+wrastar+extended-random-pivot-10",
+                    //"results/GridPathFinding/generated/brc202d.map/Inconsistent/generated+wrastar+extended-random-pivot-10+additional-weights",
+                    //"results/GridPathFinding/generated/ost003d.map/Inconsistent/generated+wrastar+extended-random-pivot-10-fixed",
+                    "results/GridPathFinding/generated/brc202d.map/Inconsistent/generated+wrastar+extended-random-pivot-10",
+                    //"results/GridPathFinding/generated/brc202d.map/Inconsistent/RANDOM_PIVOT_10/generated+wastar+extended-random-pivot-10-ar-at-iteration-1",
+                    //"results/GridPathFinding/generated/maze512-1-6.map/generated+wrastar+extended",
                     null,
-                    //WRAStar_General_Experiment.readOptimalCosts("input/gridpathfinding/generated/brc202d.map/optimal.raw"),
-                    //WRAStar_General_Experiment.readOptimalCosts("input/gridpathfinding/generated/ost003d.map/optimal.raw"),
-                    //WRAStar_General_Experiment.readOptimalCosts("input/gridpathfinding/generated/den400d.map/optimal.raw"),
+                    //WRAStar_General_Experiment.readOptimalCosts("input/GridPathFinding/generated/brc202d.map/optimal.raw"),
+                    //WRAStar_General_Experiment.readOptimalCosts("input/GridPathFinding/generated/ost003d.map/optimal.raw"),
+                    //WRAStar_General_Experiment.readOptimalCosts("input/GridPathFinding/generated/den400d.map/optimal.raw"),
                     // Add header
                     true);
         } catch (IOException e) {
