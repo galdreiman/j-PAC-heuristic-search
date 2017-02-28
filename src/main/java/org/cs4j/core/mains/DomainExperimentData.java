@@ -26,7 +26,7 @@ public class DomainExperimentData {
 	static {
         // All instances set configuration
         domainToExperimentDataAll = new HashMap<>();
-        domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/FifteenPuzzle/states15",
+        domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/fifteenpuzzle/states15",
                 "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(Pancakes.class, new DomainExperimentData("./input/pancakes/generated-40",
                 "./results/pancakes/", 1, NUM_OF_INSTANCES));
@@ -34,7 +34,7 @@ public class DomainExperimentData {
                 new DomainExperimentData("./input/GridPathFinding/brc202d.map", "./results/GridPathFinding/",
                         1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-                "./input/vacuumrobot/generated-5-dirt", "./results/VacuumRobot/", 1, NUM_OF_INSTANCES));
+                "./input/vacuumrobot/generated-5-dirt", "./results/vacuumrobot/", 1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(DockyardRobot.class,
                 new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
                         "./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, NUM_OF_INSTANCES));
