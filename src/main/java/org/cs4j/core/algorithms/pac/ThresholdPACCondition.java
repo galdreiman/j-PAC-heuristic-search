@@ -7,6 +7,7 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
@@ -78,7 +79,13 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
      */
     private void dumpCDFToFile(String outputFileName,SortedMap<Double, Double> costToCDF) {
         try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName));
+            // Create output file and dir if does not exists already (mainly the dir makes problems if it isn't there)
+            File outputFile = new File(outputFileName);
+            if(outputFile.exists()==false){
+                outputFile.getParentFile().mkdirs();
+                outputFile.createNewFile();
+            }
+            BufferedWriter writer = new BufferedWriter(new FileWriter(outputFile));
             writer.write("Cost, Pr(OPT<Cost)");
             writer.newLine();
             for (Double cost : costToCDF.keySet()) {
