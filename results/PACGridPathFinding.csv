@@ -1,7 +1,0 @@
-InstanceID,Found,Depth,Cost,Iterations,Generated,Expanded,Cpu Time,Wall Time,delta,epsilon,pacCondition
-51,1,1097,1097.0,1,23990,8841,145,169,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,
-52,1,1111,1111.0,1,1150209,412412,975,1040,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,
-53,1,931,931.0,1,2594732,922930,1070,1123,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,
-54,1,504,504.0,1,5643,2112,4,4,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,
-55,1,554,554.0,1,11889,4395,6,7,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,
-56,1,549,549.0,1,5020,1867,3,4,0.0,1.0,org.cs4j.core.algorithms.pac.FMinCondition,

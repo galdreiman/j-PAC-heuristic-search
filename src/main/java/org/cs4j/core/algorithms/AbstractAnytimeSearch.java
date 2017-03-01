@@ -76,6 +76,13 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
         if (clearClosed) {
             this.closed = new HashMap<>();
         }
+        this.fCounter.clear();
+        this.totalSearchResults=null;
+        this.fmin=-1;
+        this.maxFmin=-1;
+        this.result=null;
+        this.incumbentSolution=Double.MAX_VALUE;
+        this.iteration=0;
     }
 
 
@@ -200,11 +207,9 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
                     this.addTofCounter(childNode.getF());
                     this.closed.put(childNode.packed, childNode);
                 }
-
-
-                // Update the fCounter and possible minf and maxminf
-                this.updateFmin();
             }
+            // Update the fCounter and possible minf and maxminf
+            this.updateFmin();
         }
         // Stop the timer and check that a goal was found
         result.stopTimer();
@@ -318,8 +323,7 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     public SearchResult search(SearchDomain domain) {
         // Initially all the data structures are cleaned
         this.domain = domain;
-        this.incumbentSolution=Double.MAX_VALUE;
-        this.iteration=0;
+
         // The result will be stored here
         // Initialize all the data structures )
         this._initDataStructures(true, true);
