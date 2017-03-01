@@ -31,7 +31,7 @@ public class DomainExperimentData {
         domainToExperimentDataAll.put(Pancakes.class, new DomainExperimentData("./input/pancakes/generated-40",
                 "./results/pancakes/", 1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(GridPathFinding.class,
-                new DomainExperimentData("./input/GridPathFinding/brc202d.map", "./results/GridPathFinding/",
+                new DomainExperimentData("./input/gridpathfinding/brc202d.map", "./results/GridPathFinding/",
                         1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
                 "./input/vacuumrobot/generated-5-dirt", "./results/vacuumrobot/", 1, NUM_OF_INSTANCES));
