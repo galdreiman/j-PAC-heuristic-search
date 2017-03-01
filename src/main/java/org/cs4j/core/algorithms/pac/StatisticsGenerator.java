@@ -189,7 +189,7 @@ public class StatisticsGenerator {
 
 
     /**
-     * An example of using ExperimentRunner
+     * Generate statistics
      * @param args
      */
     public static void main(String[] args) {

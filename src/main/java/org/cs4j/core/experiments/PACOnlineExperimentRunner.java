@@ -129,7 +129,7 @@ public class PACOnlineExperimentRunner {
 	}
 
 	/**
-	 * An example of using ExperimentRunner
+	 * Running PAC experiments
 	 * 
 	 * @param args
 	 */

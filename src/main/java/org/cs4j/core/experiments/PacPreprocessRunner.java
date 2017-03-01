@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import com.sun.org.apache.regexp.internal.RE;
 import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.cs4j.core.AnytimeSearchAlgorithm;
@@ -11,6 +12,7 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.algorithms.IDAstar;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.collections.PackedElement;
@@ -31,7 +33,9 @@ public class PacPreprocessRunner {
 		double[] resultsData;
 		SearchDomain domain;
 		SearchResult result;
+		SearchResult idaResult;
 		OutputResult output = null;
+		IDAstar idaStar;
 
 		// Construct a variant of A* that records also the h value of the start state
 		WAStar astar = new WAStar() {
@@ -64,11 +68,19 @@ public class PacPreprocessRunner {
 					domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 					result = astar.search(domain);
 					logger.info("Solution found? " + result.hasSolution());
-
+					if(result.hasSolution()==false) {
+						idaStar = new IDAstar();
+						logger.info("A* failed on instance " + i + ", running IDA*");
+						idaResult = idaStar.search(domain);
+						if (idaResult.hasSolution() == false) {
+							logger.info("IDA* also failed :(");
+						}
+						idaResult.getExtras().put("initial-h",result.getExtras().get("initial-h"));
+						result=idaResult;
+					}
 					setResultsData(result, resultsData, i);
 					output.appendNewResult(resultsData);
 					output.newline();
-
 				} catch (OutOfMemoryError e) {
 					logger.error("PacPreprocessRunner OutOfMemory :-( ", e);
 					logger.error("OutOfMemory in:" + astar.getName() + " on:" + domainClass.getName());
@@ -119,10 +131,10 @@ public class PacPreprocessRunner {
 		for(Class domainClass : domains) {
 			logger.info("Running PacPreprocessRunner on domain "+domainClass.getSimpleName());
 			runner.run(domainClass,
-					DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath,
-					DomainExperimentData.get(domainClass,RunType.TRAIN).outputPath,
-					DomainExperimentData.get(domainClass,RunType.TRAIN).fromInstance,
-					DomainExperimentData.get(domainClass,RunType.TRAIN).toInstance,
+					DomainExperimentData.get(domainClass,RunType.ALL).inputPath,
+					DomainExperimentData.get(domainClass,RunType.ALL).outputPath,
+					DomainExperimentData.get(domainClass,RunType.ALL).fromInstance,
+					DomainExperimentData.get(domainClass,RunType.ALL).toInstance,
 					domainParams);
 		}
 	}

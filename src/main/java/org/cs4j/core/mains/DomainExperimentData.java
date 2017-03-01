@@ -37,7 +37,7 @@ public class DomainExperimentData {
                 "./input/vacuumrobot/generated-5-dirt", "./results/vacuumrobot/", 1, NUM_OF_INSTANCES));
         domainToExperimentDataAll.put(DockyardRobot.class,
                 new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
-                        "./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, NUM_OF_INSTANCES));
+                        "./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, 90));
 
 
         // Training set configuration
@@ -51,7 +51,8 @@ public class DomainExperimentData {
             domainToExperimentDataTrain.put(domainClass,
                     domainToExperimentDataAll.get(domainClass).subset(1, trainEndIndex));
             domainToExperimentDataTest.put(domainClass,
-                    domainToExperimentDataAll.get(domainClass).subset(testStartIndex, NUM_OF_INSTANCES));
+                    domainToExperimentDataAll.get(domainClass).subset(testStartIndex,
+							domainToExperimentDataAll.get(domainClass).toInstance));
         }
 	}
 
@@ -64,7 +65,8 @@ public class DomainExperimentData {
 		return domainToExperimentDataTrain.get(domainClass);
 		else if(runType.equals(RunType.TEST)){
 			return domainToExperimentDataTest.get(domainClass);
-		}
+		}else if(runType.equals(runType.ALL))
+			return domainToExperimentDataAll.get(domainClass);
 		throw new IllegalArgumentException("Trying to get unknown DomainExperimentData");
 	}
 
