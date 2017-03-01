@@ -1,6 +1,11 @@
 package org.cs4j.core.experiments;
 
+import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
+import org.cs4j.core.algorithms.IDAstar;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 
@@ -8,7 +13,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,6 +24,7 @@ import java.util.Map;
  * This class holds helper functions that are useful for running experiments
  */
 public class ExperimentUtils {
+    final static Logger logger = Logger.getLogger(ExperimentUtils.class);
 
     /**
      * Create a constructor for the search domain, to enable creating search domains for a
@@ -74,4 +82,42 @@ public class ExperimentUtils {
         return ExperimentUtils.getSearchDomain(inputPath,new HashMap<>(),constructor,instance);
     }
 
+    /**
+     * Returns the class names from the command line args. @TODO: Replace all this with a descent framework
+     * for parsing command line arguments (there are many such frameworks)
+     * @param args
+     * @return
+     */
+    public static Class[] readClasses(String[] args){
+        // Default classes
+        boolean classesFound=false;
+        int i;
+        for(i=0;i<args.length;i++){
+            if(args[i].equals("-classes")) {
+                classesFound=true;
+                break;
+            }
+        }
+        if(classesFound==false)
+            return new Class[]{DockyardRobot.class, Pancakes.class,FifteenPuzzle.class};
+
+        List<Class> domainsList = new ArrayList<>();
+        Class domainClass=null;
+        for(int j=i+1;j<args.length;j++){
+            if(args[j].startsWith("-")) { // Next type of parameter
+                return domainsList.toArray(new Class[]{});
+            }
+            else{
+                try {
+                    domainClass=Class.forName(args[j]);
+                } catch (ClassNotFoundException e) {
+                    logger.error("Class "+args[j] + " unknown");
+                    domainClass=null;
+                }
+                if(domainClass!=null)
+                    domainsList.add(domainClass);
+            }
+        }
+        return domainsList.toArray(new Class[]{});
+    }
 }

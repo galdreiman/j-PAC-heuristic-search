@@ -1,10 +1,12 @@
 package org.cs4j.core.algorithms;
+import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchDomain.Operator;
 import org.cs4j.core.SearchDomain.State;
 import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.SearchResultImpl.SolutionImpl;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,8 @@ import java.util.Map;
  * @author Matthew Hatem
  */
 public class IDAstar implements SearchAlgorithm {
+    final static Logger logger = Logger.getLogger(IDAstar.class);
+
     // The domain for the search
     private SearchDomain domain;
 
@@ -52,10 +56,10 @@ public class IDAstar implements SearchAlgorithm {
             case "weight": {
                 this.weight = Double.parseDouble(value);
                 if (this.weight < 1.0d) {
-                    System.out.println("[ERROR] The weight must be >= 1.0");
+                    logger.error("The weight must be >= 1.0");
                     throw new IllegalArgumentException();
                 } else if (this.weight == 1.0d) {
-                    System.out.println("[WARNING] Weight of 1.0 is equivalent to A*");
+                    logger.warn("[WARNING] Weight of 1.0 is equivalent to A*");
                 }
                 break;
             }
@@ -76,8 +80,6 @@ public class IDAstar implements SearchAlgorithm {
         do {
             this.minNextF = -1;
             boolean goalWasFound = this.dfs(domain, root, 0, null);
-/*            System.out.println("min next f: " + minNextF ) ;
-            System.out.println("next");*/
             this.result.addIteration(i, this.bound, this.result.expanded, this.result.generated);
             this.bound = this.minNextF;
             if (goalWasFound) {
@@ -132,6 +134,8 @@ public class IDAstar implements SearchAlgorithm {
 
         // Expand the current node
         ++result.expanded;
+        if((result.expanded % 10000000)==0)
+            logger.info("Expanded "+result.expanded+" so far...");
         int numOps = domain.getNumOperators(parent);
         for (int i = 0; i < numOps; ++i) {
     	    Operator op = domain.getOperator(parent, i);

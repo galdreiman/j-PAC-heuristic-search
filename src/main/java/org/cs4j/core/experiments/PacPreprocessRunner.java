@@ -115,12 +115,15 @@ public class PacPreprocessRunner {
 
 		PacPreprocessRunner runner = new PacPreprocessRunner();
 		HashMap domainParams = new HashMap<>();
-		Class[] domains = {
-				GridPathFinding.class,
+		Class[] domains = ExperimentUtils.readClasses(args);
+		// Default classes
+		if(domains.length==0){
+			domains = new Class[]{GridPathFinding.class,
 				FifteenPuzzle.class,
 				Pancakes.class,
 				VacuumRobot.class,
 				DockyardRobot.class};
+		}
 
 		for(Class domainClass : domains) {
 			logger.info("Running PacPreprocessRunner on domain "+domainClass.getSimpleName());
