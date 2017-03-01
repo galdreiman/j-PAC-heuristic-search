@@ -4,6 +4,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
+import com.sun.java.browser.dom.DOMAccessException;
 import org.apache.log4j.Logger;
 import org.cs4j.core.*;
 import org.cs4j.core.algorithms.DP;
@@ -34,7 +35,12 @@ public class PACOnlineExperimentRunner {
 
 		// search on this domain and algo and weight the 100 instances
 		for (int i = fromInstance; i <= toInstance; ++i) {
-			// Print informative string
+			// Only solve for instances we can solve optimally @TODO: Make this a parameter to pass on
+			if(PACUtils.getOptimalSolutions(domainClass).containsKey(i)==false) {
+				//@
+				logger.info("Skipping instance "+i+" because we don't have an optimal solution for it");
+				continue;
+			}
 
 			logger.info("\rSolving " + domainClass.getName() + "\t instance " + i + "\t"+runParamsToLog(runParams));
 			domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
