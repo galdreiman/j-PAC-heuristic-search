@@ -1,24 +1,18 @@
 package org.cs4j.core.experiments;
 
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.*;
-
-import com.sun.org.apache.regexp.internal.RE;
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
-import org.cs4j.core.AnytimeSearchAlgorithm;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.IDAstar;
 import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.algorithms.pac.*;
-import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.util.HashMap;
 
 /**
  * This class is designed to collect statistics used for the PAC search research
