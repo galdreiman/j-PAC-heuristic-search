@@ -112,7 +112,6 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
         SearchDomain.Operator op;
         double childf,dupChildf;
         while ((goal == null) && !this.open.isEmpty()) {
-            logger.info("Open size="+this.open.size());
             // Take a node from the OPEN list (nodes are sorted according to the 'u' function)
             currentNode = this.open.poll();
             this.removeFromfCounter(currentNode.getF());
