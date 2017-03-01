@@ -9,6 +9,8 @@ import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -21,12 +23,76 @@ public class PACExperimentRunner {
     final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
 
 
-    public static void main(String[] args) throws ClassNotFoundException {
-        Class[] domains=new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
-        if(args.length>1){
-            Class domainClass= Class.forName(args[1]);
-            domains = new Class[]{domainClass};
+    //@TODO: Replace all this with better handling of command line using some known code to do so
+    private static Class[] getClassesFromCommandLine(String[] args){
+        // Default classes
+        boolean classesFound=false;
+        int i;
+        for(i=0;i<args.length;i++){
+            if(args[i].equals("-classes")) {
+                classesFound=true;
+                break;
+            }
         }
+        if(classesFound==false)
+            return new Class[]{DockyardRobot.class, Pancakes.class,FifteenPuzzle.class};
+
+        List<Class> domainsList = new ArrayList<>();
+        Class domainClass=null;
+        for(int j=i+1;j<args.length;j++){
+            if(args[j].startsWith("-")) { // Next type of parameter
+                return domainsList.toArray(new Class[]{});
+            }
+            else{
+                try {
+                    domainClass=Class.forName(args[j]);
+                } catch (ClassNotFoundException e) {
+                    logger.error("Class "+args[j] + " unknown");
+                    domainClass=null;
+                }
+                if(domainClass!=null)
+                    domainsList.add(domainClass);
+            }
+        }
+        return domainsList.toArray(new Class[]{});
+    }
+
+    private static Class[] getPACConditionsFromCommandLine(String[] args){
+        // Default classes
+        boolean classesFound=false;
+        int i;
+        for(i=0;i<args.length;i++){
+            if(args[i].equals("-PACCondition")) {
+                classesFound=true;
+                break;
+            }
+        }
+        if(classesFound==false)
+            return new Class[]{TrivialPACCondition.class, ThresholdPACCondition.class,FMinCondition.class};
+
+        List<Class> pacConditionsList = new ArrayList<>();
+        Class domainClass=null;
+        for(int j=i+1;j<args.length;j++){
+            if(args[j].startsWith("-")) { // Next type of parameter
+                return pacConditionsList.toArray(new Class[]{});
+            }
+            else{
+                try {
+                    domainClass=Class.forName(args[j]);
+                } catch (ClassNotFoundException e) {
+                    logger.error("Class "+args[j] + " unknown");
+                    domainClass=null;
+                }
+                if(domainClass!=null)
+                    pacConditionsList.add(domainClass);
+            }
+        }
+        return pacConditionsList.toArray(new Class[]{});
+    }
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        Class[] domains=getClassesFromCommandLine(args);
+        Class[] pacConditions = getPACConditionsFromCommandLine(args);
 
         if(args[0].equals("Collect")) {
             logger.info("****************************** collecting stats for open based ");
@@ -34,8 +100,24 @@ public class PACExperimentRunner {
         }
         if(args[0].equals("Run")) {
             logger.info("****************************** running threshold based ");
-            runThresholdBasedConditions(domains,false);
+            runThresholdBasedConditions(domains,pacConditions);
         }
+
+        if(args[0].equals("RunOracle")) {
+            logger.info("****************************** running threshold based ");
+            runOracleCondition(domains);
+        }
+    }
+
+    private static void runOracleCondition(Class[] domains) {
+        // Run trivial and ratio-based on all domains
+        double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
+        double[] deltas = { 0 };
+        Class[] pacConditions = new Class[]{OraclePACCondition.class};
+        Experiment experiment = new OracleExperiment();
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
     private static void collectStatisticsForOpenBased(Class[] domains) {
@@ -62,72 +144,16 @@ public class PACExperimentRunner {
         }
     }
 
-    private static void runThresholdBasedConditions(Class[] domains, boolean withDPS) {
+    private static void runThresholdBasedConditions(Class[] domains,Class[] pacConditions) {
         // Run trivial and ratio-based on all domains
-        Class[] pacConditions = { TrivialPACCondition.class, RatioBasedPACCondition.class, FMinCondition.class };
         double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
         double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
-        SortedMap<String, String> domainParams = new TreeMap<>();
-        SortedMap<String, Object> runParams = new TreeMap<>();
-        OutputResult output = null;
 
-        runParams.put("epsilon", -1);
-        runParams.put("delta", -1);
-        runParams.put("pacCondition", -1);
-        Class anytimeSearchClass = AnytimePTS4PAC.class;
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
+        Experiment experiment = new StandardExperiment(psf);
 
-        SearchAlgorithm pacSearch = new PACSearchFramework();
-        pacSearch.setAdditionalParameter("anytimeSearch", anytimeSearchClass.getName());
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
-
-        for (Class domainClass : domains) {
-            logger.info("Running anytime for domain " + domainClass.getName());
-            try {
-                // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).outputPath, "PAC", -1, -1, null, false,
-                        true);
-                runParams.put("anytimeSearch", anytimeSearchClass.getSimpleName());
-                runner.printResultsHeaders(output, runParams);
-
-                PACUtils.loadPACStatistics(domainClass);
-                for (Class pacConditionClass : pacConditions) {
-                    runParams.put("pacCondition", pacConditionClass.getSimpleName());
-                    for (double epsilon : epsilons) {
-                        runParams.put("epsilon", epsilon);
-                        for (double delta : deltas) {
-                            runParams.put("delta", delta);
-                            pacSearch.setAdditionalParameter("epsilon", "" + epsilon);
-                            pacSearch.setAdditionalParameter("delta", "" + delta);
-                            pacSearch.setAdditionalParameter("pacCondition", pacConditionClass.getName());
-                            runner.run(domainClass, pacSearch, DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).inputPath, output,
-                                    DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).fromInstance,
-                                    DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).toInstance, domainParams, runParams);
-                        }
-                    }
-                }
-
-                if(withDPS==true) {
-                    // Run DPS on the same epsilon values
-                    runParams.put("delta", -1);
-                    SearchAlgorithm dps = new DP("DPS", false, false, false); // A
-                    // bounded-suboptimal
-                    // algorithm
-                    runParams.put("searcher", dps.getClass().getSimpleName());
-                    for (double epsilon : epsilons) {
-                        runParams.put("epsilon", epsilon);
-                        dps.setAdditionalParameter("weight", "" + (1 + epsilon));
-                        runner.run(domainClass, dps, DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).inputPath, output,
-                                DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).fromInstance,
-                                DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).toInstance, domainParams, runParams);
-                    }
-                }
-
-            } catch (IOException e) {
-                logger.error(e);
-            } finally {
-                if (output != null)
-                    output.close();
-            }
-        }
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 }

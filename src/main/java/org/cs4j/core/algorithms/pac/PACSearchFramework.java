@@ -107,6 +107,9 @@ public class PACSearchFramework implements SearchAlgorithm {
     public void setPACCondition(PACCondition condition){
         this.pacCondition=condition;
     }
+    public PACCondition getPACCondition(){
+        return this.pacCondition;
+    }
 
 
     /**
