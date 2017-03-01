@@ -107,18 +107,14 @@ public class PACExperimentRunner {
             logger.info("****************************** running threshold based ");
             runOracleCondition(domains);
         }
+
+        if(args[0].equals("RunFMin")){
+            logger.info("****************************** running f-min ");
+            runFMinConditions(domains);
+        }
     }
 
-    private static void runOracleCondition(Class[] domains) {
-        // Run trivial and ratio-based on all domains
-        double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
-        double[] deltas = { 0 };
-        Class[] pacConditions = new Class[]{OraclePACCondition.class};
-        Experiment experiment = new OracleExperiment();
 
-        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
-        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
-    }
 
     private static void collectStatisticsForOpenBased(Class[] domains) {
         OutputResult output=null;
@@ -148,6 +144,31 @@ public class PACExperimentRunner {
         // Run trivial and ratio-based on all domains
         double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
         double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
+
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
+        Experiment experiment = new StandardExperiment(psf);
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
+
+    private static void runOracleCondition(Class[] domains) {
+        // Run trivial and ratio-based on all domains
+        double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
+        double[] deltas = { 0 };
+        Class[] pacConditions = new Class[]{OraclePACCondition.class};
+        Experiment experiment = new OracleExperiment();
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
+
+    private static void runFMinConditions(Class[] domains) {
+        // Run trivial and ratio-based on all domains
+        double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
+        double[] deltas = { 0 };
+        Class[] pacConditions = new Class[]{FMinCondition.class};
 
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
