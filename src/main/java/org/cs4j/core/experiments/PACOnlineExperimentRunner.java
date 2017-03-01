@@ -35,13 +35,6 @@ public class PACOnlineExperimentRunner {
 
 		// search on this domain and algo and weight the 100 instances
 		for (int i = fromInstance; i <= toInstance; ++i) {
-			// Only solve for instances we can solve optimally @TODO: Make this a parameter to pass on
-			if(PACUtils.getOptimalSolutions(domainClass).containsKey(i)==false) {
-				//@
-				logger.info("Skipping instance "+i+" because we don't have an optimal solution for it");
-				continue;
-			}
-
 			logger.info("\rSolving " + domainClass.getName() + "\t instance " + i + "\t"+runParamsToLog(runParams));
 			domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 			experiment.run(domain, output, i, runParams);
@@ -106,7 +99,7 @@ public class PACOnlineExperimentRunner {
 						true);
 				this.printResultsHeaders(output, runParams);
 
-				PACUtils.loadPACStatistics(domainClass);
+				PACUtils.getPACStatistics(domainClass); // Loads the statistics from the disk
 				for (Class pacConditionClass : pacConditions) {
 					runParams.put("pacCondition", pacConditionClass.getSimpleName());
 					for (double epsilon : epsilons) {

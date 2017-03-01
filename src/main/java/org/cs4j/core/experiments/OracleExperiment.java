@@ -31,7 +31,7 @@ public class OracleExperiment extends StandardExperiment {
     @Override
     public void run(SearchDomain instance,  OutputResult output, int instanceId, SortedMap<String, Object> runParams) {
         // @TODO: Very ineffecicent: parse input file for every instance
-        Double optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
 
         if(optimalSolution==null){
             logger.info("No known optimal solution for instance "+instance + " in domain "+instance.getClass().getSimpleName());

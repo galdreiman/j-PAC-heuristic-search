@@ -105,7 +105,7 @@ public class TestPacSearchFramework {
         result = apts.getTotalSearchResults();
         Assert.assertTrue(result.hasSolution());
         double observedOptimal = result.getBestSolution().getCost();
-        double expectedOptimal = PACUtils.getOptimalSolutions(GridPathFinding.class).get(1);
+        double expectedOptimal = PACUtils.getOptimalSolution(GridPathFinding.class,1);
 
         Assert.assertEquals(expectedOptimal,observedOptimal);
     }
@@ -114,7 +114,7 @@ public class TestPacSearchFramework {
     public void testPACOptimal() throws FileNotFoundException {
         SearchDomain domain = TestUtils.createGridPathFinding("brc202d.map","1");
         //AnytimeSearchAlgorithm apts = new AnytimePTS();
-        double optimal = PACUtils.getOptimalSolutions(GridPathFinding.class).get(1);
+        double optimal = PACUtils.getOptimalSolution(GridPathFinding.class,1);
 
         // Run PSF with epsilon and delta zero, and verify that the result in the optimal solution
         PACSearchFramework psf = new PACSearchFramework();
@@ -134,7 +134,7 @@ public class TestPacSearchFramework {
     public void testPACSubptimal() throws FileNotFoundException {
         SearchDomain domain = TestUtils.createGridPathFinding("brc202d.map","1");
         //AnytimeSearchAlgorithm apts = new AnytimePTS();
-        double optimal = PACUtils.getOptimalSolutions(GridPathFinding.class).get(1);
+        double optimal = PACUtils.getOptimalSolution(GridPathFinding.class,1);
 
         // Run PSF with epsilon and delta zero, and verify that the result in the optimal solution
         PACSearchFramework psf = new PACSearchFramework();

@@ -2,13 +2,9 @@ package org.cs4j.core.algorithms.pac;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
-import org.cs4j.core.mains.DomainExperimentData;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.*;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 
 /**
@@ -38,21 +34,23 @@ public class RatioBasedPACCondition extends ThresholdPACCondition {
      */
     @Override
     protected SortedMap<Double, Double> computeCDF(PACStatistics statistics){
-        Map<Integer,Double> instanceToOptimal = PACUtils.getOptimalSolutions(domain.getClass());
-        Map<Integer,Double> instanceToInitialH = PACUtils.getInitialHValues(domain.getClass());
+
+        PACStatistics domainStatistics = PACUtils.getPACStatistics(domain.getClass());
 
         // Building the PDF (  cost -> prob. that optimal is less than or equal to cost)
         SortedMap<Double, Double> ratioToPDF = new TreeMap<Double, Double>();
         double ratio;
-        for(Integer instance : instanceToOptimal.keySet()){
-            ratio = instanceToOptimal.get(instance)/instanceToInitialH.get(instance);
+        for(Integer instance : domainStatistics.instanceToOptimal.keySet()){
+            ratio = domainStatistics.instanceToOptimal.get(instance)/
+                    domainStatistics.instanceToInitialH.get(instance);
             if(ratioToPDF.containsKey(ratio)==false)
                 ratioToPDF.put(ratio,1.0);
             else
                 ratioToPDF.put(ratio,(ratioToPDF.get(ratio)+1));
         }
         for(Double cost : ratioToPDF.keySet())
-            ratioToPDF.put(cost,(ratioToPDF.get(cost)/instanceToOptimal.size()));
+            ratioToPDF.put(cost,(ratioToPDF.get(cost)/
+                    domainStatistics.instanceToOptimal.size()));
 
         // Building the CDF (cumulative)
         SortedMap<Double, Double>ratioToCDF = new TreeMap<Double, Double>();

@@ -30,7 +30,7 @@ public class TestOraclePACCondition {
         psf.setAdditionalParameter("epsilon", "1");
         psf.setAdditionalParameter("delta", "0");
 
-        Double optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
 
         SearchResult result = psf.search(instance);
@@ -51,7 +51,7 @@ public class TestOraclePACCondition {
         psf.setAdditionalParameter("delta", "0");
 
         logger.info("Run Oracle");
-        Double optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
         SearchResult result = psf.search(instance);
         Assert.assertTrue(result.hasSolution());
@@ -90,7 +90,7 @@ public class TestOraclePACCondition {
             for(int j=0;j<instances.length;j++){
                 instanceId = instances[j];
                 instance = ExperimentUtils.getSearchDomain(Pancakes.class, instanceId);
-                optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+                optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
                 pacCondition.setOptimalSolution(optimalSolution);
                 psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
                 psf.setPACCondition(pacCondition);
@@ -119,7 +119,7 @@ public class TestOraclePACCondition {
         psf.setAdditionalParameter("epsilon", "0.0");
         psf.setAdditionalParameter("delta", "0.0");
 
-        Double optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
         SearchResult result = psf.search(instance);
 
@@ -153,7 +153,7 @@ public class TestOraclePACCondition {
         psf.setAdditionalParameter("epsilon", "1.0");
         psf.setAdditionalParameter("delta", "0.0");
 
-        Double optimalSolution = PACUtils.getOptimalSolutions(instance.getClass()).get(instanceId);
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
 
         SearchResult result = psf.search(instance);

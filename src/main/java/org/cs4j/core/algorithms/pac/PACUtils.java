@@ -6,6 +6,7 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
@@ -23,15 +24,64 @@ public class PACUtils {
     private static Map<Class, PACStatistics> domainToPACStatistics
             = new HashMap<>();
 
-    public static Map<Integer,Double> getOptimalSolutions(Class domainClass)
+    public static PACStatistics getPACStatistics(Class domainClass)
     {
-        String inputFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath+"/optimalSolutions.in";
-        return parseFileWithPairs(inputFile);
+        // If already cached, no need to parse from disk
+        if(domainToPACStatistics.containsKey(domainClass))
+            return domainToPACStatistics.get(domainClass);
+
+        String statisticsFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath
+                +File.separator+PACStatistics.STATISTICS_FILE_NAME;
+        PACStatistics statistics =  parsePACStatisticsFile(statisticsFile);
+        domainToPACStatistics.put(domainClass,statistics);
+        return statistics;
+
     }
-    public static Map<Integer,Double> getInitialHValues(Class domainClass)
-    {
-        String inputFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath+"/initialHValues.csv";
-        return parseFileWithPairs(inputFile);
+
+    public static Double getOptimalSolution(Class domainClass, int instance){
+        return getPACStatistics(domainClass).instanceToOptimal.get(instance);
+    }
+
+    /**
+     * Internal helper function that parses the file with the basic PAC statistics (h(s), h*(s))
+     * @param inputFile input file for this domain
+     */
+    private static PACStatistics parsePACStatisticsFile(String inputFile){
+        Map<Integer,Double> instanceToInitialH= new TreeMap<>();
+        Map<Integer,Double> instanceToOptimal= new TreeMap<>();
+        try{
+            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
+            String line;
+            String[] parts;
+
+            // Handle first line if headers, if such exists
+            reader.readLine(); // Ignore the first row - it is for the column headers
+            line = reader.readLine();
+            int instanceId;
+            Double optimal;
+            Double initialH;
+            while(line!=null){
+                parts = line.split(",");
+                instanceId = (int)(Double.parseDouble(parts[0]));
+                optimal = Double.parseDouble(parts[1]);
+                initialH = Double.parseDouble(parts[2]);
+
+                instanceToOptimal.put(instanceId,optimal);
+                instanceToInitialH.put(instanceId,initialH);
+                line = reader.readLine();
+            }
+            reader.close();
+        }
+        catch(IOException e){
+            logger.error("Cannot load statistics",e);
+            throw new RuntimeException(e);
+        }
+
+        PACStatistics statistics = new PACStatistics();
+        statistics.instanceToOptimal=instanceToOptimal;
+        statistics.instanceToInitialH=instanceToInitialH;
+
+        return statistics;
     }
 
     /**
@@ -80,71 +130,12 @@ public class PACUtils {
         return  tuples;
     }
 
-    /**
-     * Internal helper function that parses a file with 2 columsn to a map
-     * @param inputFile input file
-     */
-    private static Map<Integer,Double> parseFileWithPairs(String inputFile){
-        Map<Integer,Double> keyToValue= new TreeMap<>();
-        try{
-            BufferedReader reader = new BufferedReader(new FileReader(inputFile));
-            String line = reader.readLine();
-            String[] parts;
-
-            // Handle first line if headers, if such exists
-            parts = line.split(",");
-            if(isDouble(parts[1])==false)// Then this is a header row and should ignore it
-                line = reader.readLine();
-
-            while(line!=null){
-                parts = line.split(",");
-                keyToValue.put(Integer.parseInt(parts[0]), Double.parseDouble(parts[1]));
-                line = reader.readLine();
-            }
-            reader.close();
-        }
-        catch(IOException e){
-            logger.error("Cannot load statistics",e);
-            throw new RuntimeException(e);
-        }
-        return keyToValue;
-    }
-
     public static PACStatistics getStatisticsFile(PACCondition condition, Class domainClass){
         return domainToPACStatistics.get(domainClass);
     }
     public static void setStatisticFile(PACCondition condition, Class domainClass,PACStatistics statistics){
         domainToPACStatistics.put(domainClass,statistics);
     }
-
-
-    /**
-     * Check if a string is convertable to double
-     */
-    private static boolean isDouble(String text){
-        try
-        {
-            Double.parseDouble(text);
-        }
-        catch(NumberFormatException nfe)
-        {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Load PAC statistics for the given domain
-     * @param domainClass the class of domains for which to load statistics
-     */
-    public static void loadPACStatistics(Class domainClass)
-    {
-        PACStatistics pacStatistics = new PACStatistics();
-        pacStatistics.instanceToInitialH = getInitialHValues(domainClass);
-        pacStatistics.instanceToOptimal= getOptimalSolutions(domainClass);
-        setStatisticFile(null,domainClass,pacStatistics);
-    }
-
 
 
     /**
@@ -193,5 +184,12 @@ public class PACUtils {
         }
 
         return ratioToCDF;
+    }
+
+    /**
+     * Loads the statistics from disk to memory
+     */
+    public static void loadPACStatistics(Class domainClass) {
+        getPACStatistics(domainClass);
     }
 }
