@@ -22,27 +22,19 @@ public class PACExperimentRunner {
 
 
     public static void main(String[] args) throws ClassNotFoundException {
+        Class[] domains=new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
+        if(args.length>1){
+            Class domainClass= Class.forName(args[1]);
+            domains = new Class[]{domainClass};
+        }
+
         if(args[0].equals("Collect")) {
             logger.info("****************************** collecting stats for open based ");
-            if(args.length>1){
-                Class domainClass= Class.forName(args[1]);
-                collectStatisticsForOpenBased(new Class[]{domainClass});
-            }
-            else {
-                collectStatisticsForOpenBased(new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class});
-            }
-            return;
+            collectStatisticsForOpenBased(domains);
         }
         if(args[0].equals("Run")) {
             logger.info("****************************** running threshold based ");
-            if(args.length>1){
-                Class domainClass= Class.forName(args[1]);
-                runThresholdBasedConditions(new Class[]{domainClass},false);
-            }
-            else {
-                runThresholdBasedConditions(new Class[]{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class},false);
-            }
-            return;
+            runThresholdBasedConditions(domains,false);
         }
     }
 
@@ -73,7 +65,7 @@ public class PACExperimentRunner {
     private static void runThresholdBasedConditions(Class[] domains, boolean withDPS) {
         // Run trivial and ratio-based on all domains
         Class[] pacConditions = { TrivialPACCondition.class, RatioBasedPACCondition.class, FMinCondition.class };
-        double[] epsilons = { 0, 0.1, 0.25, 0.5, 0.75, 1 };// ,1 ,1.5};
+        double[] epsilons = { 1, 0.75, 0.5, 0.25, 0.1,0};// ,1 ,1.5};
         double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
         SortedMap<String, String> domainParams = new TreeMap<>();
         SortedMap<String, Object> runParams = new TreeMap<>();
