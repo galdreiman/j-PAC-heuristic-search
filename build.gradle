@@ -2,6 +2,7 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
 
+
 tasks.withType(JavaCompile) {
     options.warnings = false
 }

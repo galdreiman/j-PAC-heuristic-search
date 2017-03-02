@@ -98,7 +98,7 @@ public class PACExperimentRunner {
         boolean classesFound=false;
         int i;
         for(i=0;i<args.length;i++){
-            if(args[i].equals("-PACCondition")) {
+            if(args[i].equals("-pacCondition")) {
                 classesFound=true;
                 break;
             }

@@ -1,6 +1,5 @@
 package org.cs4j.core.test.algorithms.pac;
 
-import com.sun.org.apache.regexp.internal.RESyntaxException;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
@@ -9,8 +8,10 @@ import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
+import org.cs4j.core.test.algorithms.TestUtils;
 import org.junit.Test;
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 /**
@@ -48,8 +49,32 @@ public class TestThresholdPACConditions {
         result.getExtras().put("fmin",1.0);
 
         Assert.assertTrue("Should have halted",pacCondition.shouldStop(result));
-
     }
+
+
+    @Test
+    public void testFMinDelta() throws FileNotFoundException {
+        SearchDomain domain = TestUtils.createDockyardRobot("52");
+
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
+        psf.setPACCondition(new FMinCondition());
+
+        // Zero delta
+        psf.setAdditionalParameter("epsilon","0.0");
+        psf.setAdditionalParameter("delta","0.0");
+        SearchResult result = psf.search(domain);
+        long expanded0 = result.getExpanded();
+
+        psf.setAdditionalParameter("delta","1.0");
+        result = psf.search(domain);
+        long expanded1 = result.getExpanded();
+        Assert.assertEquals(expanded0,expanded1);
+        logger.info(expanded0);
+        logger.info(expanded1);
+    }
+
+
 
     public void testDeltaEffect(PACCondition condition){
         Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
