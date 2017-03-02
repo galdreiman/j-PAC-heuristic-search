@@ -9,10 +9,7 @@ import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Roni Stern on 28/02/2017.
@@ -24,7 +21,7 @@ public class PACExperimentRunner {
 
 
     //@TODO: Replace all this with better handling of command line using some known code to do so
-    private static Class[] getClassesFromCommandLine(String[] args){
+    private Class[] getClassesFromCommandLine(String[] args){
         // Default classes
         boolean classesFound=false;
         int i;
@@ -60,7 +57,7 @@ public class PACExperimentRunner {
     /**
      * Read epsilon valuse from command line
      */
-    private static double[] getEpsilonValuesFromCommandLine(String[] args){
+    private double[] getEpsilonValuesFromCommandLine(String[] args){
         // Default classes
         boolean epislonsFound=false;
         int i;
@@ -96,7 +93,7 @@ public class PACExperimentRunner {
         return epsilons;
     }
 
-    private static Class[] getPACConditionsFromCommandLine(String[] args){
+    private Class[] getPACConditionsFromCommandLine(String[] args){
         // Default classes
         boolean classesFound=false;
         int i;
@@ -129,33 +126,7 @@ public class PACExperimentRunner {
         return pacConditionsList.toArray(new Class[]{});
     }
 
-    public static void main(String[] args) throws ClassNotFoundException {
-        Class[] domains=getClassesFromCommandLine(args);
-        Class[] pacConditions = getPACConditionsFromCommandLine(args);
-        double[] epsilonValues = getEpsilonValuesFromCommandLine(args);
-        if(args[0].equals("Collect")) {
-            logger.info("****************************** collecting stats for open based ");
-            collectStatisticsForOpenBased(domains);
-        }
-        if(args[0].equals("Run")) {
-            logger.info("****************************** running threshold based ");
-            runThresholdBasedConditions(domains,pacConditions,epsilonValues);
-        }
-
-        if(args[0].equals("RunOracle")) {
-            logger.info("****************************** running threshold based ");
-            runOracleCondition(domains,epsilonValues);
-        }
-
-        if(args[0].equals("RunFMin")){
-            logger.info("****************************** running f-min ");
-            runFMinConditions(domains,epsilonValues);
-        }
-    }
-
-
-
-    private static void collectStatisticsForOpenBased(Class[] domains) {
+    private void collectStatisticsForOpenBased(Class[] domains) {
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
@@ -179,7 +150,32 @@ public class PACExperimentRunner {
         }
     }
 
-    private static void runThresholdBasedConditions(Class[] domains,Class[] pacConditions,double[] epsilons) {
+    /**
+     * Collects statistics for the threshold based  PAC conditions
+     * @param domains list of classes
+     */
+    private void collectStatisticsForThresholdBased(Class[] domains){
+        OutputResult output=null;
+        PacPreprocessRunner generator = new PacPreprocessRunner();
+        HashMap<String, String> domainParams = new HashMap<>();
+        for(Class domainClass : domains) {
+            logger.info("Running anytime for domain " + domainClass.getName());
+            try {
+                // Prepare experiment for a new domain
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
+                        "ThesholdBasedStatisticsGenerator", -1, -1, null, false, true);
+                generator.run(domainClass,domainParams);
+                output.close();
+            }catch(IOException e){
+                logger.error(e);
+            }finally{
+                if(output!=null)
+                    output.close();
+            }
+        }
+    }
+
+    private void runThresholdBasedConditions(Class[] domains,Class[] pacConditions,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
 
@@ -191,7 +187,7 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
-    private static void runOracleCondition(Class[] domains,double[] epsilons) {
+    private void runOracleCondition(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = { 0 };
         Class[] pacConditions = new Class[]{OraclePACCondition.class};
@@ -201,7 +197,7 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
-    private static void runFMinConditions(Class[] domains,double[] epsilons) {
+    private void runFMinConditions(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = { 0 };
         Class[] pacConditions = new Class[]{FMinCondition.class};
@@ -212,5 +208,37 @@ public class PACExperimentRunner {
 
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
+
+
+
+    public static void main(String[] args) throws ClassNotFoundException {
+        PACExperimentRunner runner = new PACExperimentRunner();
+
+        Class[] domains=runner.getClassesFromCommandLine(args);
+        Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
+        double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
+        if(args[0].equals("CollectOpenBased")) {
+            logger.info("****************************** collecting stats for open based ");
+            runner.collectStatisticsForOpenBased(domains);
+        }
+        if(args[0].equals("CollectThresholdBased")) {
+            logger.info("****************************** collecting stats for open based ");
+            runner.collectStatisticsForThresholdBased(domains);
+        }
+        if(args[0].equals("Run")) {
+            logger.info("****************************** running threshold based ");
+            runner.runThresholdBasedConditions(domains,pacConditions,epsilonValues);
+        }
+
+        if(args[0].equals("RunOracle")) {
+            logger.info("****************************** running threshold based ");
+            runner.runOracleCondition(domains,epsilonValues);
+        }
+
+        if(args[0].equals("RunFMin")){
+            runner.logger.info("****************************** running f-min ");
+            runner.runFMinConditions(domains,epsilonValues);
+        }
     }
 }

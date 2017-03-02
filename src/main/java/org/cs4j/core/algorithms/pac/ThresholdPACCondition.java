@@ -53,7 +53,7 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
 
         // Compute threshold
         threshold = this.computeThreshold(epsilon,delta,costToCDF);
-        logger.info("Threshold is set to " + this.threshold);
+        logger.info("Threshold for epsilon="+epsilon+" and delta="+delta+" is set to " + this.threshold);
     }
 
     @Override
@@ -112,16 +112,16 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
      * @return the maximal cost that ensured these PAC parameters
      */
     public double computeThreshold(double epsilon, double delta,SortedMap<Double, Double> costToCDF){
-        Double oldCdfValue = 0.0;
-        double cdfValue;
+        Double oldCdfCost = 0.0;
+        double cdfValue=0.0;
         for(Double cost : costToCDF.keySet()) { // Note that costsToCDF is a sorted list!
             cdfValue=costToCDF.get(cost);
             if(cdfValue==delta)
                 return cost*(1+epsilon);
             if (cdfValue>delta)
-                return oldCdfValue*(1+epsilon);
-            oldCdfValue=cdfValue;
+                return oldCdfCost*(1+epsilon);
+            oldCdfCost=cost;
         }
-        throw new IllegalStateException("CDF must sum up to one, so delta value must be met (delta was "+delta+" and last CDF value was "+oldCdfValue+")");
+        throw new IllegalStateException("CDF must sum up to one, so delta value must be met (delta was "+delta+" and last CDF value was "+cdfValue+")");
     }
 }

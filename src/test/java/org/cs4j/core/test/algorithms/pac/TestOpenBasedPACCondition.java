@@ -5,6 +5,7 @@ import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.DP;
+import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.OpenBasedPACCondition;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
@@ -47,10 +48,15 @@ public class TestOpenBasedPACCondition {
 
     @Test
     public void testPACSF() {
-        SearchDomain instance = ExperimentUtils.getSearchDomain(Pancakes.class, 51);
-        SearchAlgorithm dps = new DP("DPS", false, false, false); // A
+        SearchResult result;
 
-        SearchResult result = dps.search(instance);
+        SearchDomain instance = ExperimentUtils.getSearchDomain(Pancakes.class, 51);
+        SearchAlgorithm wasatr = new WAStar();
+        wasatr.setAdditionalParameter("weight","2.0");
+        result = wasatr.search(instance);
+        Assert.assertTrue(result.hasSolution());
+
+        SearchAlgorithm dps = new DP("DPS", false, false, false); // A
         Assert.assertTrue(result.hasSolution());
     }
 

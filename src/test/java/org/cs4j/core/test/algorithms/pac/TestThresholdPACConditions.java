@@ -1,14 +1,12 @@
 package org.cs4j.core.test.algorithms.pac;
 
+import com.sun.org.apache.regexp.internal.RESyntaxException;
 import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.SearchResultImpl;
-import org.cs4j.core.algorithms.pac.PACCondition;
-import org.cs4j.core.algorithms.pac.PACUtils;
-import org.cs4j.core.algorithms.pac.RatioBasedPACCondition;
-import org.cs4j.core.algorithms.pac.TrivialPACCondition;
+import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.junit.Test;
@@ -31,8 +29,61 @@ public class TestThresholdPACConditions {
     @Test
     public void testTrivialSetup()    {
         testSetup(new TrivialPACCondition());
+        testDeltaEffect(new TrivialPACCondition());
     }
 
+    @Test
+    public void TestThresholdTooLow(){
+        int instanceId = 52;
+        Double delta = 0.25;
+        Double epsilon = 0.1;
+
+        PACUtils.loadPACStatistics(DockyardRobot.class);
+        TrivialPACCondition pacCondition = new TrivialPACCondition();
+        SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class,
+                instanceId); // Arbitrary instance
+        pacCondition.setup(instance,epsilon,delta);
+
+        SearchResult result = new SearchResultsStub(50);
+        result.getExtras().put("fmin",1.0);
+
+        Assert.assertTrue("Should have halted",pacCondition.shouldStop(result));
+
+    }
+
+    public void testDeltaEffect(PACCondition condition){
+        Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        SearchDomain instance;
+        PACSearchFramework psf;
+        SearchResult result;
+        int instanceId = 52;
+        double oldExpanded;
+        double newExpanded;
+        for(Class domainClass :domains){
+            logger.info("Testing domain " + domainClass.getName());
+            for(Double epsilon : new Double[]{0.0,0.1, 0.25, 0.5, 0.75, 1.0}){
+                oldExpanded = Double.MAX_VALUE;
+                for(Double delta : new Double[]{0.0,0.1, 0.25, 0.5, 0.75, 1.0}){
+                    logger.info("Testing eps="+epsilon+",delta="+delta);
+                    PACUtils.loadPACStatistics(domainClass);
+                    psf = new PACSearchFramework();
+                    psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
+                    psf.setPACCondition(condition);
+                    psf.setAdditionalParameter("delta",""+delta);
+                    psf.setAdditionalParameter("epsilon",""+epsilon);
+
+                    instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+                    result = psf.search(instance);
+
+                    Assert.assertTrue(result.hasSolution());
+                    newExpanded = result.getExpanded();
+                    Assert.assertTrue("oldExpanded="+oldExpanded+", newExpanded="+newExpanded,
+                            oldExpanded>=newExpanded);
+                    oldExpanded = result.getExpanded();
+                }
+            }
+        }
+    }
 
     /**
      * Tests the setup function of a given condition and some extreme values

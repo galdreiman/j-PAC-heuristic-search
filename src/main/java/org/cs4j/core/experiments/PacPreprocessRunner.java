@@ -21,6 +21,14 @@ public class PacPreprocessRunner {
 
 	final static Logger logger = Logger.getLogger(PacPreprocessRunner.class);
 
+	public double[] run(Class domainClass, HashMap<String, String> domainParams) {
+		String inputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).inputPath;
+		String outputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).outputPath;
+		int fromInstance = DomainExperimentData.get(domainClass, RunType.TRAIN).fromInstance;
+		int toInstance = DomainExperimentData.get(domainClass, RunType.TRAIN).toInstance;
+		return run(domainClass,inputPath,outputPath,fromInstance,toInstance,domainParams);
+	}
+
 	public double[] run(Class domainClass, String inputPath, String outputPath, int startInstance,
 			int stopInstance, HashMap<String, String> domainParams) {
 
