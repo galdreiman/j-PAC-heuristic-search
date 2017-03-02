@@ -6,6 +6,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.domains.*;
 import org.junit.Assert;
+import org.junit.Test;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,5 +82,11 @@ public class TestUtils {
         Assert.assertTrue(result.getExpanded() == expanded);
         Assert.assertTrue(sol.getCost() == cost);
         Assert.assertTrue(sol.getLength() == cost);
+    }
+
+    @Test
+    public void testStub(){
+        // This test is a santify check. Also, Gradle runs crazy if I have a Test class without a test (fails on build task)
+        Assert.assertTrue(1==1);
     }
 }
