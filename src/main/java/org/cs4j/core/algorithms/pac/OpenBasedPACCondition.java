@@ -31,8 +31,13 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
-        if(this.incumbent>=0)
-            return this.probNotSuboptimal<=this.delta;
+        if(this.incumbent>=0) {
+            if(this.probNotSuboptimal <= this.delta){
+                conditionFired = Condition.OPEN_BASED;
+                return this.probNotSuboptimal <= this.delta;
+            }
+            return false;
+        }
         else
             return false;
     }
@@ -49,7 +54,9 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
      */
     @Override
     protected void prepareStatistics(){
-        this.hToCdf = this.createCDFs();
+        List<Tuple<Double,Double>> hToOptimalTuples = PACUtils.getHtoOptimalTuples(this.domain.getClass());
+        List<Double> hRanges = this.computeHRanges(hToOptimalTuples);
+        this.hToCdf = this.createCDFs(hRanges, hToOptimalTuples);
 
         // Dump statistics (for DEBUG)
         dumpCDFsToFile();
@@ -125,20 +132,6 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             }
         }while(i<hToOptimalTuples.size()-1);
         return hToCDF;
-    }
-
-
-    /**
-     * Builds a CDF of the h-ratios, but group by according to the h ranges
-     * Assumed that the given h values and hratios are correlated
-     * and sorted by ascending order
-     *
-     * @return hToCdf - maps an value to a CDF of optimal to h ratios
-     */
-    public SortedMap<Double, SortedMap<Double,Double>>  createCDFs(){
-        List<Tuple<Double,Double>> hToOptimalTuples = PACUtils.getHtoOptimalTuples(this.domain.getClass());
-        List<Double> hRanges = this.computeHRanges(hToOptimalTuples);
-        return this.createCDFs(hRanges, hToOptimalTuples);
     }
 
     /**
@@ -232,7 +225,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
                 return 1-cdf.get(ratio); // @TODO: This is a conservative estimate
 
         }
-        throw new IllegalStateException("CDF must sum up to one, so delta value must be met (delta was "+delta+" and last CDF value was "+oldCdfValue+")");
+        return 0;
     }
 
     /**
@@ -265,6 +258,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
      */
     public void setFmin(double fmin){
         this.fmin=fmin;
+        if(this.incumbent<0) return;
         if(this.incumbent/this.fmin < (1+this.epsilon)) {
             this.conditionFired=Condition.FMIN;
             throw new PACConditionSatisfied(this);

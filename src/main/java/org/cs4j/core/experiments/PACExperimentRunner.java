@@ -199,6 +199,17 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
+    private void runOpenBased(Class[] domains,double[] epsilons, double[] deltas) {
+        // Run trivial and ratio-based on all domains
+        Class[] pacConditions = new Class[]{OpenBasedPACCondition.class};
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        Experiment experiment = new StandardExperiment(psf);
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
+
     private void runFMinConditions(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = { 0 };
@@ -220,6 +231,11 @@ public class PACExperimentRunner {
         Class[] domains=runner.getClassesFromCommandLine(args);
         Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
         double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
+        if(args[0].equals("OpenBased")){
+            logger.info("********** OPEN BASED CONDITION");
+            runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
+        }
+
         if(args[0].equals("CollectOpenBased")) {
             logger.info("****************************** collecting stats for open based ");
             runner.collectStatisticsForOpenBased(domains);

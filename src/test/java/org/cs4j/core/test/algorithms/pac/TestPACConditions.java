@@ -6,7 +6,10 @@ import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.*;
-import org.cs4j.core.domains.*;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.test.algorithms.TestUtils;
 import org.junit.Test;
@@ -19,13 +22,11 @@ import java.util.List;
  *
  * Test case for the threshold-based  PAC condition
  */
-public class TestThresholdPACConditions {
+public class TestPACConditions {
 
-    final static Logger logger = Logger.getLogger(TestThresholdPACConditions.class);
-    @Test
-    public void testRatioBased(){
-        testSetup(new RatioBasedPACCondition());
-    }
+    final static Logger logger = Logger.getLogger(TestPACConditions.class);
+
+
 
     @Test
     public void testTrivialSetup()    {
@@ -37,6 +38,14 @@ public class TestThresholdPACConditions {
         testSetup(new FMinCondition());
         testDeltaEffect(FMinCondition.class);
     }
+
+    @Test
+    public void testRatioBased()    {
+        testSetup(new RatioBasedPACCondition());
+        testDeltaEffect(RatioBasedPACCondition.class);
+    }
+
+
     @Test
     public void testThresholdTooLow(){
         int instanceId = 52;
@@ -127,7 +136,7 @@ public class TestThresholdPACConditions {
     private void testSetup(PACCondition condition){
 
         Class[] domains = {
-                FifteenPuzzle.class,
+                //FifteenPuzzle.class,
                 Pancakes.class,
                 VacuumRobot.class,
                 DockyardRobot.class,
@@ -143,7 +152,6 @@ public class TestThresholdPACConditions {
             // We don't want the f-min rule to be used here
             resultMax.getExtras().put("fmin",1.0);
             resultZero.getExtras().put("fmin",1.0);
-
             condition.setup(instance,0,0);
             Assert.assertFalse(condition.shouldStop(resultMax));
             Assert.assertTrue("Solution of cost zero must be PAC", condition.shouldStop(resultZero));

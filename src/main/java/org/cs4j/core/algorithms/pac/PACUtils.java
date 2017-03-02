@@ -90,10 +90,10 @@ public class PACUtils {
     public static List<Tuple<Double,Double>> getHtoOptimalTuples(Class domainClass)
     {
         DomainExperimentData domainDetails = DomainExperimentData.get(domainClass,RunType.TRAIN);
-        String inputFile = domainDetails.inputPath+"/openBasedStatistics.csv";
+        String inputFile = domainDetails.inputPath+"/open-statistics.in";
         List<Tuple<Double,Double>> tuples = new ArrayList<>();
         String[] parts;
-
+        double h,opt;
         // Read the tuples from the statistics file
         try{
             BufferedReader reader = new BufferedReader(new FileReader(inputFile));
@@ -103,8 +103,12 @@ public class PACUtils {
             while(line!=null) {
                 parts = line.split(",");
                 instance = Integer.parseInt(parts[0]);
-                if((instance>= domainDetails.fromInstance)&&(instance<=domainDetails.toInstance))
-                    tuples.add(new Tuple<>(Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
+                if((instance>= domainDetails.fromInstance)&&(instance<=domainDetails.toInstance)) {
+                    h = Double.parseDouble(parts[1]);
+                    opt = Double.parseDouble(parts[2]);
+                    if(opt>=0) // In some cases we didn't find the optimal solution, so skip thoseS
+                        tuples.add(new Tuple<>(h,opt));
+                }
 
                 line = reader.readLine();
             }
