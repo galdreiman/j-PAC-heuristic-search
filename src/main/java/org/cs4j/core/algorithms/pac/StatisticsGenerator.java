@@ -5,6 +5,7 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.algorithms.IDAstar;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.domains.*;
@@ -32,34 +33,57 @@ public class StatisticsGenerator {
      */
     private Map<Double,Double> runOnInstance(SearchDomain domain) throws IOException {
 
+        Double optimal;
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAdditionalParameter("epsilon","0.0");
         psf.setAdditionalParameter("delta","0.0");
         psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
         psf.setPACConditionClass(StatesCollector.class);
 
+        logger.info("Running anytime search to collect representative states... ");
         SearchResult result = psf.search(domain);
         StatesCollector collector = (StatesCollector) psf.getPACCondition();
 
-        WAStar optimalSolver = new WAStar();
-        optimalSolver.setAdditionalParameter("weight","1.0");
         SearchDomain.State state;
         Map<Double,Double> hToOptimal = new TreeMap<>();
         for(Double h : collector.hToRepresentativeState.keySet()){
+            logger.info("Collecting statistics for state representing states with h="+h+"...");
             state = domain.unpack(collector.hToRepresentativeState.get(h));
             domain.setInitialState(state);
-            result = optimalSolver.search(domain);
-            if(result.hasSolution()) {
-                hToOptimal.put(h,result.getBestSolution().getCost());
-            }
-            else{
-                hToOptimal.put(h,-1.0);
-            }
+
+            optimal = solveOptimally(domain);
+            hToOptimal.put(h,optimal);
+
         }
         return hToOptimal;
     }
 
+    /**
+     * Solve optimally the given instance
+     * @param domain the problem instance to solve
+     * @return the cost of the optimal solution, or -1 if not found
+     */
+    private Double solveOptimally(SearchDomain domain) {
+        WAStar optimalSolver = new WAStar();
+        optimalSolver.setAdditionalParameter("weight","1.0");
 
+        SearchResult result;
+        result = optimalSolver.search(domain);
+        if(result.hasSolution()) {
+            return result.getBestSolution().getCost();
+        }
+        else{
+            IDAstar idAstar = new IDAstar();
+            logger.info("A* failed, running IDA*...");
+            result= idAstar.search(domain);
+            if(result.hasSolution())
+                return result.getBestSolution().getCost();
+            else {
+                logger.warn("Couldn't solve an instance");
+                return -1.0;
+            }
+        }
+    }
 
 
     /**
