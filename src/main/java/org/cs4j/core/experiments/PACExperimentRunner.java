@@ -104,7 +104,7 @@ public class PACExperimentRunner {
             }
         }
         if(classesFound==false)
-            return new Class[]{TrivialPACCondition.class, ThresholdPACCondition.class,FMinCondition.class};
+            return new Class[]{TrivialPACCondition.class, RatioBasedPACCondition.class,FMinCondition.class};
 
         List<Class> pacConditionsList = new ArrayList<>();
         Class domainClass=null;

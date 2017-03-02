@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class DomainExperimentData {
 	public enum RunType {
-		TRAIN, TEST, ALL
+		TRAIN, TEST, ALL, DEBUG
 	}
 
 	private static final double TRAIN_PRESENTAGE = 0.5;
@@ -23,6 +23,10 @@ public class DomainExperimentData {
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataAll;
+
+	// This defined experiments data to be used for debugging purposes. It can be set from outside this class
+	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataDebugRange;
+
 	static {
         // All instances set configuration
         domainToExperimentDataAll = new HashMap<>();
@@ -46,6 +50,7 @@ public class DomainExperimentData {
 
 		domainToExperimentDataTrain = new HashMap<>();
         domainToExperimentDataTest = new HashMap<>();
+		domainToExperimentDataDebugRange = new HashMap<>();
 
         for(Class domainClass : domainToExperimentDataAll.keySet()){
             domainToExperimentDataTrain.put(domainClass,
@@ -53,9 +58,15 @@ public class DomainExperimentData {
             domainToExperimentDataTest.put(domainClass,
                     domainToExperimentDataAll.get(domainClass).subset(testStartIndex,
 							domainToExperimentDataAll.get(domainClass).toInstance));
+			domainToExperimentDataDebugRange.put(domainClass,
+					domainToExperimentDataAll.get(domainClass).subset(1,10));
         }
 	}
 
+	public static void setDebugRnage(int fromInstance, int toInstance){
+		domainToExperimentDataDebugRange.get(RunType.DEBUG).fromInstance=fromInstance;
+		domainToExperimentDataDebugRange.get(RunType.DEBUG).toInstance=toInstance;
+	}
 
     /**
      * Get the relevant DomainExperimentData for this class of domain and run confiuratino (train,test,all)
