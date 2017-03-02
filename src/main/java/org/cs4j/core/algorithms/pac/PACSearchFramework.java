@@ -98,7 +98,24 @@ public class PACSearchFramework implements SearchAlgorithm {
 
     @Override
     public String getName() {
-        return "PACSF("+this.anytimeSearchClass.getSimpleName()+","+this.pacConditionClass.getSimpleName()+")";
+        String anytimeSearchName;
+        String pacConditionName;
+
+        if(this.anytimeSearchAlgorithm!=null)
+            anytimeSearchName = this.anytimeSearchAlgorithm.getName();
+        else if (this.anytimeSearchClass!=null)
+            anytimeSearchName = this.anytimeSearchClass.getSimpleName();
+        else
+            anytimeSearchName = "None";
+
+        if(this.pacCondition!=null)
+            pacConditionName = this.pacCondition.getClass().getSimpleName();
+        else if (this.pacConditionClass!=null)
+            pacConditionName = this.pacConditionClass.getSimpleName();
+        else
+            pacConditionName = "None";
+
+        return "PACSF("+anytimeSearchName+","+pacConditionName+")";
     }
 
     public void setAnytimeSearchAlgorithm(AnytimeSearchAlgorithm algorithm){
