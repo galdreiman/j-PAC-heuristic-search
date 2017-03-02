@@ -19,39 +19,20 @@ public class TestOraclePACCondition {
     final static Logger logger = Logger.getLogger(TestOraclePACCondition.class);
 
     @Test
-    public void testOraclePACCondition() {
-        int instanceId=91;
-        SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class, instanceId);
-        PACSearchFramework psf = new PACSearchFramework();
-        OraclePACCondition pacCondition = new OraclePACCondition();
-
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(pacCondition);
-        psf.setAdditionalParameter("epsilon", "1");
-        psf.setAdditionalParameter("delta", "0");
-
-        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
-        pacCondition.setOptimalSolution(optimalSolution);
-
-        SearchResult result = psf.search(instance);
-        Assert.assertTrue(result.hasSolution());
-    }
-
-    @Test
     public void testPanacke54e01() {
         int instanceId=54;
         Double epsilon = 0.1;
         SearchDomain instance = ExperimentUtils.getSearchDomain(Pancakes.class, instanceId);
         PACSearchFramework psf = new PACSearchFramework();
-        OraclePACCondition pacCondition = new OraclePACCondition();
 
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(pacCondition);
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
         psf.setAdditionalParameter("epsilon", ""+0.1);
         psf.setAdditionalParameter("delta", "0");
 
         logger.info("Run Oracle");
         Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
+        OraclePACCondition pacCondition = (OraclePACCondition) psf.getPACCondition();
         pacCondition.setOptimalSolution(optimalSolution);
         SearchResult result = psf.search(instance);
         Assert.assertTrue(result.hasSolution());
@@ -61,8 +42,8 @@ public class TestOraclePACCondition {
 
 
         logger.info("Run Fmin");
-        FMinCondition fminCondition = new FMinCondition();
-        psf.setPACCondition(fminCondition);
+        psf.setPACConditionClass(FMinCondition.class);
+
         result = psf.search(instance);
         Assert.assertTrue(result.hasSolution());
         incumbent = result.getBestSolution().getCost();
@@ -77,7 +58,7 @@ public class TestOraclePACCondition {
     public void testOraclePACConditionInPancakes() {
         SearchDomain instance;
         PACSearchFramework psf = new PACSearchFramework();
-        OraclePACCondition pacCondition = new OraclePACCondition();
+        OraclePACCondition pacCondition;
         double epsilon=1;
         int[] instances = new int[]{51,52,53};
         SearchResult result=null;
@@ -90,10 +71,12 @@ public class TestOraclePACCondition {
             for(int j=0;j<instances.length;j++){
                 instanceId = instances[j];
                 instance = ExperimentUtils.getSearchDomain(Pancakes.class, instanceId);
+                psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+                psf.setPACConditionClass(OraclePACCondition.class);
+                pacCondition = (OraclePACCondition) psf.getPACCondition();
                 optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
                 pacCondition.setOptimalSolution(optimalSolution);
-                psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-                psf.setPACCondition(pacCondition);
+
                 psf.setAdditionalParameter("epsilon", "" + epsilon);
                 psf.setAdditionalParameter("delta", "0");
 
@@ -112,15 +95,17 @@ public class TestOraclePACCondition {
         int instanceId=53;
         SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class, instanceId);
         PACSearchFramework psf = new PACSearchFramework();
-        OraclePACCondition pacCondition = new OraclePACCondition();
+        OraclePACCondition pacCondition;
 
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(pacCondition);
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
         psf.setAdditionalParameter("epsilon", "0.0");
         psf.setAdditionalParameter("delta", "0.0");
 
+        pacCondition = (OraclePACCondition) psf.getPACCondition();
         Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
+
         SearchResult result = psf.search(instance);
 
         Assert.assertTrue(result.hasSolution());
@@ -132,16 +117,16 @@ public class TestOraclePACCondition {
         int instanceId=53;
         SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class, instanceId);
         PACSearchFramework psf = new PACSearchFramework();
-        OraclePACCondition pacCondition = new OraclePACCondition();
+        OraclePACCondition pacCondition;
 
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(pacCondition);
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
         psf.setAdditionalParameter("epsilon", "1.0");
         psf.setAdditionalParameter("delta", "0.0");
 
+        pacCondition = (OraclePACCondition) psf.getPACCondition();
         Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
         pacCondition.setOptimalSolution(optimalSolution);
-
         SearchResult result = psf.search(instance);
 
         Assert.assertTrue(result.hasSolution());
@@ -150,13 +135,15 @@ public class TestOraclePACCondition {
 
         logger.info("Search with eps=0.25");
         psf = new PACSearchFramework();
-        pacCondition = new OraclePACCondition();
-        pacCondition.setOptimalSolution(optimalSolution);
 
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(pacCondition);
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
         psf.setAdditionalParameter("epsilon", "0.25");
         psf.setAdditionalParameter("delta", "0.0");
+
+        pacCondition = (OraclePACCondition) psf.getPACCondition();
+        optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
+        pacCondition.setOptimalSolution(optimalSolution);
 
         result = psf.search(instance);
         Assert.assertTrue(result.hasSolution());

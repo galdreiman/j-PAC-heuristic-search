@@ -24,8 +24,8 @@ public class OracleExperiment extends StandardExperiment {
         super(new PACSearchFramework());
 
         PACSearchFramework psf = (PACSearchFramework)this.searchAlgorithm;
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(new OraclePACCondition());
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
     }
 
     @Override

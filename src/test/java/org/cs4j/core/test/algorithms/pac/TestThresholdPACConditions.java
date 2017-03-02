@@ -30,7 +30,7 @@ public class TestThresholdPACConditions {
     @Test
     public void testTrivialSetup()    {
         testSetup(new TrivialPACCondition());
-        testDeltaEffect(new TrivialPACCondition());
+        testDeltaEffect(TrivialPACCondition.class);
     }
 
     @Test
@@ -57,8 +57,8 @@ public class TestThresholdPACConditions {
         SearchDomain domain = TestUtils.createDockyardRobot("52");
 
         PACSearchFramework psf = new PACSearchFramework();
-        psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-        psf.setPACCondition(new FMinCondition());
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(FMinCondition.class);
 
         // Zero delta
         psf.setAdditionalParameter("epsilon","0.0");
@@ -76,7 +76,7 @@ public class TestThresholdPACConditions {
 
 
 
-    public void testDeltaEffect(PACCondition condition){
+    public void testDeltaEffect(Class<? extends PACCondition> conditionClass){
         Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
         SearchDomain instance;
         PACSearchFramework psf;
@@ -92,8 +92,8 @@ public class TestThresholdPACConditions {
                     logger.info("Testing eps="+epsilon+",delta="+delta);
                     PACUtils.loadPACStatistics(domainClass);
                     psf = new PACSearchFramework();
-                    psf.setAnytimeSearchAlgorithm(new AnytimePTS4PAC());
-                    psf.setPACCondition(condition);
+                    psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+                    psf.setPACConditionClass(conditionClass);
                     psf.setAdditionalParameter("delta",""+delta);
                     psf.setAdditionalParameter("epsilon",""+epsilon);
 

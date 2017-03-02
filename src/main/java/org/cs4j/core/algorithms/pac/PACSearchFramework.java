@@ -50,6 +50,42 @@ public class PACSearchFramework implements SearchAlgorithm {
         return POSSIBLE_PARAMETERS;
     }
 
+    public void setAnytimeSearchClass(Class<? extends AnytimeSearchAlgorithm> searchClass){
+        this.anytimeSearchClass = searchClass;
+        if(this.anytimeSearchAlgorithm==null) {
+            try {
+                Constructor constructor = this.anytimeSearchClass.getConstructor();
+                this.anytimeSearchAlgorithm= (AnytimeSearchAlgorithm) (constructor.newInstance());
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+    public void setPACConditionClass(Class<? extends PACCondition> pacConditionClass){
+        this.pacConditionClass= pacConditionClass;
+        // Create an instance of this class
+        Constructor constructor = null;
+        try {
+            constructor = this.pacConditionClass.getConstructor();
+            this.pacCondition = (PACCondition) (constructor.newInstance());
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void setAdditionalParameter(String parameterName, String value) {
         switch (parameterName) {
@@ -71,7 +107,7 @@ public class PACSearchFramework implements SearchAlgorithm {
             }
             case "anytimeSearch":
                 try {
-                    this.anytimeSearchClass = Class.forName(value);
+                    this.setAnytimeSearchClass((Class<? extends AnytimeSearchAlgorithm>) Class.forName(value));
                 } catch (ClassNotFoundException e) {
                     throw new IllegalArgumentException("Anytime Search Algorithm "+value+" is not a valid class name");
                 }
@@ -81,7 +117,7 @@ public class PACSearchFramework implements SearchAlgorithm {
                 break;
             case "pacCondition":
                 try {
-                    this.pacConditionClass = Class.forName(value);
+                    this.setPACConditionClass((Class<? extends PACCondition>) Class.forName(value));
                 } catch (ClassNotFoundException e) {
                     throw new IllegalArgumentException("PAC condition "+value+" is not a valid class name");
                 }
@@ -118,12 +154,7 @@ public class PACSearchFramework implements SearchAlgorithm {
         return "PACSF("+anytimeSearchName+","+pacConditionName+")";
     }
 
-    public void setAnytimeSearchAlgorithm(AnytimeSearchAlgorithm algorithm){
-        this.anytimeSearchAlgorithm=algorithm;
-    }
-    public void setPACCondition(PACCondition condition){
-        this.pacCondition=condition;
-    }
+
     public PACCondition getPACCondition(){
         return this.pacCondition;
     }
@@ -135,8 +166,8 @@ public class PACSearchFramework implements SearchAlgorithm {
      */
     @Override
     public SearchResult search(SearchDomain domain) {
-        this.setupAnytimeSearchAlgorithm();
-        this.setupPacCondition(domain,this.epsilon,this.delta);
+
+        this.pacCondition.setup(domain, epsilon,delta);
         if(anytimeSearchAlgorithm instanceof AnytimePACSearch)
             ((AnytimePACSearch)anytimeSearchAlgorithm).setPacCondition(pacCondition);
 
@@ -156,50 +187,5 @@ public class PACSearchFramework implements SearchAlgorithm {
             logger.info(conditionSatisfied.getClass().getSimpleName());
         }
         return anytimeSearchAlgorithm.getTotalSearchResults();
-    }
-
-
-    /**
-     * Setup the anytimeSearchAlgorithm, creating it if necessary
-     */
-    private void setupAnytimeSearchAlgorithm()
-    {
-        if(this.anytimeSearchAlgorithm==null) {
-            try {
-                Constructor constructor = this.anytimeSearchClass.getConstructor();
-                this.anytimeSearchAlgorithm= (AnytimeSearchAlgorithm) (constructor.newInstance());
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            } catch (InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
-
-    /**
-     * Setup the PAC condition, creating it if necessary
-     */
-    private void setupPacCondition(SearchDomain domain, double epsilon, double delta)
-    {
-        if(this.pacCondition==null){
-            Constructor constructor = null;
-            try {
-                constructor = this.pacConditionClass.getConstructor();
-                this.pacCondition = (PACCondition) (constructor.newInstance());
-            } catch (NoSuchMethodException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InstantiationException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
-        this.pacCondition.setup(domain, epsilon,delta);
     }
 }

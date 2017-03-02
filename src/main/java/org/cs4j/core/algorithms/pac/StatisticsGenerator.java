@@ -27,23 +27,19 @@ public class StatisticsGenerator {
     /**
      * Generate the statistics for this instance
      * @param domain
-     * @param anytimeSearcher
      * @return an h to optimal map generated from random states from the search space
      * of solving the given domain.
      */
-    private Map<Double,Double> runOnInstance(SearchDomain domain,
-                                      SearchAwarePACSearch anytimeSearcher) throws IOException {
+    private Map<Double,Double> runOnInstance(SearchDomain domain) throws IOException {
 
-
-        StatesCollector collector = new StatesCollector();
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAdditionalParameter("epsilon","0.0");
         psf.setAdditionalParameter("delta","0.0");
-        psf.setPACCondition(collector);
-        psf.setAnytimeSearchAlgorithm(anytimeSearcher);
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        psf.setPACConditionClass(StatesCollector.class);
 
         SearchResult result = psf.search(domain);
-
+        StatesCollector collector = (StatesCollector) psf.getPACCondition();
         //logger.info("Solution found? " + result.hasSolution());
         //for(Double h : collector.hToCount.keySet())
         //  logger.info(h+","+collector.hToCount.get(h));
@@ -173,7 +169,7 @@ public class StatisticsGenerator {
                 // Read domain from file
                 logger.info("\rGenerating statistics for " + domainClass.getName() + "\t instance " + i);
                 domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
-                hToOptimal = runOnInstance(domain,new SearchAwarePACSearchImpl());
+                hToOptimal = runOnInstance(domain);
                 logger.info("Statistics generated!");
 
                 for(Double h : hToOptimal.keySet()) {

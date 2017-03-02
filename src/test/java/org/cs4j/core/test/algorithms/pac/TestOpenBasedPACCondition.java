@@ -65,8 +65,8 @@ public class TestOpenBasedPACCondition {
     public void testOpenBasedInSearch() {
         SearchDomain instance = ExperimentUtils.getSearchDomain(Pancakes.class, 51);
         PACSearchFramework psf = new PACSearchFramework();
-        psf.setAnytimeSearchAlgorithm(new SearchAwarePACSearchImpl());
-        psf.setPACCondition(new OpenBasedPACCondition());
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        psf.setPACConditionClass(OpenBasedPACCondition.class);
         psf.setAdditionalParameter("epsilon", "1");
         psf.setAdditionalParameter("delta", "1");
 
