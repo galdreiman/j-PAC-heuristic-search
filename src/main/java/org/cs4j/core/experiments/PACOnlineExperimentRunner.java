@@ -101,12 +101,12 @@ public class PACOnlineExperimentRunner {
 
 				PACUtils.getPACStatistics(domainClass); // Loads the statistics from the disk
 				for (Class pacConditionClass : pacConditions) {
-					runParams.put("pacCondition", pacConditionClass.getSimpleName());
+					logger.info("******** Running PAC Condition"+pacConditionClass.getSimpleName());
+					runParams.put("pacCondition", pacConditionClass.getName());
 					for (double epsilon : epsilons) {
 						runParams.put("epsilon", epsilon);
 						for (double delta : deltas) {
 							runParams.put("delta", delta);
-							runParams.put("pacCondition", pacConditionClass.getName());
 							this.run(experiment,domainClass, RunType.TEST, output,
 									domainParams, runParams);
 						}

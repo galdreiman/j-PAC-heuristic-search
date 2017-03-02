@@ -20,10 +20,10 @@ def compute_gains():
     # 9 delta
     # 10 epsilon
     # 11 pacCondition
-    domain = "GridPathFinding"
+    domain = "pancakes"
     print "##### Input"
     epsilons = []
-    input = open('../../../results/summary/conditions-%s.csv' % domain,'r')
+    input = open('../../../results/alone/conditions-PAC%s.csv' % domain,'r')
     first_line = True
     data = []
     to_best = dict()

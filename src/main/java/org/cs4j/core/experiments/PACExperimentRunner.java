@@ -18,6 +18,8 @@ import java.util.*;
  */
 public class PACExperimentRunner {
     final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
+    final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
+    final static double[] DEFAULT_DELTAS = new double[] { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
 
 
     //@TODO: Replace all this with better handling of command line using some known code to do so
@@ -68,7 +70,7 @@ public class PACExperimentRunner {
             }
         }
         if(epislonsFound==false)
-            return new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};;
+            return DEFAULT_EPSILONS;
 
         List<Double> epsilonList = new ArrayList<>();
         Double epsilon=null;
@@ -177,7 +179,7 @@ public class PACExperimentRunner {
 
     private void runThresholdBasedConditions(Class[] domains,Class[] pacConditions,double[] epsilons) {
         // Run trivial and ratio-based on all domains
-        double[] deltas = { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
+        double[] deltas = DEFAULT_DELTAS;
 
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());

@@ -32,9 +32,13 @@ public class TestThresholdPACConditions {
         testSetup(new TrivialPACCondition());
         testDeltaEffect(TrivialPACCondition.class);
     }
-
     @Test
-    public void TestThresholdTooLow(){
+    public void testFMinSetup()    {
+        testSetup(new FMinCondition());
+        testDeltaEffect(FMinCondition.class);
+    }
+    @Test
+    public void testThresholdTooLow(){
         int instanceId = 52;
         Double delta = 0.25;
         Double epsilon = 0.1;
@@ -66,6 +70,7 @@ public class TestThresholdPACConditions {
         SearchResult result = psf.search(domain);
         long expanded0 = result.getExpanded();
 
+        psf.setPACConditionClass(FMinCondition.class);
         psf.setAdditionalParameter("delta","1.0");
         result = psf.search(domain);
         long expanded1 = result.getExpanded();
@@ -75,13 +80,12 @@ public class TestThresholdPACConditions {
     }
 
 
-
     public void testDeltaEffect(Class<? extends PACCondition> conditionClass){
         Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
         SearchDomain instance;
         PACSearchFramework psf;
         SearchResult result;
-        int instanceId = 52;
+        int instanceId = 51;
         double oldExpanded;
         double newExpanded;
         for(Class domainClass :domains){
@@ -104,8 +108,14 @@ public class TestThresholdPACConditions {
                     newExpanded = result.getExpanded();
                     Assert.assertTrue("oldExpanded="+oldExpanded+", newExpanded="+newExpanded,
                             oldExpanded>=newExpanded);
+
+                    // Fmin unaffected by delta
+                    if(conditionClass.equals(FMinCondition.class) && oldExpanded<Double.MAX_VALUE){
+                        Assert.assertEquals(newExpanded,oldExpanded);
+                    }
                     oldExpanded = result.getExpanded();
                 }
+
             }
         }
     }
