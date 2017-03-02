@@ -16,25 +16,12 @@
  */
 package org.cs4j.core.test.algorithms;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
-import org.junit.Assert;
-
 import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
-import org.cs4j.core.SearchResult.Solution;
-import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.algorithms.WAStar.HeapType;
-import org.cs4j.core.algorithms.EES;
-import org.cs4j.core.algorithms.IDAstar;
-import org.cs4j.core.algorithms.RBFS;
-import org.cs4j.core.algorithms.WRBFS;
-import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.algorithms.*;
 import org.junit.Test;
+
+import java.io.FileNotFoundException;
 
 public class TestAllBasics {
 		
@@ -42,35 +29,35 @@ public class TestAllBasics {
 	public void testAstarBinHeap() throws FileNotFoundException {
 		SearchDomain domain = TestUtils.createFifteenPuzzle("12");
 		SearchAlgorithm algo = new WAStar();
-		TestUtils.testSearchAlgorithm(domain, algo, 65271, 32470, 45);
+		TestUtils.checkSearchAlgorithm(domain, algo, 65271, 32470, 45);
 	}	
 
 	@Test
 	public void testRBFS() throws FileNotFoundException {
 		SearchDomain domain = TestUtils.createFifteenPuzzle("12");
 		SearchAlgorithm algo = new RBFS();
-		TestUtils.testSearchAlgorithm(domain, algo, 301098, 148421, 45);
+		TestUtils.checkSearchAlgorithm(domain, algo, 301098, 148421, 45);
 	}	
 	
 	@Test
 	public void testIDAstar() throws FileNotFoundException {
 		SearchDomain domain = TestUtils.createFifteenPuzzle("12");
 		SearchAlgorithm algo = new IDAstar();
-		TestUtils.testSearchAlgorithm(domain, algo, 546343, 269708, 45);
+		TestUtils.checkSearchAlgorithm(domain, algo, 546343, 269708, 45);
 	}		
 
 	@Test
 	public void testEES() throws FileNotFoundException {
 		SearchDomain domain = TestUtils.createFifteenPuzzle("12");
 		SearchAlgorithm algo = new EES(2);
-		TestUtils.testSearchAlgorithm(domain, algo, 5131, 2506, 55);
+		TestUtils.checkSearchAlgorithm(domain, algo, 5131, 2506, 55);
 	}	
 	
 	@Test
 	public void testWRBFS() throws FileNotFoundException {
 		SearchDomain domain = TestUtils.createFifteenPuzzle("12");
 		SearchAlgorithm algo = new WRBFS();
-		TestUtils.testSearchAlgorithm(domain, algo, 301098, 148421, 45);
+		TestUtils.checkSearchAlgorithm(domain, algo, 301098, 148421, 45);
 	}	
 	
 

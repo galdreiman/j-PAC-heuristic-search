@@ -28,7 +28,7 @@ public class TestPacSearchFramework {
      */
     public void testFMinPacCondition(SearchAlgorithm algorithm,double epsilon) throws FileNotFoundException {
         SearchDomain[] domains = {
-                TestUtils.createFifteenPuzzle("12"),
+                //TestUtils.createFifteenPuzzle("12"),
                 TestUtils.createPancakePuzzle(12,"12"),
                 TestUtils.createGridPathFinding("brc202d.map","12"),
                 TestUtils.createVacuumRobot(5,"12"),

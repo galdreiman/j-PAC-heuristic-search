@@ -70,8 +70,8 @@ public class TestUtils {
      * @param expanded
      * @param cost
      */
-    public static void testSearchAlgorithm(SearchDomain domain, SearchAlgorithm algo,
-                                    long generated, long expanded, double cost) {
+    public static void checkSearchAlgorithm(SearchDomain domain, SearchAlgorithm algo,
+                                            long generated, long expanded, double cost) {
         SearchResult result = algo.search(domain);
         SearchResult.Solution sol = result.getSolutions().get(0);
         Assert.assertTrue(result.getWallTimeMillis() > 1);

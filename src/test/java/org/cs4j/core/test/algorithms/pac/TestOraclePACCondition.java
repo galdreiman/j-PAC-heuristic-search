@@ -128,20 +128,6 @@ public class TestOraclePACCondition {
     }
 
     @Test
-    public void testOptimal(){
-        int instanceId=54;
-        SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class, 1);
-
-        WAStar alg = new WAStar();
-        alg.setAdditionalParameter("weight","1.0");
-        SearchResult result = alg.search(instance);
-
-        Assert.assertEquals(23,result.getBestSolution().getCost());
-    }
-
-
-
-    @Test
     public void testOracleDockyard() {
         int instanceId=53;
         SearchDomain instance = ExperimentUtils.getSearchDomain(DockyardRobot.class, instanceId);
