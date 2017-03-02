@@ -20,7 +20,11 @@ def compute_gains():
     # 9 delta
     # 10 epsilon
     # 11 pacCondition
-    domain = "pancakes"
+
+    #domain = "pancakes"
+    #domain = "pancakes"
+    #domain = "vacuumrobot"
+    domain = "dockyard"
     print "##### Input"
     epsilons = []
     input = open('../../../results/alone/conditions-PAC%s.csv' % domain,'r')
@@ -38,13 +42,13 @@ def compute_gains():
         parts = line.split(",")
         data_line = [x.strip() for x in parts]
         delta = float(data_line[9])
-
+        condition = data_line[11]
         # Store delta zero value for every experiment
-        if (delta==0.0):
+        if delta==0.0 and "FMin" in condition:
             epsilon = float(data_line[10])
             if epsilon not in epsilons:
                 epsilons.append(epsilon)
-            key = (data_line[0],data_line[10],data_line[11])
+            key = (data_line[0],data_line[10])
             to_best[key]=data_line[6] # Store expanded
 
         data.append(data_line)
@@ -56,7 +60,7 @@ def compute_gains():
     output.write("%s, expandedFMin\n" % headers)
     for data_line in data:
 
-        key = (data_line[0],data_line[10],data_line[11])
+        key = (data_line[0],data_line[10])
         output_line = ",".join(data_line)
         print output_line
         output.write("%s,%s\n" % (output_line,to_best[key]))
