@@ -137,7 +137,7 @@ public class PACExperimentRunner {
             try {
                 // Prepare experiment for a new domain
                 output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
-                        "StatisticsGenerator", -1, -1, null, false, true);
+                        "openBasedStatistics", -1, -1, null, false, true);
                 generator.printResultsHeaders(output,
                         new String[]{"InstanceID", "h", "opt"},
                         new TreeMap<>());
