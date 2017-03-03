@@ -23,4 +23,6 @@ public interface Experiment {
                            OutputResult output,
                            int instanceId,
                            SortedMap<String, Object> runParams);
+
+    String[] getResultsHeaders();
 }

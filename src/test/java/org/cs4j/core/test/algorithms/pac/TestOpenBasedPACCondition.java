@@ -182,14 +182,6 @@ public class TestOpenBasedPACCondition {
                 previousExpanded=newExpanded;
                 logger.info(delta);
             }
-
-            psf = this.createPSF(epsilon,1.0);
-            instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
-            result = psf.search(instance);
-            newExpanded = result.getExpanded();
-            Assert.assertTrue(":Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1",
-                    newExpanded<oldExpanded);
-
         }
     }
 

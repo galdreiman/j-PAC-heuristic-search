@@ -10,4 +10,14 @@ public class PACConditionSatisfied extends RuntimeException{
         super();
         this.conditionSatisfied=conditionSatisfied;
     }
+
+
+    @Override
+    public String toString(){
+        String text=this.conditionSatisfied.getClass().getSimpleName();
+        if(this.conditionSatisfied instanceof OpenBasedPACCondition)
+            text=text+((OpenBasedPACCondition) this.conditionSatisfied).conditionFired;
+
+        return text;
+    }
 }

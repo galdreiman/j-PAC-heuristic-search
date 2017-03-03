@@ -1,11 +1,8 @@
 package org.cs4j.core.algorithms.pac;
 
-import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
 /**
  * Created by Roni Stern on 28/02/2017.

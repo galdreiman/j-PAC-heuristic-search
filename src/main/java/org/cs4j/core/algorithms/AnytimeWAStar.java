@@ -1,5 +1,7 @@
 package org.cs4j.core.algorithms;
 
+import org.cs4j.core.algorithms.pac.BoundedCostPACSearch;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;

@@ -58,9 +58,7 @@ public class PACOnlineExperimentRunner {
 	 * @param runParams
 	 * @throws IOException
 	 */
-	public void printResultsHeaders(OutputResult output, SortedMap<String, Object> runParams) throws IOException {
-		String[] defaultColumnNames = new String[] { "InstanceID", "Found", "Depth", "Cost", "Iterations", "Generated",
-				"Expanded", "Cpu Time", "Wall Time" };
+	public void printResultsHeaders(OutputResult output, String[] defaultColumnNames,SortedMap<String, Object> runParams) throws IOException {
 		List<String> runParamColumns = new ArrayList<>(runParams.keySet());
 		List<String> columnNames = new ArrayList();
 		for (String columnName : defaultColumnNames)
@@ -97,7 +95,7 @@ public class PACOnlineExperimentRunner {
 				// Prepare experiment for a new domain
 				output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputPath, "PAC", -1, -1, null, false,
 						true);
-				this.printResultsHeaders(output, runParams);
+				this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
 
 				PACUtils.getPACStatistics(domainClass); // Loads the statistics from the disk
 				for (Class pacConditionClass : pacConditions) {

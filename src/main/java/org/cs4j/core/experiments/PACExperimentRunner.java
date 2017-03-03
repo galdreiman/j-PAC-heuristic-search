@@ -190,6 +190,18 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
+    private void runBoundedCostBased(Class[] domains,Class[] pacConditions,double[] epsilons) {
+        // Run trivial and ratio-based on all domains
+        double[] deltas = DEFAULT_DELTAS;
+
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAdditionalParameter("anytimeSearch", BoundedCostPACSearch.class.getName());
+        Experiment experiment = new StandardExperiment(psf);
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
+
     private void runOracleCondition(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = { 0 };
@@ -205,7 +217,7 @@ public class PACExperimentRunner {
         Class[] pacConditions = new Class[]{OpenBasedPACCondition.class};
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
-        Experiment experiment = new StandardExperiment(psf);
+        Experiment experiment = new OpenBasedExperiment();
 
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
@@ -232,10 +244,16 @@ public class PACExperimentRunner {
         Class[] domains=runner.getClassesFromCommandLine(args);
         Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
         double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
-        if(args[0].equals("OpenBased")){
+        if(args[0].equals("RunOpenBased")){
             logger.info("********** OPEN BASED CONDITION");
             runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
         }
+
+        if(args[0].equals("BoundedCostBased")){
+            logger.info("********** Bounded Cost Based Search");
+            runner.runBoundedCostBased(domains,pacConditions,epsilonValues);
+        }
+
 
         if(args[0].equals("CollectOpenBased")) {
             logger.info("****************************** collecting stats for open based ");

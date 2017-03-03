@@ -2,10 +2,9 @@ package org.cs4j.core.experiments;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.OutputResult;
-import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -13,16 +12,18 @@ import java.util.List;
 import java.util.SortedMap;
 
 /**
- * Created by Roni Stern on 01/03/2017.
+ * Created by Roni Stern on 03/03/2017.
+ * Designed to output the condition for open based experiments.
  */
-public class StandardExperiment implements Experiment
-{
-    final static Logger logger = Logger.getLogger(StandardExperiment.class);
+public class OpenBasedExperiment  extends StandardExperiment{
+    final static Logger logger = Logger.getLogger(OpenBasedExperiment.class);
 
-    protected SearchAlgorithm searchAlgorithm;
+    public OpenBasedExperiment() {
+        super(new PACSearchFramework());
 
-    public StandardExperiment(SearchAlgorithm searchAlgorithm){
-        this.searchAlgorithm=searchAlgorithm;
+        PACSearchFramework psf = (PACSearchFramework)this.searchAlgorithm;
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        psf.setPACConditionClass(OpenBasedPACCondition.class);
     }
 
     @Override
@@ -58,20 +59,15 @@ public class StandardExperiment implements Experiment
         }
     }
 
-    @Override
-    public String[] getResultsHeaders() {
-        return new String[] { "InstanceID", "Found", "Depth", "Cost", "Iterations", "Generated",
-                "Expanded", "Cpu Time", "Wall Time" };
-    }
-
 
     /**
      * Extract from SearchResults the data to output to the file
      * @param result the SearchResults object to extract from
      * @param resultsData a list to append the results extracted from SearchResults
      */
+    @Override
     protected void appendSearchResults(SearchResult result,
-                                    List resultsData) {
+                                       List resultsData) {
         resultsData.add(result.hasSolution() ? 1 : 0);
         if (result.hasSolution()) {
             resultsData.add(result.getBestSolution().getLength());
@@ -85,5 +81,18 @@ public class StandardExperiment implements Experiment
         resultsData.add(result.getExpanded());
         resultsData.add(result.getCpuTimeMillis());
         resultsData.add(result.getWallTimeMillis());
+
+        // Add condition fired
+        if(result.getExtras().containsKey("PACSatisfied"))
+            resultsData.add(result.getExtras().get("PACSatisfied"));
+        else
+            resultsData.add("Fmin?");
     }
+
+    @Override
+    public String[] getResultsHeaders() {
+        return new String[] { "InstanceID", "Found", "Depth", "Cost", "Iterations", "Generated",
+                "Expanded", "Cpu Time", "Wall Time","PACCondition" };
+    }
+
 }

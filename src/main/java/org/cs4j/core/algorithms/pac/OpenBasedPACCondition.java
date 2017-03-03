@@ -93,14 +93,24 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         // Recompute the prob not suboptimal
         this.probIncumbentPAC =0;
         this.zeroProbabilityCounter=0;
-        for(AnytimeSearchNode node : openNodes)
+        this.fmin=Double.MAX_VALUE;
+        for(AnytimeSearchNode node : openNodes) {
             this.addedToOpen(node);
+            if(node.getF()<this.fmin)
+                this.fmin=node.getF();
+        }
 
-        if(this.shouldStop(newSearchResults))
+        if(this.shouldStop(newSearchResults)) {
+            if(openNodes.size()==0)
+                this.conditionFired=Condition.OPTIMAL;
+            else if(fmin*(1+epsilon)>=incumbent)
+                this.conditionFired=Condition.FMIN;
+            else
+                this.conditionFired=Condition.OPEN_BASED;
             throw new PACConditionSatisfied(this);
+        }
 
-        logger.info("Incumbent set to " + incumbent
-                +",  probSum="+this.probIncumbentPAC+", zero probs="+this.zeroProbabilityCounter);
+//        logger.info("Incumbent set to " + incumbent +",  probSum="+this.probIncumbentPAC+", zero probs="+this.zeroProbabilityCounter);
     }
 
     // ----------------- FUNCTIONS FOR GENERATING THE STATISTICS ----------------------------
@@ -222,6 +232,14 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         // Second pasS: join hranges with the same average ratio
         double averageRatio;
         List<Double> hRanges = new ArrayList<>();
+
+        // A common setting is to have the low h values be perfect. To account for this we create a special bin for them
+        Double firstH =  hToTuples.firstKey();
+        boolean startWithOptimalBin=false;
+        averageRatio=computeAverageRatio(hToTuples.get(firstH));
+        if(averageRatio==1.0)
+            startWithOptimalBin=true;
+
         oldH = 0.0;
         double oldAverage = 0.0;
         for(Double h : hToTuples.keySet()){
@@ -231,15 +249,31 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
                 // If the previous h range had almost the same average - join them
                 // @TODO: Using the average is a heuristic for having a similar distribution
                 // @TODO: Future work may be to considder distribution distances, e.g., KL divergence
-                if(Math.abs(oldAverage-averageRatio)<=0.1)
-                    hRanges.remove(oldH);
-                else
-                    oldAverage=averageRatio;
 
-                hRanges.add(h);
+                if(startWithOptimalBin){
+                    if(averageRatio==1.0){
+                        // Continue the optimal bin
+                        hRanges.remove(oldH);
+                    }
+                    else{
+                        startWithOptimalBin=false;
+                        oldAverage=averageRatio;
+                    }
+                }
+                else{
+                    if(Math.abs(oldAverage-averageRatio)<=0.1){
+                        hRanges.remove(oldH);
+                    }
+                    else{
+                        oldAverage=averageRatio;
+                    }
+                }
             }
             oldH = h;
+            hRanges.add(oldH);
         }
+        if(hRanges.isEmpty())
+            hRanges.add(Double.MAX_VALUE);
         return hRanges;
     }
 

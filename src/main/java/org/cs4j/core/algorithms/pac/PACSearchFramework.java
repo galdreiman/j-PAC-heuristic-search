@@ -184,7 +184,7 @@ public class PACSearchFramework implements SearchAlgorithm {
             }
         }catch(PACConditionSatisfied conditionSatisfied){
             // This part is designed for the search-aware PAC conditions
-            logger.info(conditionSatisfied.getClass().getSimpleName());
+            anytimeSearchAlgorithm.getTotalSearchResults().getExtras().put("PACSatisfied",conditionSatisfied.toString());
         }
         return anytimeSearchAlgorithm.getTotalSearchResults();
     }

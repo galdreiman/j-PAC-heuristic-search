@@ -17,7 +17,7 @@ public class FMinCondition extends AbstractPACCondition {
             return false;
 
         double fmin = (Double)incumbentSolution.getExtras().get("fmin");
-        double incumbent = incumbentSolution.getSolutions().get(0).getCost();
+        double incumbent = incumbentSolution.getBestSolution().getCost();
 
         if (incumbent/fmin <= 1+epsilon)
             return true;
