@@ -17,4 +17,7 @@ public abstract class AbstractPACCondition implements PACCondition {
         this.epsilon=epsilon;
         this.delta=delta;
     }
+
+    public double getEpsilon() {return epsilon;}
+    public double getDelta() {return delta;}
 }

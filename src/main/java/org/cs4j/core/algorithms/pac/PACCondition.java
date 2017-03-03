@@ -9,4 +9,6 @@ import org.cs4j.core.SearchResult;
 public interface PACCondition {
     public boolean shouldStop(SearchResult incumbentSolution);
     public void setup(SearchDomain domain, double epsilon, double delta);
+    public double getEpsilon();
+    public double getDelta();
 }

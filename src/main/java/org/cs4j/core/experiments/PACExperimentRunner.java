@@ -19,7 +19,8 @@ import java.util.*;
 public class PACExperimentRunner {
     final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
     final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
-    final static double[] DEFAULT_DELTAS = new double[] { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
+    //final static double[] DEFAULT_DELTAS = new double[] { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
+    final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1 };
 
 
     //@TODO: Replace all this with better handling of command line using some known code to do so

@@ -5,16 +5,24 @@ import org.cs4j.core.algorithms.AbstractAnytimeSearch;
 import org.cs4j.core.algorithms.SearchResultImpl;
 
 /**
- * Created by user on 26/02/2017.
+ * Created by Roni Stern on 26/02/2017.
+ *
+ * This is an anytime search algorithm that is aware that it is used in a PAC Search framework
+ * and is intended to find a PAC solution.
+ * This enables some faster halting, e.g., when f-min condition occurs.
  */
 public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
     final static Logger logger = Logger.getLogger(AnytimePACSearch.class);
 
     protected PACCondition pacCondition;
+    private double epsilon;
+    private double delta;
 
 
     public void setPacCondition(PACCondition pacCondition){
         this.pacCondition = pacCondition;
+        this.epsilon=this.pacCondition.getEpsilon();
+        this.delta = this.pacCondition.getDelta();
     }
 
 
@@ -39,12 +47,14 @@ public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
             return super._search();
         }
         catch(PACConditionSatisfied exception){
-            // Stop the timer and check that a goal was found
-            result.stopTimer();
-
-            // If a goal was found: update the solution
+            // If the PAC conditions was satisfied, prepare the results objects
             result.setExtras("fmin",this.maxFmin); // Record the lower bound for future analysis @TODO: Not super elegant
             result.setExtras("pac-condition-statisfied",exception.conditionSatisfied); // Record the lower bound for future analysis @TODO: Not super elegant
+            result.stopTimer();
+
+            this.totalSearchResults.increase(this.result);
+            this.totalSearchResults.stopTimer();
+
             return result;
         }
     }
@@ -55,21 +65,12 @@ public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
      */
     @Override
     protected void updateFmin(){
-        // If fmin is no longer fmin, need to search for a new fmin @TODO: May improve efficiency
-        if(this.fCounter.containsKey(fmin)==false){
-            fmin=Double.MAX_VALUE;
-            for(double fInOpen : this.fCounter.keySet()){
-                if(fInOpen<fmin)
-                    fmin=fInOpen;
-            }
-            if(maxFmin<fmin) {
-                maxFmin = fmin;
-                this.totalSearchResults.getExtras().put("fmin", maxFmin);
-                if(this.pacCondition.shouldStop(this.totalSearchResults)) {
-                    this.totalSearchResults.increase(this.result);
-                    this.totalSearchResults.stopTimer();
-                    throw new PACConditionSatisfied(this.pacCondition);
-                }
+        super.updateFmin();
+
+        // Check PAC condition if max f min is updated
+        if(this.totalSearchResults!=null) {
+            if (this.incumbentSolution<=this.maxFmin * (1 + this.epsilon)){
+                throw new PACConditionSatisfied(new FMinCondition());
             }
         }
     }

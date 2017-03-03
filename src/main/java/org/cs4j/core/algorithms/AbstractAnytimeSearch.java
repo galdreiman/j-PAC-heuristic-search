@@ -50,7 +50,11 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     // A data structure to maintain minf. @TODO: Allow disabling this for Anytime algorithms that don't care about this
     protected HashMap<Double, Integer> fCounter = new HashMap<Double,Integer>();
     protected double maxFmin; // The maximal fmin observed so far. This is a lower bound on the optimal cost
-    protected double fmin; // The minimal f value currently in the open list
+
+    // The minimal f value currently in the open list.
+    // Actually, this holds an f value of some nodes in OPEN, such that this f value is smaller than max f min.
+    // Its purpose is to know when to go over OPEN and try to increase max f min.
+    protected double fmin;
 
     public AbstractAnytimeSearch() {
         // Initial values (afterwards they can be set independently)
@@ -107,109 +111,20 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
         result.startTimer();
 
          // Loop while there is no solution and there are states in the OPEN list
-        SearchDomain.State childState,currentState;
-        AnytimeSearchNode currentNode, childNode, dupChildNode;
-        SearchDomain.Operator op;
-        double childf,dupChildf;
+        AnytimeSearchNode currentNode;
         while ((goal == null) && !this.open.isEmpty()) {
             // Take a node from the OPEN list (nodes are sorted according to the 'u' function)
             currentNode = this.open.poll();
             this.removeFromfCounter(currentNode.getF());
 
-            // Extract a state from the node
-            currentState = domain.unpack(currentNode.packed);
             // expand the node (since, if its g satisfies the goal test - it would be already returned)
+            goal = expand(currentNode);
             ++result.expanded;
             if (result.expanded % 1000000 == 0)
                 logger.info("[INFO] Expanded so far " + result.expanded);
 
-            // Go over all the successors of the state
-            for (int i = 0; i < domain.getNumOperators(currentState); ++i) {
-                // Get the current operator
-                op = domain.getOperator(currentState, i);
-                // Don't apply the previous operator on the state - in order not to enter a loop
-                if (op.equals(currentNode.pop)) {
-                    continue;
-                }
-                // Otherwise, let's generate the child state
-                ++result.generated;
-                // Get it by applying the operator on the parent state
-                childState = domain.applyOperator(currentState, op);
-                // Create a search node for this state
-                childNode = new AnytimeSearchNode(this.domain,
-                        childState,
-                        currentNode,
-                        currentState,
-                        op, op.reverse(currentState));
-
-                // Prune nodes over the bound
-                if (childNode.getF() >= this.incumbentSolution) {
-                    continue;
-                }
-
-                // If the generated node satisfies the goal condition - let' mark the goal and break
-                if (domain.isGoal(childState)) {
-                    goal = childNode;
-                    break;
-                }
-
-                // If we got here - the state isn't a goal!
-
-                // Now, merge duplicates - let's check if the state already exists in CLOSE/OPEN:
-                // In the node is not in the CLOSED list, then it is also not in the OPEN list
-                // In any case it can't be that node is a goal - otherwise, we should return it
-                // when we see it at first
-                if (this.closed.containsKey(childNode.packed)) {
-                    // Count the duplicates
-                    ++result.duplicates;
-                    // Take the duplicate node
-                    dupChildNode = this.closed.get(childNode.packed);
-                    childf = childNode.getF();
-                    dupChildf = dupChildNode.getF();
-                    if (dupChildf > childf) {
-                        // Consider only duplicates with higher G value
-                        if (dupChildNode.g > childNode.g) {
-                            // Make the duplicate to be successor of the current parent node
-                            dupChildNode.g = childNode.g;
-                            dupChildNode.op = childNode.op;
-                            dupChildNode.pop = childNode.pop;
-                            dupChildNode.parent = childNode.parent;
-
-                            // In case the node is in the OPEN list - update its key using the new G
-                            if (dupChildNode.getIndex(this.open.getKey()) != -1) {
-                                ++result.opupdated;
-                                this.open.update(dupChildNode);
-                                this.closed.put(dupChildNode.packed, dupChildNode);
-
-                                // Update fCounter (and possible minf and maxminf)
-                                this.addTofCounter(childf);
-                                this.removeFromfCounter(dupChildf);
-                            } else {
-                                // Return to OPEN list only if reopening is allowed
-                                if (this.reopen) {
-                                    ++result.reopened;
-                                    this.open.add(dupChildNode);
-                                    this.addTofCounter(childf);
-
-                                } else {
-                                    // Maybe, we will want to expand these states later
-                                    this.incons.put(dupChildNode.packed, dupChildNode);
-                                }
-                                // In any case, update the duplicate node in CLOSED
-                                this.closed.put(dupChildNode.packed, dupChildNode);
-                            }
-                        }
-                    }
-                    // Consider the new node only if its cost is lower than the maximum cost
-                } else {
-                    // Otherwise, add the node to the search lists
-                    this.open.add(childNode);
-                    this.addTofCounter(childNode.getF());
-                    this.closed.put(childNode.packed, childNode);
-                }
-            }
-            // Update the fCounter and possible minf and maxminf
-            this.updateFmin();
+            if(currentNode.getF()==this.fmin)
+                this.updateFmin();
         }
         // Stop the timer and check that a goal was found
         result.stopTimer();
@@ -221,6 +136,109 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
 
         result.setExtras("fmin",this.maxFmin); // Record the lower bound for future analysis @TODO: Not super elegant
         return result;
+    }
+
+    /**
+     * Expands a node and generate its children
+     */
+    protected AnytimeSearchNode expand(AnytimeSearchNode currentNode) {
+        SearchDomain.Operator op;
+        SearchDomain.State childState;
+        AnytimeSearchNode childNode;
+        double childf;
+        AnytimeSearchNode dupChildNode;
+        double dupChildf;
+        AnytimeSearchNode goal = null;
+
+        // Extract a state from the node
+        SearchDomain.State currentState = domain.unpack(currentNode.packed);
+
+        for (int i = 0; i < domain.getNumOperators(currentState); ++i) {
+            // Get the current operator
+            op = domain.getOperator(currentState, i);
+            // Don't apply the previous operator on the state - in order not to enter a loop
+            if (op.equals(currentNode.pop)) {
+                continue;
+            }
+            // Otherwise, let's generate the child state
+            ++result.generated;
+            // Get it by applying the operator on the parent state
+            childState = domain.applyOperator(currentState, op);
+            // Create a search node for this state
+            childNode = new AnytimeSearchNode(this.domain,
+                    childState,
+                    currentNode,
+                    currentState,
+                    op, op.reverse(currentState));
+
+            // Prune nodes over the bound
+            if (childNode.getF() >= this.incumbentSolution) {
+                continue;
+            }
+
+            // If the generated node satisfies the goal condition - let' mark the goal and break
+            if (domain.isGoal(childState)) {
+                goal = childNode;
+                break;
+            }
+
+            // If we got here - the state isn't a goal!
+            childf = childNode.getF();
+
+
+            // Now, merge duplicates - let's check if the state already exists in CLOSE/OPEN:
+            // In the node is not in the CLOSED list, then it is also not in the OPEN list
+            // In any case it can't be that node is a goal - otherwise, we should return it
+            // when we see it at first
+            if (this.closed.containsKey(childNode.packed)) {
+                // Count the duplicates
+                ++result.duplicates;
+                // Take the duplicate node
+                dupChildNode = this.closed.get(childNode.packed);
+                dupChildf = dupChildNode.getF();
+                if (dupChildf > childf) {
+                    // Consider only duplicates with higher G value
+                    if (dupChildNode.g > childNode.g) {
+                        // Make the duplicate to be successor of the current parent node
+                        dupChildNode.g = childNode.g;
+                        dupChildNode.op = childNode.op;
+                        dupChildNode.pop = childNode.pop;
+                        dupChildNode.parent = childNode.parent;
+
+                        // In case the node is in the OPEN list - update its key using the new G
+                        if (dupChildNode.getIndex(this.open.getKey()) != -1) {
+                            ++result.opupdated;
+                            this.open.update(dupChildNode);
+                            this.closed.put(dupChildNode.packed, dupChildNode);
+
+                            // Update fCounter (and possible minf and maxminf)
+                            this.addTofCounter(childf);
+                            this.removeFromfCounter(dupChildf);
+                        } else {
+                            // Return to OPEN list only if reopening is allowed
+                            if (this.reopen) {
+                                ++result.reopened;
+                                this.open.add(dupChildNode);
+                                this.addTofCounter(childf);
+
+                            } else {
+                                // Maybe, we will want to expand these states later
+                                this.incons.put(dupChildNode.packed, dupChildNode);
+                            }
+                            // In any case, update the duplicate node in CLOSED
+                            this.closed.put(dupChildNode.packed, dupChildNode);
+                        }
+                    }
+                }
+                // Consider the new node only if its cost is lower than the maximum cost
+            } else {
+                // Otherwise, add the node to the search lists
+                this.open.add(childNode);
+                this.addTofCounter(childNode.getF());
+                this.closed.put(childNode.packed, childNode);
+            }
+        }
+        return goal;
     }
 
 
@@ -327,30 +345,28 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
         // Initialize all the data structures )
         this._initDataStructures(true, true);
 
-        // Extract the initial state from the domain
+        // Create the initial node and add it to OPEN
         SearchDomain.State currentState = domain.initialState();
-        // Initialize a search node using the state (contains data according to the current
-        // algorithm)
         AnytimeSearchNode initialNode = new AnytimeSearchNode(this.domain,currentState);
-
-        // Start the search: Add the node to the OPEN and CLOSED lists
         this.open.add(initialNode);
+
+        // Set the min f counters to the f value of the initial node
         double startFmin = initialNode.getF();
         this.fCounter.put(startFmin,1);
-        this.maxFmin = startFmin;
-        this.fmin = startFmin;
+        this.fmin=startFmin;
+        this.maxFmin=this.fmin;
 
         // n in OPEN ==> n in CLOSED -Thus- ~(n in CLOSED) ==> ~(n in OPEN)
         this.closed.put(initialNode.packed, initialNode);
 
-        SearchResult results = this._search();
-        if(results.hasSolution())
-            this.incumbentSolution=results.getSolutions().get(0).getCost();
+        // Run the search!
+        SearchResult result = this._search();
+        if(result.hasSolution())
+            this.addNewIncumbent(result.getBestSolution());
 
-        // Store these results if we continue the search
-        this.totalSearchResults=(SearchResultImpl)results;
-        return results;
+        return result;
     }
+
 
     /**
      * Continues the search to find better goals
@@ -359,21 +375,30 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
     @Override
     public SearchResult continueSearch() {
         this.iteration++;
-        SearchResult results = this._search();
-
-        // Update total search results, which contains the effort over all the iterations
-        this.totalSearchResults.addIteration(this.iteration,this.incumbentSolution,results.getExpanded(), results.getGenerated());
-        this.totalSearchResults.increase(results);
-
-        if(results.hasSolution()) {
-            SearchResult.Solution bestSolution = results.getBestSolution();
-            double solutionCost = bestSolution.getCost();
-            assert solutionCost<this.incumbentSolution;
-            this.incumbentSolution = solutionCost;
-            this.totalSearchResults.getSolutions().add(bestSolution);
+        SearchResult result = this._search();
+        if(result.hasSolution()) {
+            this.addNewIncumbent(result.getBestSolution());
         }
-        return results;
+        this.totalSearchResults.addIteration(this.iteration,this.incumbentSolution,result.getExpanded(), result.getGenerated());
+        this.totalSearchResults.increase(result);
+        return result;
     }
+
+    /**
+     * Update data structures with the new result.
+     * This is mainly the incumbent solution and totalSearchResults.
+     * @param newSolution the new result found
+     */
+    protected void addNewIncumbent(SearchResult.Solution newSolution){
+        double solutionCost = newSolution.getCost();
+        assert solutionCost<this.incumbentSolution;
+        this.incumbentSolution = solutionCost;
+        if(this.totalSearchResults!=this.result) { // If this is not the first result returned, update the total search results
+            // @TODO: Fix the SearchResults object to do this by itself in the addIteration function
+            this.totalSearchResults.getSolutions().add(newSolution);
+        }
+    }
+
 
 
     @Override

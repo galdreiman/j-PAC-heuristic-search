@@ -109,4 +109,87 @@ public class TestOpenBasedPACCondition {
             }
         }
     }
+
+
+    @Test
+    public void testEpsilonEffect(){
+        //Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        Class[] domains = {Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        SearchDomain instance;
+        PACSearchFramework psf;
+        SearchResult result;
+        int instanceId = 51;
+        double oldExpanded;
+        double newExpanded;
+        double epsilon,delta;
+        for(Class domainClass :domains){
+            logger.info("Testing domain " + domainClass.getName());
+            epsilon = 0;
+            delta = 0;
+            logger.info("Testing eps="+epsilon+",delta="+delta);
+            PACUtils.loadPACStatistics(domainClass);
+            psf = this.createPSF(epsilon,delta);
+
+            instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+            result = psf.search(instance);
+            Assert.assertTrue(result.hasSolution());
+            oldExpanded = result.getExpanded();
+
+            epsilon = 1;
+            psf = this.createPSF(epsilon,delta);
+            instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+            result = psf.search(instance);
+            Assert.assertTrue(result.hasSolution());
+            newExpanded = result.getExpanded();
+            Assert.assertTrue("Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1", newExpanded<oldExpanded);
+        }
+    }
+
+    @Test
+    public void testDeltaEffect2(){
+        //Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        Class[] domains = {Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        SearchDomain instance;
+        PACSearchFramework psf;
+        SearchResult result;
+        int instanceId = 51;
+        double oldExpanded;
+        double newExpanded;
+        double epsilon,delta;
+        for(Class domainClass :domains){
+            logger.info("Testing domain " + domainClass.getName());
+            epsilon = 5;
+            delta = 0;
+            logger.info("Testing eps="+epsilon+",delta="+delta);
+            PACUtils.loadPACStatistics(domainClass);
+            psf = this.createPSF(epsilon,delta);
+
+            instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+            result = psf.search(instance);
+            Assert.assertTrue(result.hasSolution());
+            oldExpanded = result.getExpanded();
+
+            delta = 0;
+            psf = this.createPSF(epsilon,delta);
+            instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+            result = psf.search(instance);
+            Assert.assertTrue(result.hasSolution());
+            newExpanded = result.getExpanded();
+            Assert.assertTrue("Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1", newExpanded<oldExpanded);
+        }
+    }
+
+
+    /**
+     * Create a PACSearchFramework instance with the given parameters
+     */
+    private PACSearchFramework createPSF(double epsilon, double delta){
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        psf.setPACConditionClass(OpenBasedPACCondition.class);
+        psf.setAdditionalParameter("delta",""+delta);
+        psf.setAdditionalParameter("epsilon",""+epsilon);
+        return psf;
+    }
+
 }

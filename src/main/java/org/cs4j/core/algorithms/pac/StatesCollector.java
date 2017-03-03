@@ -80,4 +80,14 @@ public class StatesCollector implements SearchAwarePACCondition{
         this.hToRepresentativeState = new HashMap();
         this.randomGenerator = new Random();
     }
+
+    @Override
+    public double getEpsilon() {
+        throw new IllegalStateException("Dont need epsilon here");
+    }
+
+    @Override
+    public double getDelta() {
+        throw new IllegalStateException("Dont need delta here");
+    }
 }

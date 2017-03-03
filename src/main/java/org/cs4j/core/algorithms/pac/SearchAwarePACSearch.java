@@ -2,6 +2,7 @@ package org.cs4j.core.algorithms.pac;
 
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.AbstractAnytimeSearch;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.SearchResultImpl;
 
@@ -18,6 +19,10 @@ import java.util.*;
  * 1-( product of (Pr((1+epsilon)*(g(n)+h*(n))>incumbent)
  */
 abstract public class SearchAwarePACSearch extends AnytimePACSearch {
+    private double epsilon; // @TODO: Consider if this is a good place for this
+
+
+
 
     @Override
     public void setAdditionalParameter(String parameterName, String value) {
@@ -28,53 +33,6 @@ abstract public class SearchAwarePACSearch extends AnytimePACSearch {
             }
         }
     }
-    /**
-     * The internal main search procedure
-     *
-     * @return The search result filled by all the results of the search
-     */
-    protected SearchResultImpl _search() {
-        // The result will be stored here
-        AnytimeSearchNode goal = null;
-        this.result = new SearchResultImpl();
-        if(this.totalSearchResults==null)
-            this.totalSearchResults=this.result;
-        result.startTimer();
-
-
-        // Loop while there is no solution and there are states in the OPEN list
-        AnytimeSearchNode currentNode;
-        while ((goal == null) && !this.open.isEmpty()) {
-            // Take a node from the OPEN list (nodes are sorted according to the 'u' function)
-            currentNode = this.open.poll();
-            this.removeFromfCounter(currentNode.getF());
-            ((SearchAwarePACCondition)this.pacCondition).removedFromOpen(currentNode);
-
-            // expand the node (since, if its g satisfies the goal test - it would be already returned)
-            goal = expand(currentNode);
-            ++result.expanded;
-            if (result.expanded % 1000000 == 0)
-                logger.info("Expanded so far " + result.expanded);
-
-            // Update fmin and prob-not-suboptimal
-            this.updateFmin();
-
-            // Check the open-based PAC condition
-            if(this.pacCondition.shouldStop(this.result)){
-                throw new PACConditionSatisfied(this.pacCondition);
-            }
-        }
-        // Stop the timer and check that a goal was found
-        result.stopTimer();
-
-        // If a goal was found: update the solution
-        if (goal != null) {
-            result.addSolution(constructSolution(goal, this.domain));
-        }
-
-        result.setExtras("fmin",this.maxFmin); // Record the lower bound for future analysis @TODO: Not super elegant
-        return result;
-    }
 
     /**
      * Expand a node, generating all its children
@@ -82,13 +40,17 @@ abstract public class SearchAwarePACSearch extends AnytimePACSearch {
      * @param currentNode the node being expanded
      * @return the goal node, if it was found. Otherwise, return null
      */
-    private AnytimeSearchNode expand(AnytimeSearchNode currentNode) {
+    @Override
+    protected AnytimeSearchNode expand(AnytimeSearchNode currentNode) {
         SearchDomain.Operator op;
         SearchDomain.State childState;
         AnytimeSearchNode childNode;
         AnytimeSearchNode dupChildNode;
         double childf;
         double dupChildf;
+
+        // Notify the SearchAware PAC condition that current node was popped from OPEN
+        ((SearchAwarePACCondition)this.pacCondition).removedFromOpen(currentNode);
 
         // Extract a state from the node
         SearchDomain.State currentState = domain.unpack(currentNode.packed);
@@ -108,7 +70,8 @@ abstract public class SearchAwarePACSearch extends AnytimePACSearch {
                     childState, currentNode, currentState, op, op.reverse(currentState));
 
             // Prune nodes over the bound
-            if (childNode.getF() >= this.incumbentSolution) {
+            childf = childNode.getF();
+            if (childf*(1+epsilon) >= this.incumbentSolution) {  // @TODO: Is it a good place to do this?
                 continue;
             }
 
@@ -186,42 +149,22 @@ abstract public class SearchAwarePACSearch extends AnytimePACSearch {
     }
 
     @Override
-    /**
-     * Continue the search. This means the previous solution was not PAC.
-     * Here, we update the pac condition that a new incumbent solution was found.
-     */
-    public SearchResult continueSearch() {
-        // Resort open according to the new incumbent @TODO: Study if this actually helps or not?
-        List<AnytimeSearchNode> openNodes = new ArrayList<AnytimeSearchNode>(this.open.size());
-        while(this.open.size()>0)
-            openNodes.add(this.open.poll());
-        for(AnytimeSearchNode node : openNodes) {
-            this.open.add(node);
-        }
-        ((SearchAwarePACCondition)this.pacCondition).setIncumbent(this.totalSearchResults.getBestSolution().getCost(),
-                openNodes);
+    protected void addNewIncumbent(SearchResult.Solution newSolution){
+        super.addNewIncumbent(newSolution);
+
+        // Update OPEN and PAC condition
+
+        //@TODO: Replace this by defining an iterator over open instead of adding and removing all of the nodes in OPEN
+        // Get all nodes in OPEN by removing all of them and then re-inserting them
+        List<AnytimeSearchNode> openNodes = new ArrayList<>(this.open.size());
+        while(this.open.size()>0) openNodes.add(this.open.poll());
+        for(AnytimeSearchNode node : openNodes) this.open.add(node);
+
+        // Update the PAC condition (this may throw PACCondition satisfied
+        ((SearchAwarePACCondition) this.pacCondition).setIncumbent(
+                this.totalSearchResults.getBestSolution().getCost(),openNodes);
+
         openNodes.clear(); // To free space. Probably this is not needed @TODO: Check if this helps memory and runtime
-        return super.continueSearch();
     }
 
-
-
-    /**
-     * If there are no more nodes with the old fmin, need to update fmin and maybe also maxfmin accordingly.
-     */
-    @Override
-    protected void updateFmin(){
-        // If fmin is no longer fmin, need to search for a new fmin @TODO: May improve efficiency
-        if(this.fCounter.containsKey(fmin)==false){
-            fmin=Double.MAX_VALUE;
-            for(double fInOpen : this.fCounter.keySet()){
-                if(fInOpen<fmin)
-                    fmin=fInOpen;
-            }
-            if(maxFmin<fmin) {
-                maxFmin = fmin;
-                ((SearchAwarePACCondition)this.pacCondition).setFmin(maxFmin);
-            }
-        }
-    }
 }

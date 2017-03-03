@@ -15,8 +15,11 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     // This is the probability that the incumbent solution does not have the desired suboptimality
     // We maintain this value and change it during the search, halting when it is lower than delta.
     private double probNotSuboptimal;
-    private double fmin;
     private double incumbent;
+
+    // Logarithm of 1-delta (stored for computational efficiency)
+    private double log1minusDelta;
+    private double fmin;
 
     // This shows the condition that was fired, if a PACConditionSatisifed has been thrown
     // This knowledge is mainly used for analyzing the experimental results
@@ -32,9 +35,9 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
         if(this.incumbent>=0) {
-            if(this.probNotSuboptimal <= this.delta){
+            if(this.probNotSuboptimal >= 1-this.delta){
                 conditionFired = Condition.OPEN_BASED;
-                return this.probNotSuboptimal <= this.delta;
+                return true;
             }
             return false;
         }
@@ -46,6 +49,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     public void setup(SearchDomain domain, double epsilon, double delta) {
         this.probNotSuboptimal=1;
         this.incumbent=-1;
+        this.log1minusDelta = Math.log10(1-delta);
         super.setup(domain,epsilon,delta);
     }
 
@@ -185,11 +189,6 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             }
             oldH = h;
         }
-
-        // DEBUG
-        for(Double h:hRanges)
-            logger.info("h rangle = "+ h);
-
         return hRanges;
     }
 
@@ -218,6 +217,9 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         SortedMap<Double, Double> cdf = getCDF(node);
         Double oldCdfValue = 0.0;
 
+        if(this.incumbent<=(1+this.epsilon)*node.getF())
+            return 1;
+
         // If the h*-to-h ratio is smaller than this value, our solution is not PAC
         double sufficientRatio = ((this.incumbent/(1+this.epsilon))-node.g)/node.h;
         for(Double ratio: cdf.keySet()) { // Note that costsToCDF is a sorted list!
@@ -245,25 +247,18 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 
     public void removedFromOpen(AnytimeSearchNode node)
     {
-        this.probNotSuboptimal=this.probNotSuboptimal/this.getProb(node);
+        this.probNotSuboptimal=this.probNotSuboptimal-Math.log10(1-this.getProb(node));
     }
     public void addedToOpen(AnytimeSearchNode node)
     {
-        this.probNotSuboptimal=this.probNotSuboptimal*this.getProb(node);
+        this.probNotSuboptimal=this.probNotSuboptimal+Math.log10(1-this.getProb(node));
     }
 
-    /**
-     * Fmin has been updated. Check if a PAC conddition is satisfied
-     * @param fmin
-     */
-    public void setFmin(double fmin){
-        this.fmin=fmin;
-        if(this.incumbent<0) return;
-        if(this.incumbent/this.fmin < (1+this.epsilon)) {
-            this.conditionFired=Condition.FMIN;
-            throw new PACConditionSatisfied(this);
-        }
+    @Override
+    public void setFmin(double fmin) {
+        this.fmin=fmin; // @TODO NOT SURE IF THIS IS NEEDED
     }
+
 
     /**
      * A new incumbent solution has been found.
@@ -273,21 +268,17 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     public void setIncumbent(double incumbent, List<AnytimeSearchNode> openNodes){
         this.incumbent=incumbent;
 
-        // Check fmin
-        if(this.incumbent/this.fmin < (1+this.epsilon)) {
-            this.conditionFired=Condition.FMIN;
-            throw new PACConditionSatisfied(this);
-        }
-
         // Recompute the prob not suboptimal
         this.probNotSuboptimal=1;
         for(AnytimeSearchNode node : openNodes) {
-            this.probNotSuboptimal=this.probNotSuboptimal*
-                    this.getProb(node);
+            this.probNotSuboptimal=
+                    this.probNotSuboptimal+
+                    Math.log10(1-this.getProb(node));
         }
-        if(this.probNotSuboptimal<=this.delta) {
+        if(this.probNotSuboptimal>=this.log1minusDelta){
             this.conditionFired=Condition.OPEN_BASED;
             throw new PACConditionSatisfied(this);
         }
+        logger.info("Incumbent set to " + incumbent +",  probSum="+this.probNotSuboptimal);
     }
 }
