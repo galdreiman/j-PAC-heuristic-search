@@ -62,8 +62,8 @@ public class StatesCollector implements SearchAwarePACCondition{
     }
 
     @Override
-    public void setIncumbent(double incumbent, List<AnytimeSearchNode> openNodes) {
-        this.incumbent=incumbent;
+    public void addNewSearchResults(SearchResult newSearchResults, List<AnytimeSearchNode> openNodes) {
+        this.incumbent=newSearchResults.getBestSolution().getCost();
         if(this.fmin!=-1)
             if(this.incumbent/this.fmin==1) // Only halt if optimal
                 throw new PACConditionSatisfied(this);

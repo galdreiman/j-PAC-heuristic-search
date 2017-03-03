@@ -161,8 +161,8 @@ abstract public class SearchAwarePACSearch extends AnytimePACSearch {
         for(AnytimeSearchNode node : openNodes) this.open.add(node);
 
         // Update the PAC condition (this may throw PACCondition satisfied
-        ((SearchAwarePACCondition) this.pacCondition).setIncumbent(
-                this.totalSearchResults.getBestSolution().getCost(),openNodes);
+        ((SearchAwarePACCondition) this.pacCondition).addNewSearchResults(
+                this.totalSearchResults,openNodes);
 
         openNodes.clear(); // To free space. Probably this is not needed @TODO: Check if this helps memory and runtime
     }

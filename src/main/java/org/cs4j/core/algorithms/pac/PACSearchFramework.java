@@ -171,12 +171,12 @@ public class PACSearchFramework implements SearchAlgorithm {
         if(anytimeSearchAlgorithm instanceof AnytimePACSearch)
             ((AnytimePACSearch)anytimeSearchAlgorithm).setPacCondition(pacCondition);
 
-        // Run an anytime search
-        SearchResult result = anytimeSearchAlgorithm.search(domain);
-        if(result.hasSolution()==false) return result;
-
         // Check solution after it is found to see if we should halt
         try {
+            // Run an anytime search
+            SearchResult result = anytimeSearchAlgorithm.search(domain);
+            if(result.hasSolution()==false) return result;
+
             while (pacCondition.shouldStop(result) == false) {
                 result = anytimeSearchAlgorithm.continueSearch();
                 if (result.hasSolution() == false)

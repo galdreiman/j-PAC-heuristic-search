@@ -154,8 +154,9 @@ public class TestOpenBasedPACCondition {
         SearchResult result;
         int instanceId = 51;
         double oldExpanded;
-        double newExpanded;
+        double newExpanded=Double.MAX_VALUE;
         double epsilon,delta;
+        double previousExpanded;
         for(Class domainClass :domains){
             logger.info("Testing domain " + domainClass.getName());
             epsilon = 5;
@@ -168,17 +169,65 @@ public class TestOpenBasedPACCondition {
             result = psf.search(instance);
             Assert.assertTrue(result.hasSolution());
             oldExpanded = result.getExpanded();
+            previousExpanded=oldExpanded;
+            // Verify that gets to a delta where the PAC condition works
+            for(delta = 0.1; delta<=1;delta+=0.1){
+                psf = this.createPSF(epsilon,delta);
+                instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+                result = psf.search(instance);
+                Assert.assertTrue(result.hasSolution());
+                newExpanded = result.getExpanded();
+                Assert.assertTrue("Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1", newExpanded<=oldExpanded);
+                Assert.assertTrue("Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1", newExpanded<=previousExpanded);
+                previousExpanded=newExpanded;
+                logger.info(delta);
+            }
 
-            delta = 0;
-            psf = this.createPSF(epsilon,delta);
+            psf = this.createPSF(epsilon,1.0);
             instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
             result = psf.search(instance);
-            Assert.assertTrue(result.hasSolution());
             newExpanded = result.getExpanded();
-            Assert.assertTrue("Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1", newExpanded<oldExpanded);
+            Assert.assertTrue(":Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1",
+                    newExpanded<oldExpanded);
+
         }
     }
 
+
+    @Test
+    public void testDeltaEffect3(){
+        //Class[] domains = {DockyardRobot.class,Pancakes.class,VacuumRobot.class,GridPathFinding.class};
+        Class[] domains = {GridPathFinding.class,Pancakes.class,VacuumRobot.class,DockyardRobot.class};
+        SearchDomain instance;
+        PACSearchFramework psf;
+        SearchResult result;
+        int instanceId = 51;
+        double oldExpanded;
+        double newExpanded;
+        double epsilon,delta;
+        for(Class domainClass :domains){
+            PACUtils.loadPACStatistics(domainClass);
+            for(epsilon=0;epsilon<3; epsilon+=0.1){
+                delta = 0.0;
+                psf = this.createPSF(epsilon,delta);
+                instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+                result = psf.search(instance);
+                Assert.assertTrue(result.hasSolution());
+                oldExpanded = result.getExpanded();
+
+                psf = this.createPSF(epsilon,0.999999);
+                instance = ExperimentUtils.getSearchDomain(domainClass, instanceId); // Arbitrary instance
+                result = psf.search(instance);
+                newExpanded = result.getExpanded();
+                Assert.assertTrue(delta+":Expanded "+oldExpanded +" for eps=0, and "+newExpanded+" for eps=1",
+                        newExpanded<=oldExpanded);
+
+                if(newExpanded<oldExpanded)
+                    logger.info("Found you!"+epsilon+","+delta+", domain"+domainClass.getSimpleName());
+
+            }
+        }
+    }
 
     /**
      * Create a PACSearchFramework instance with the given parameters

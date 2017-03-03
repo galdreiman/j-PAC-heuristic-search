@@ -1,5 +1,6 @@
 package org.cs4j.core.algorithms.pac;
 
+import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 
 import java.util.List;
@@ -21,8 +22,8 @@ public interface SearchAwarePACCondition extends PACCondition {
 
     /**
      * A new incumbent solution has been found.
-     * @param incumbent The cost of the new incumbent solutions
+     * @param newSearchResults The new search results
      * @param openNodes The nodes in the open list
      */
-    public void setIncumbent(double incumbent, List<AnytimeSearchNode> openNodes);
+    public void addNewSearchResults(SearchResult newSearchResults, List<AnytimeSearchNode> openNodes);
 }

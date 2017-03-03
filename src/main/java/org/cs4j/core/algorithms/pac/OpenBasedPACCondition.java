@@ -14,7 +14,7 @@ import java.util.*;
 public class OpenBasedPACCondition extends RatioBasedPACCondition implements SearchAwarePACCondition{
     // This is the probability that the incumbent solution does not have the desired suboptimality
     // We maintain this value and change it during the search, halting when it is lower than delta.
-    private double probNotSuboptimal;
+    private double probIncumbentPAC;
     private double incumbent;
 
     // Logarithm of 1-delta (stored for computational efficiency)
@@ -28,14 +28,32 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         FMIN, OPTIMAL, OPEN_BASED
     }
 
-    // Maps to a given h value the CDF for it. Every h value represents the range of h values up to it
-    // sinde the last h value
+    /** This counts the number nodes with zero probabiltiy are in OPEN.
+     * This counter is needed since otherwise the product of probIncumbentPAC becomes useless after one such node.
+     */
+    private int zeroProbabilityCounter = 0;
+
+    // Maps to a given h value the CDF for it.
+    // Every h value represents the range of h values up to it. The last h value is assumed to be Double.MAX_VALUE
+    // Each CDF is a MAP that maps a value v to the value Pr(h*/h(n)<= v)
     public SortedMap<Double, SortedMap<Double,Double>> hToCdf;
 
     @Override
+    public void setup(SearchDomain domain, double epsilon, double delta) {
+        this.probIncumbentPAC =1;
+        this.incumbent=-1;
+        this.log1minusDelta = Math.log10(1-delta);
+        this.zeroProbabilityCounter= 0;
+        super.setup(domain,epsilon,delta);
+    }
+
+    @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
+        if(this.zeroProbabilityCounter>0)
+            return false;
+
         if(this.incumbent>=0) {
-            if(this.probNotSuboptimal >= 1-this.delta){
+            if(this.probIncumbentPAC >= this.log1minusDelta){
                 conditionFired = Condition.OPEN_BASED;
                 return true;
             }
@@ -45,14 +63,47 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
             return false;
     }
 
+
+
+    public void removedFromOpen(AnytimeSearchNode node)
+    {
+        double probGood = this.getProb(node);
+        if(probGood==0)
+            --this.zeroProbabilityCounter;
+        else
+            this.probIncumbentPAC =this.probIncumbentPAC - Math.log10(probGood);
+    }
+    public void addedToOpen(AnytimeSearchNode node)
+    {
+        double probGood = this.getProb(node);
+        if(probGood==0)
+            ++this.zeroProbabilityCounter;
+        else
+            this.probIncumbentPAC =this.probIncumbentPAC + Math.log10(probGood);
+    }
+    /**
+     * A new incumbent solution has been found.
+     * @param newSearchResults The new search results
+     * @param openNodes The nodes in the open list
+     */
     @Override
-    public void setup(SearchDomain domain, double epsilon, double delta) {
-        this.probNotSuboptimal=1;
-        this.incumbent=-1;
-        this.log1minusDelta = Math.log10(1-delta);
-        super.setup(domain,epsilon,delta);
+    public void addNewSearchResults(SearchResult newSearchResults, List<AnytimeSearchNode> openNodes){
+        this.incumbent=newSearchResults.getBestSolution().getCost();
+
+        // Recompute the prob not suboptimal
+        this.probIncumbentPAC =0;
+        this.zeroProbabilityCounter=0;
+        for(AnytimeSearchNode node : openNodes)
+            this.addedToOpen(node);
+
+        if(this.shouldStop(newSearchResults))
+            throw new PACConditionSatisfied(this);
+
+        logger.info("Incumbent set to " + incumbent
+                +",  probSum="+this.probIncumbentPAC+", zero probs="+this.zeroProbabilityCounter);
     }
 
+    // ----------------- FUNCTIONS FOR GENERATING THE STATISTICS ----------------------------
     /**
      * Prepare the statistics needed to run the condition
      */
@@ -209,6 +260,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
      * than 1+epsilon times the cost of the optimal path from the initial state
      * to the goal state that passes through this node.
      * ion an
+     * Formally: getProb(n) = Pr(incumbent <= (1+epsilon)*g(n)+h*(n)
      * @param node The node
      * @return The prob. that it cannto invalidate the PAC-ness of the incumbent
      */
@@ -217,6 +269,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
         SortedMap<Double, Double> cdf = getCDF(node);
         Double oldCdfValue = 0.0;
 
+        // In this case node is guaranteed to lead to a solution that is more than (1+epsilon) times the incumbent
         if(this.incumbent<=(1+this.epsilon)*node.getF())
             return 1;
 
@@ -245,40 +298,11 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
     }
 
 
-    public void removedFromOpen(AnytimeSearchNode node)
-    {
-        this.probNotSuboptimal=this.probNotSuboptimal-Math.log10(1-this.getProb(node));
-    }
-    public void addedToOpen(AnytimeSearchNode node)
-    {
-        this.probNotSuboptimal=this.probNotSuboptimal+Math.log10(1-this.getProb(node));
-    }
-
     @Override
     public void setFmin(double fmin) {
         this.fmin=fmin; // @TODO NOT SURE IF THIS IS NEEDED
     }
 
 
-    /**
-     * A new incumbent solution has been found.
-     * @param incumbent The cost of the new incumbent solutions
-     * @param openNodes The nodes in the open list
-     */
-    public void setIncumbent(double incumbent, List<AnytimeSearchNode> openNodes){
-        this.incumbent=incumbent;
 
-        // Recompute the prob not suboptimal
-        this.probNotSuboptimal=1;
-        for(AnytimeSearchNode node : openNodes) {
-            this.probNotSuboptimal=
-                    this.probNotSuboptimal+
-                    Math.log10(1-this.getProb(node));
-        }
-        if(this.probNotSuboptimal>=this.log1minusDelta){
-            this.conditionFired=Condition.OPEN_BASED;
-            throw new PACConditionSatisfied(this);
-        }
-        logger.info("Incumbent set to " + incumbent +",  probSum="+this.probNotSuboptimal);
-    }
 }
