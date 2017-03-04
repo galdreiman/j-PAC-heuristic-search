@@ -17,11 +17,10 @@ import java.util.*;
  * A utility runner to set up what to run on the server for PAC research
  */
 public class PACExperimentRunner {
-    final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
-    final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
-    //final static double[] DEFAULT_DELTAS = new double[] { 0, 0.1, 0.25, 0.5, 0.75, 0.8, 1 };
-    final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1 };
-
+    private final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
+    private final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
+    private final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1 };
+    private final static Class[] DEFAULT_CLASSES = new Class[]{DockyardRobot.class, Pancakes.class,FifteenPuzzle.class, VacuumRobot.class};
 
     //@TODO: Replace all this with better handling of command line using some known code to do so
     private Class[] getClassesFromCommandLine(String[] args){
@@ -35,7 +34,7 @@ public class PACExperimentRunner {
             }
         }
         if(classesFound==false)
-            return new Class[]{DockyardRobot.class, Pancakes.class,FifteenPuzzle.class};
+            return DEFAULT_CLASSES;
 
         List<Class> domainsList = new ArrayList<>();
         Class domainClass=null;
@@ -180,19 +179,16 @@ public class PACExperimentRunner {
 
     private void runThresholdBasedConditions(Class[] domains,Class[] pacConditions,double[] epsilons) {
         // Run trivial and ratio-based on all domains
-        double[] deltas = DEFAULT_DELTAS;
-
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());
         Experiment experiment = new StandardExperiment(psf);
 
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
-        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+        runner.runExperimentBatch(domains,pacConditions,epsilons, DEFAULT_DELTAS,experiment);
     }
 
     private void runBoundedCostBased(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
-        double[] deltas = DEFAULT_DELTAS;
         Class[] pacConditions = new Class[]{TrivialPACCondition.class, RatioBasedPACCondition.class};
 
         PACSearchFramework psf = new PACSearchFramework();
@@ -200,7 +196,7 @@ public class PACExperimentRunner {
         Experiment experiment = new StandardExperiment(psf);
 
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
-        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+        runner.runExperimentBatch(domains,pacConditions,epsilons, DEFAULT_DELTAS,experiment);
     }
 
     private void runOracleCondition(Class[] domains,double[] epsilons) {
@@ -275,7 +271,7 @@ public class PACExperimentRunner {
         }
 
         if(args[0].equals("RunFMin")){
-            runner.logger.info("****************************** running f-min ");
+            logger.info("****************************** running f-min ");
             runner.runFMinConditions(domains,epsilonValues);
         }
     }
