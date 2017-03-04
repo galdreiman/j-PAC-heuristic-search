@@ -3,6 +3,7 @@ package org.cs4j.core.test.algorithms.pac;
 import junit.framework.Assert;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
@@ -23,9 +24,12 @@ public class TestBoundedCost {
         Class conditionClass = TrivialPACCondition.class;
         SearchDomain instance = ExperimentUtils.getSearchDomain(Pancakes.class, instanceId);
         PACUtils.loadPACStatistics(Pancakes.class);
+
+        SearchResult result;
+
         PACSearchFramework psf = this.createPSF(epsilon, delta, conditionClass);
 
-        SearchResult result = psf.search(instance);
+        result = psf.search(instance);
         Assert.assertTrue(result.hasSolution());
     }
 

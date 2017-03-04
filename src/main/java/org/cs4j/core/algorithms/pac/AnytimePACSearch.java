@@ -15,7 +15,7 @@ public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
     final static Logger logger = Logger.getLogger(AnytimePACSearch.class);
 
     protected PACCondition pacCondition;
-    private double epsilon;
+    protected double epsilon;
     private double delta;
 
 

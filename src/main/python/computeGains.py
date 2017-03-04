@@ -5,8 +5,14 @@ import os
 
 
 
+def compute_all_gains():
+    compute_gains("dockyard")
+    compute_gains("pancakes")
+    compute_gains("vacuumrobot")
+    compute_gains("GridPathFinding")
 
-def compute_gains():
+
+def compute_gains(domain):
     #  Input line format:
     # 0 InstanceID
     # 1 Found
@@ -17,17 +23,19 @@ def compute_gains():
     # 6 Expanded
     # 7 Cpu Time
     # 8 Wall Time
-    # 9 delta
-    # 10 epsilon
-    # 11 pacCondition
+    # 9 pacCondition
+    # 10 delta
+    # 11 epsilon
+    # 12 pacCondition2
+    # 13 gain
+    # 14 has gain
 
     #domain = "pancakes"
     #domain = "pancakes"
     #domain = "vacuumrobot"
-    domain = "dockyard"
     print "##### Input"
     epsilons = []
-    input = open('../../../results/alone/conditions-PAC%s.csv' % domain,'r')
+    input = open('../../../results/conditions-%s.csv' % domain,'r')
     first_line = True
     data = []
     to_best = dict()
@@ -41,14 +49,14 @@ def compute_gains():
         # Get delta
         parts = line.split(",")
         data_line = [x.strip() for x in parts]
-        delta = float(data_line[9])
-        condition = data_line[11]
+        delta = float(data_line[10])
+        condition = data_line[12]
         # Store delta zero value for every experiment
         if delta==0.0 and "FMin" in condition:
-            epsilon = float(data_line[10])
+            epsilon = float(data_line[11])
             if epsilon not in epsilons:
                 epsilons.append(epsilon)
-            key = (data_line[0],data_line[10])
+            key = (data_line[0],data_line[11])
             to_best[key]=data_line[6] # Store expanded
 
         data.append(data_line)
@@ -56,15 +64,21 @@ def compute_gains():
 
     # Compute gains
     print "##### Output "
-    output = open('../../../results/conditions-%s-gains.csv' % domain,'w')
+    output = open('../../../results/summary/openbased/conditions-%s-gains.csv' % domain,'w')
     output.write("%s, expandedFMin\n" % headers)
     for data_line in data:
 
         key = (data_line[0],data_line[10])
         output_line = ",".join(data_line)
         print output_line
-        output.write("%s,%s\n" % (output_line,to_best[key]))
+        gain = float(data_line[6])/float(to_best[key])
+        if gain>1:
+            has_gain=True
+        else:
+            has_gain=False
+
+        output.write("%s,%s,%s,%s\n" % (output_line,to_best[key], gain, has_gain ))
 
     output.close()
 
-compute_gains()
+compute_all_gains()

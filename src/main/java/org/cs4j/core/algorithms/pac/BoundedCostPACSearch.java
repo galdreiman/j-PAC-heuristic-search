@@ -9,7 +9,9 @@ import org.cs4j.core.collections.BucketHeap;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.collections.SearchQueueElement;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Created by Roni Stern on 03/03/2017.
@@ -32,6 +34,34 @@ public class BoundedCostPACSearch extends AnytimePACSearch {
         return super._search();
     }
 
+    /**
+     * If there are no more nodes with the old fmin, need to update fmin and maybe also maxfmin accordingly.
+     */
+    @Override
+    protected void updateFmin(){
+        super.updateFmin();
+
+        if(this.maxFmin*(1+this.epsilon)>this.threshold) {
+            this.threshold=this.maxFmin*(1+this.epsilon);
+            this.resortOpen();//throw new RuntimeException("bip");
+        }
+
+        // Check PAC condition if max f min is updated
+        if(this.totalSearchResults!=null) {
+            if (this.incumbentSolution<=this.maxFmin * (1 + this.epsilon)){
+                throw new PACConditionSatisfied(new FMinCondition());
+            }
+        }
+    }
+
+    private void resortOpen() {
+        //@TODO: Replace this by defining an iterator over open instead of adding and removing all of the nodes in OPEN
+        // Get all nodes in OPEN by removing all of them and then re-inserting them
+        List<AnytimeSearchNode> openNodes = new ArrayList<>(this.open.size());
+        while(this.open.size()>0) openNodes.add(this.open.poll());
+        for(AnytimeSearchNode node : openNodes) this.open.add(node);
+        openNodes.clear(); // To free space. Probably this is not needed @TODO: Check if this helps memory and runtime
+    }
 
     @Override
     protected Comparator<AnytimeSearchNode> createNodeComparator() {

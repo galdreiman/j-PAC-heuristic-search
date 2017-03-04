@@ -121,8 +121,8 @@ public abstract class AbstractAnytimeSearch implements AnytimeSearchAlgorithm {
             // expand the node (since, if its g satisfies the goal test - it would be already returned)
             goal = expand(currentNode);
             ++result.expanded;
-            if (result.expanded % 1000000 == 0)
-                logger.info("[INFO] Expanded so far " + result.expanded);
+            if (result.expanded % 1000 == 0)
+                logger.info("[INFO] Expanded so far " + result.expanded + ", incumbent ="+this.incumbentSolution+", fmin="+this.fmin+",opensize="+this.open.size());
 
             if(currentNode.getF()==this.fmin)
                 this.updateFmin();
