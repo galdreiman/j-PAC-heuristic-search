@@ -190,9 +190,10 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
 
-    private void runBoundedCostBased(Class[] domains,Class[] pacConditions,double[] epsilons) {
+    private void runBoundedCostBased(Class[] domains,double[] epsilons) {
         // Run trivial and ratio-based on all domains
         double[] deltas = DEFAULT_DELTAS;
+        Class[] pacConditions = new Class[]{TrivialPACCondition.class, RatioBasedPACCondition.class};
 
         PACSearchFramework psf = new PACSearchFramework();
         psf.setAdditionalParameter("anytimeSearch", BoundedCostPACSearch.class.getName());
@@ -251,7 +252,7 @@ public class PACExperimentRunner {
 
         if(args[0].equals("BoundedCostBased")){
             logger.info("********** Bounded Cost Based Search");
-            runner.runBoundedCostBased(domains,pacConditions,epsilonValues);
+            runner.runBoundedCostBased(domains,epsilonValues);
         }
 
 
