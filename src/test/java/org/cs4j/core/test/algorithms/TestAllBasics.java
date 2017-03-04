@@ -16,8 +16,10 @@
  */
 package org.cs4j.core.test.algorithms;
 
+import junit.framework.Assert;
 import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
+import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.*;
 import org.junit.Test;
 
@@ -61,7 +63,15 @@ public class TestAllBasics {
 	}	
 	
 
-	
+	@Test
+	public void testDPS() throws FileNotFoundException {
+		SearchDomain domain = TestUtils.createPancakePuzzle(40,"51");
+		SearchAlgorithm dps = new DP("DPS", false,false,false);
+		dps.setAdditionalParameter("weight","2.0");
+		SearchResult results = dps.search(domain);
+
+		Assert.assertTrue(results.hasSolution());
+	}
 
 	
 	public static void main(String[] args) throws FileNotFoundException {

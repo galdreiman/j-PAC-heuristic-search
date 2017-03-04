@@ -9,6 +9,7 @@ import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.util.*;
 
 /**
@@ -19,8 +20,8 @@ import java.util.*;
 public class PACExperimentRunner {
     private final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
     private final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
-    private final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1 };
-    private final static Class[] DEFAULT_CLASSES = new Class[]{DockyardRobot.class, Pancakes.class,FifteenPuzzle.class, VacuumRobot.class};
+    private final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1,0.0 };
+    private final static Class[] DEFAULT_CLASSES = new Class[]{DockyardRobot.class, GridPathFinding.class, Pancakes.class,VacuumRobot.class,FifteenPuzzle.class, };
 
     //@TODO: Replace all this with better handling of command line using some known code to do so
     private Class[] getClassesFromCommandLine(String[] args){
@@ -234,6 +235,12 @@ public class PACExperimentRunner {
     }
 
 
+    private void runDPS(Class[] domains,double[] epsilons){
+        // Run trivial and ratio-based on all domains
+        DPSExperimentRunner runner = new DPSExperimentRunner();
+        runner.runExperimentBatch(domains,epsilons);
+    }
+
 
     public static void main(String[] args) throws ClassNotFoundException {
         PACExperimentRunner runner = new PACExperimentRunner();
@@ -257,7 +264,7 @@ public class PACExperimentRunner {
             runner.collectStatisticsForOpenBased(domains);
         }
         if(args[0].equals("CollectThresholdBased")) {
-            logger.info("****************************** collecting stats for open based ");
+            logger.info("****************************** collecting stats for threshold based ");
             runner.collectStatisticsForThresholdBased(domains);
         }
         if(args[0].equals("Run")) {
@@ -266,7 +273,7 @@ public class PACExperimentRunner {
         }
 
         if(args[0].equals("RunOracle")) {
-            logger.info("****************************** running threshold based ");
+            logger.info("****************************** running Oracle ");
             runner.runOracleCondition(domains,epsilonValues);
         }
 
@@ -274,5 +281,11 @@ public class PACExperimentRunner {
             logger.info("****************************** running f-min ");
             runner.runFMinConditions(domains,epsilonValues);
         }
+
+        if(args[0].equals("RunDPS")){
+            logger.info("****************************** running DPS ");
+            runner.runDPS(domains,epsilonValues);
+        }
+
     }
 }
