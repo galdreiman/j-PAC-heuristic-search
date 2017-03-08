@@ -14,6 +14,9 @@ def compute_all_gains():
     #compute_gains(input_path_template % "GridPathFinding")
 
 
+def get_column_indices():
+
+
 def compute_gains(input_path, output_path):
     #  Input line format:
     # 0 InstanceID
@@ -34,7 +37,7 @@ def compute_gains(input_path, output_path):
     #domain = "vacuumrobot"
 
     INSTANCE_INDEX =0
-    DELTA_INDEA = 9
+    DELTA_INDEX = 9
     EPSILON_INDEX = 10
     EXPANDED_INDEX = 6
     CONDITION_INDEX = 11
@@ -55,7 +58,7 @@ def compute_gains(input_path, output_path):
         # Get delta
         parts = line.split(",")
         data_line = [x.strip() for x in parts]
-        delta = float(data_line[DELTA_INDEA])
+        delta = float(data_line[DELTA_INDEX])
         condition = data_line[CONDITION_INDEX]
         # Store delta zero value for every experiment
         if delta==0.0 and "DPS" in condition:
@@ -71,13 +74,13 @@ def compute_gains(input_path, output_path):
     # Compute gains
     print "##### Output "
     output = open(output_path,'w')
-    output.write("%s, expandedFMin\n" % headers)
+    output.write("%s, expandedFMin, gain, has_gain\n" % headers)
     for data_line in data:
 
         key = (data_line[INSTANCE_INDEX],data_line[EPSILON_INDEX])
         output_line = ",".join(data_line)
         print output_line
-        gain = float(data_line[EXPANDED_INDEX])/float(to_best[key])
+        gain = float(to_best[key])/float(data_line[EXPANDED_INDEX])
         if gain>1:
             has_gain=True
         else:

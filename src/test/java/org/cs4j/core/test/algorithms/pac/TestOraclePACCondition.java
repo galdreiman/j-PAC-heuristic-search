@@ -7,7 +7,9 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.*;
 import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.experiments.PacPreprocessRunner;
 import org.junit.Test;
@@ -152,5 +154,50 @@ public class TestOraclePACCondition {
         Assert.assertTrue("Expanded " + expanded10 +" for e=1.0 and " + expanded025 + " for e=0.25",
                 expanded10<expanded025);
     }
+
+    @Test
+    public void testOracleVacuum() {
+        int instanceId=53;
+        SearchDomain instance = ExperimentUtils.getSearchDomain(VacuumRobot.class, instanceId);
+        PACSearchFramework psf = new PACSearchFramework();
+        OraclePACCondition pacCondition;
+
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
+        psf.setAdditionalParameter("epsilon", "0.0");
+        psf.setAdditionalParameter("delta", "0.0");
+
+        pacCondition = (OraclePACCondition) psf.getPACCondition();
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
+        pacCondition.setOptimalSolution(optimalSolution);
+
+        SearchResult result = psf.search(instance);
+
+        Assert.assertTrue(result.hasSolution());
+        Assert.assertEquals(result.getBestSolution().getCost(),optimalSolution);
+    }
+
+    @Test
+    public void testOracleGrid() {
+        int instanceId=53;
+        SearchDomain instance = ExperimentUtils.getSearchDomain(GridPathFinding.class, instanceId);
+        PACSearchFramework psf = new PACSearchFramework();
+        OraclePACCondition pacCondition;
+
+        psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+        psf.setPACConditionClass(OraclePACCondition.class);
+        psf.setAdditionalParameter("epsilon", "0.0");
+        psf.setAdditionalParameter("delta", "0.0");
+
+        pacCondition = (OraclePACCondition) psf.getPACCondition();
+        Double optimalSolution = PACUtils.getOptimalSolution(instance.getClass(),instanceId);
+        pacCondition.setOptimalSolution(optimalSolution);
+
+        SearchResult result = psf.search(instance);
+
+        Assert.assertTrue(result.hasSolution());
+        Assert.assertEquals(result.getBestSolution().getCost(),optimalSolution);
+    }
+
 
 }
