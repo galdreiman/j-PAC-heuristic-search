@@ -1,20 +1,27 @@
-package org.cs4j.core.algorithms.pac;
+package org.cs4j.core.algorithms.pac.preprocess;
+
+import java.io.IOException;
+import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.IDAstar;
 import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.collections.PackedElement;
-import org.cs4j.core.domains.*;
+import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
+import org.cs4j.core.algorithms.pac.StatesCollector;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
-
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.util.*;
 
 /**
  * Created by Roni Stern on 28/02/2017.
