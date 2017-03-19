@@ -5,6 +5,7 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,7 +27,8 @@ public class OpenBasedExperiment  extends StandardExperiment{
         psf.setPACConditionClass(OpenBasedPACCondition.class);
     }
 
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     public void run(SearchDomain instance, OutputResult output, int instanceId, SortedMap<String, Object> runParams) {
         SearchResult result;
         List resultsData;
@@ -65,7 +67,8 @@ public class OpenBasedExperiment  extends StandardExperiment{
      * @param result the SearchResults object to extract from
      * @param resultsData a list to append the results extracted from SearchResults
      */
-    @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
     protected void appendSearchResults(SearchResult result,
                                        List resultsData) {
         resultsData.add(result.hasSolution() ? 1 : 0);

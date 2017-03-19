@@ -1,10 +1,10 @@
 package org.cs4j.core.algorithms;
 
-import org.cs4j.core.algorithms.pac.BoundedCostPACSearch;
-
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
 
 /**
  * Created by Roni Stern on 23/02/2017.

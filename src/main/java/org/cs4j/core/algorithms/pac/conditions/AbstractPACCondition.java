@@ -1,7 +1,7 @@
-package org.cs4j.core.algorithms.pac;
+package org.cs4j.core.algorithms.pac.conditions;
 
 import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.pac.PACCondition;
 
 /**
  * Created by Roni Stern on 26/02/2017.

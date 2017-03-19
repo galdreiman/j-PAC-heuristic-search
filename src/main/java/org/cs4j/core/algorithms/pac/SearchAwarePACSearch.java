@@ -5,6 +5,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AbstractAnytimeSearch;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.SearchResultImpl;
+import org.cs4j.core.algorithms.pac.conditions.SearchAwarePACCondition;
 
 import java.util.*;
 

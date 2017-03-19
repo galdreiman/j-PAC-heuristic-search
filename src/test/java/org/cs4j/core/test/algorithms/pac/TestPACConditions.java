@@ -6,6 +6,8 @@ import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
 import org.cs4j.core.domains.DockyardRobot;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;

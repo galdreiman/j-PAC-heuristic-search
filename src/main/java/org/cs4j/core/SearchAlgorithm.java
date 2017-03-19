@@ -16,8 +16,6 @@
  */
 package org.cs4j.core;
 
-import java.util.Map;
-
 /**
  * The search algorithm interface.
  *

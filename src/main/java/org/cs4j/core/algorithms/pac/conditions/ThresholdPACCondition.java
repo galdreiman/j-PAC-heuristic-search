@@ -1,18 +1,18 @@
-package org.cs4j.core.algorithms.pac;
-
-import org.apache.log4j.Logger;
-import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
-import org.cs4j.core.mains.DomainExperimentData;
-import org.cs4j.core.mains.DomainExperimentData.RunType;
+package org.cs4j.core.algorithms.pac.conditions;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.SortedMap;
-import java.util.TreeMap;
+
+import org.apache.log4j.Logger;
+import org.cs4j.core.SearchDomain;
+import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.pac.PACStatistics;
+import org.cs4j.core.algorithms.pac.PACUtils;
+import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.mains.DomainExperimentData.RunType;
 
 /**
  * Created by Roni Stern on 26/02/2017.

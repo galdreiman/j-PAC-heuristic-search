@@ -1,10 +1,6 @@
-package org.cs4j.core.algorithms.pac;
+package org.cs4j.core.algorithms.pac.conditions;
 
-import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-
-import java.util.SortedMap;
-import java.util.TreeMap;
 
 /**
  * Created by Roni Stern on 01/03/2017.

@@ -1,16 +1,29 @@
 package org.cs4j.core.experiments;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.cs4j.core.OutputResult;
-import org.cs4j.core.SearchAlgorithm;
-import org.cs4j.core.algorithms.DP;
-import org.cs4j.core.algorithms.pac.*;
-import org.cs4j.core.domains.*;
+import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
+import org.cs4j.core.algorithms.pac.FMinCondition;
+import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
+import org.cs4j.core.algorithms.pac.StatisticsGenerator;
+import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
+import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
+import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.mains.DomainExperimentData;
-
-import java.io.IOException;
-import java.lang.reflect.Constructor;
-import java.util.*;
 
 /**
  * Created by Roni Stern on 28/02/2017.

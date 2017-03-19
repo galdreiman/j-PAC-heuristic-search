@@ -2,8 +2,7 @@ package org.cs4j.core.algorithms;
 
 
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.pac.BoundedCostPACSearch;
-
+import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
 
 import java.util.*;
 

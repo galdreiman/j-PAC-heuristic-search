@@ -5,9 +5,9 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.algorithms.DP;
 import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
-import org.cs4j.core.algorithms.pac.OraclePACCondition;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.PACUtils;
+import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
 
 import java.util.SortedMap;
 

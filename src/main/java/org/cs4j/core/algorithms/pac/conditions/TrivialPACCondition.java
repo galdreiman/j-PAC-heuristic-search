@@ -1,12 +1,11 @@
-package org.cs4j.core.algorithms.pac;
+package org.cs4j.core.algorithms.pac.conditions;
+
+import java.util.Collection;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
-import org.cs4j.core.mains.DomainExperimentData;
-
-import java.io.*;
-import java.util.*;
+import org.cs4j.core.algorithms.pac.PACStatistics;
 
 
 

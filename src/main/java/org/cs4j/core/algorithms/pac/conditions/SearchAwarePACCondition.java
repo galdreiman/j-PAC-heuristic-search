@@ -1,7 +1,8 @@
-package org.cs4j.core.algorithms.pac;
+package org.cs4j.core.algorithms.pac.conditions;
 
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.algorithms.pac.PACCondition;
 
 import java.util.List;
 

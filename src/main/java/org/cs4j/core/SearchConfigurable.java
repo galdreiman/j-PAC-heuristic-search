@@ -1,7 +1,5 @@
 package org.cs4j.core;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Map;
 
 /**
@@ -17,7 +15,8 @@ public interface SearchConfigurable {
      *
      * @return A mapping of parameters (name=>type) or null if there are no such parameters
      */
-    Map<String, Class> getPossibleParameters();
+    @SuppressWarnings("rawtypes")
+	Map<String, Class> getPossibleParameters();
 
     /**
      * The function allows setting of different parameters of the search, according to the algorithm

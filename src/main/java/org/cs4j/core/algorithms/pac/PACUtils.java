@@ -2,6 +2,7 @@ package org.cs4j.core.algorithms.pac;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.SearchDomain;
+import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 

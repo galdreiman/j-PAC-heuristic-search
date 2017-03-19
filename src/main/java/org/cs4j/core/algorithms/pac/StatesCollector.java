@@ -3,6 +3,7 @@ package org.cs4j.core.algorithms.pac;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.algorithms.pac.conditions.SearchAwarePACCondition;
 import org.cs4j.core.collections.PackedElement;
 
 import java.util.HashMap;

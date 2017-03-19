@@ -9,6 +9,8 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.*;
 import org.cs4j.core.algorithms.DP;
 import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;

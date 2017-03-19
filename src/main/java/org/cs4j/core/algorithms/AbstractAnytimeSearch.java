@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.AnytimeSearchAlgorithm;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.pac.BoundedCostPACSearch;
+import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
 import org.cs4j.core.collections.*;
 
 import java.util.ArrayList;
