@@ -16,6 +16,7 @@ public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
 
     protected PACCondition pacCondition;
     protected double epsilon;
+    protected double delta;
     public void setPacCondition(PACCondition pacCondition){
         this.pacCondition = pacCondition;
         this.epsilon=this.pacCondition.getEpsilon();

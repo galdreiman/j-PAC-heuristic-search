@@ -1,35 +1,34 @@
 package org.cs4j.core.algorithms.pac.preprocess;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.AnytimeSearchAlgorithm;
+import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimePTS;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.domains.VacuumRobot;
-import org.cs4j.core.experiments.AnytimeExperimentRunner;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 
-public class MLPacPreprocess extends AnytimeExperimentRunner {
-
-	
+public class MLPacPreprocess {
 
 	private final static Logger logger = Logger.getLogger(MLPacPreprocess.class);
+	private static OutputResult output;
 
 	/**
-	 * for each domain in Domains:
-	 * 		1. train a classifier:
-	 * 			1.1 for each problem in domain:
-	 * 				apply AnytimeSearchAlgo on problem:
-	 * 				for each solution extract features
-	 * 			1.2 train the model with features table
+	 * for each domain in Domains: 1. train a classifier: 1.1 for each problem
+	 * in domain: apply AnytimeSearchAlgo on problem: for each solution extract
+	 * features 1.2 train the model with features table
 	 * 
 	 * @param args
 	 */
@@ -37,6 +36,9 @@ public class MLPacPreprocess extends AnytimeExperimentRunner {
 	public static void main(String[] args) {
 		Class[] domains = { VacuumRobot.class }; // , DockyardRobot.class,
 													// FifteenPuzzle.class };
+
+		double inputEpsilon = 0.2; // TODO: get input from user (from console,
+									// e.g. args[] or whatever)
 
 		for (Class domainClass : domains) {
 			logger.info("Running anytime for domain " + domainClass.getName());
@@ -57,29 +59,89 @@ public class MLPacPreprocess extends AnytimeExperimentRunner {
 				String inputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).inputPath;
 
 				AnytimeSearchAlgorithm algorithm = getAnytimeAlg();
+				List<SearchResultImpl> searchResultsList = new ArrayList<>();
+				output = new OutputResult(
+						DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
+						"ML_PAC_ConditionPreprocessFeatures", -1, -1, null, false, true);
+				output.writeln(getHeaderLineFeatures());
 
 				for (int i = fromInstance; i <= toInstance; ++i) {
 					logger.info("\rSolving " + domainClass.getName() + "\t instance " + i);
 					domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
+					double optimalCost = PACUtils.getOptimalSolution(domainClass, i);
 
-					SearchResultImpl results = (SearchResultImpl)algorithm.search(domain);
-					int counter = 0;
-					while (!results.hasSolution()) {
-						algorithm.continueSearch();
-						counter ++;
+					int problemAttemptIndx = 1;
+					SearchResultImpl result = (SearchResultImpl) algorithm.search(domain);
+					searchResultsList.add(result);
+
+					// if another solution is possible - continue searing
+					while (result.hasSolution()) {
+						// extract feature out of every solution:
+						ExtractFeaturesToFile(result, domain, domainClass,problemAttemptIndx++, i, optimalCost, inputEpsilon);
+						
+						// continue to search another solution:
+						result = (SearchResultImpl) algorithm.continueSearch();
+						searchResultsList.add(result);
 					}
-					results = (SearchResultImpl) algorithm.getTotalSearchResults();
-					int solutions = results.getSolutions().size();
+
 					System.out.println("------------------");
-					System.out.println(solutions);
-					System.out.println(counter);
+					System.out.println(searchResultsList.size());
 					System.out.println("------------------");
+
 				}
 
 			} catch (Exception e) {
 				logger.error(e);
+				e.printStackTrace();
+			} finally {
+				if (output != null) {
+					output.close();
+				}
 			}
 		}
+	}
+
+	private static String getHeaderLineFeatures() {
+		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "length",
+				"initial-H", "is-W-opt" };
+		return String.join(",", attributes);
+	}
+
+	private static void ExtractFeaturesToFile(SearchResultImpl searchResult, SearchDomain domain, Class domainClass,
+			int attemptCounter, int instance, double optimalCost, double inputEpsilon) {
+
+		String domainName = domainClass.getSimpleName();
+		int problemInstance = instance;
+		int attempt = attemptCounter++;
+
+		long generated = searchResult.getGenerated();
+		long expanded = searchResult.getExpanded();
+		long reopened = searchResult.getReopened();
+		double U = searchResult.getBestSolution().getCost();
+		int g = searchResult.getBestSolution().getLength();
+		double initialH = domain.initialState().getH();
+
+		boolean isWOptimal = isWOpttimal(U, g, optimalCost, inputEpsilon);
+
+		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
+				reopened + "", U + "", g + "", initialH + "", isWOptimal + "" };
+		String line = String.join(",", lineParts);
+		logger.debug("adding new features to table: " + line);
+		try {
+			output.writeln(line);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+
+	
+
+	private static boolean isWOpttimal(double U, int g, double optimalCost, double inputEpsilon) {
+		// a solution consider as W-optimal iff:
+		// g(n) + h*(n)(1+epsilon) < U
+
+		return g + (optimalCost * inputEpsilon) < U;
 	}
 
 	private static AnytimeSearchAlgorithm getAnytimeAlg() {
