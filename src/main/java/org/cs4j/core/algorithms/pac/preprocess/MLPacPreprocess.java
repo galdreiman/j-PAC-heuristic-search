@@ -24,7 +24,12 @@ public class MLPacPreprocess extends AnytimeExperimentRunner {
 	private final static Logger logger = Logger.getLogger(MLPacPreprocess.class);
 
 	/**
-	 * Generate statistics
+	 * for each domain in Domains:
+	 * 		1. train a classifier:
+	 * 			1.1 for each problem in domain:
+	 * 				apply AnytimeSearchAlgo on problem:
+	 * 				for each solution extract features
+	 * 			1.2 train the model with features table
 	 * 
 	 * @param args
 	 */
