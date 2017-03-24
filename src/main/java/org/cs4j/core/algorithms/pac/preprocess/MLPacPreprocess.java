@@ -13,6 +13,7 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimePTS;
+import org.cs4j.core.algorithms.AnytimePTSForMLPac;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.domains.VacuumRobot;
@@ -102,8 +103,8 @@ public class MLPacPreprocess {
 	}
 
 	private static String getHeaderLineFeatures() {
-		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "length",
-				"initial-H", "is-W-opt" };
+		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
+				"h1","g2", "h2", "g3","h3", "is-W-opt" };
 		return String.join(",", attributes);
 	}
 
@@ -120,11 +121,18 @@ public class MLPacPreprocess {
 		double U = searchResult.getBestSolution().getCost();
 		int g = searchResult.getBestSolution().getLength();
 		double initialH = domain.initialState().getH();
+		
+		double g1 = (double) searchResult.getExtras().get("g_1");
+		double h1 = (double) searchResult.getExtras().get("h_1");
+		
+		double g2 = (double) searchResult.getExtras().get("g_2");
+		double h2 = (double) searchResult.getExtras().get("h_2");
+		
 
 		boolean isWOptimal = isWOpttimal(U, g, optimalCost, inputEpsilon);
 
 		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
-				reopened + "", U + "", g + "", initialH + "", isWOptimal + "" };
+				reopened + "", U + "", g + "", initialH + "", g1+ "",h1+ "",g2+ "",h2+ "", isWOptimal + "" };
 		String line = String.join(",", lineParts);
 		logger.debug("adding new features to table: " + line);
 		try {
@@ -145,7 +153,7 @@ public class MLPacPreprocess {
 	}
 
 	private static AnytimeSearchAlgorithm getAnytimeAlg() {
-		AnytimeSearchAlgorithm algorithm = new AnytimePTS() {
+		AnytimeSearchAlgorithm algorithm = new AnytimePTSForMLPac() {
 			@Override
 			public SearchResult search(SearchDomain domain) {
 				double initialH = domain.initialState().getH();
