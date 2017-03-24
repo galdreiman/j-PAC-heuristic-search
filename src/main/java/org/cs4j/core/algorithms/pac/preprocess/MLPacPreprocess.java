@@ -104,7 +104,7 @@ public class MLPacPreprocess {
 
 	private static String getHeaderLineFeatures() {
 		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
-				"h1","g2", "h2", "g3","h3", "is-W-opt" };
+				"h1","g2", "h2", "g3","h3","oprimal_cost", "w", "is-W-opt" };
 		return String.join(",", attributes);
 	}
 
@@ -132,7 +132,7 @@ public class MLPacPreprocess {
 		boolean isWOptimal = isWOpttimal(U, g, optimalCost, inputEpsilon);
 
 		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
-				reopened + "", U + "", g + "", initialH + "", g1+ "",h1+ "",g2+ "",h2+ "", isWOptimal + "" };
+				reopened + "", U + "", g + "", initialH + "", g1+ "",h1+ "",g2+ "",h2+ "",optimalCost+"",inputEpsilon +"", isWOptimal + "" };
 		String line = String.join(",", lineParts);
 		logger.debug("adding new features to table: " + line);
 		try {
