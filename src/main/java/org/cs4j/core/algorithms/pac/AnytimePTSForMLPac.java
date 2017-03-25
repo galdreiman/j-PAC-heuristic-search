@@ -1,6 +1,9 @@
-package org.cs4j.core.algorithms;
+package org.cs4j.core.algorithms.pac;
 
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.AnytimePTS;
+import org.cs4j.core.algorithms.AnytimeSearchNode;
+import org.cs4j.core.algorithms.SearchResultImpl;
 
 public class AnytimePTSForMLPac extends AnytimePTS{
 	public AnytimePTSForMLPac() {
