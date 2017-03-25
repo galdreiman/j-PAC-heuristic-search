@@ -6,6 +6,7 @@ import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
 import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
 import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
 import org.cs4j.core.domains.DockyardRobot;
@@ -28,7 +29,11 @@ public class TestPACConditions {
 
     final static Logger logger = Logger.getLogger(TestPACConditions.class);
 
-
+    @Test
+    public void testMLPacConditionSetup()    {
+        testSetup(new MLPacCondition());
+        testDeltaEffect(MLPacCondition.class);
+    }
 
     @Test
     public void testTrivialSetup()    {
