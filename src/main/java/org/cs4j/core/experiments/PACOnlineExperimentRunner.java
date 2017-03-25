@@ -1,17 +1,25 @@
 package org.cs4j.core.experiments;
 
-import java.io.*;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
-import com.sun.java.browser.dom.DOMAccessException;
 import org.apache.log4j.Logger;
-import org.cs4j.core.*;
-import org.cs4j.core.algorithms.DP;
-import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.OutputResult;
+import org.cs4j.core.SearchDomain;
+import org.cs4j.core.algorithms.pac.FMinCondition;
+import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
 import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
-import org.cs4j.core.domains.*;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 

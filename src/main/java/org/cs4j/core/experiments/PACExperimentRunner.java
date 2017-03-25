@@ -13,6 +13,7 @@ import org.cs4j.core.algorithms.pac.FMinCondition;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
 import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
+import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
 import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
 import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
 import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
@@ -222,6 +223,17 @@ public class PACExperimentRunner {
         PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
         runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
     }
+    
+    private void runMLPac(Class[] domains,double[] epsilons, double[] deltas) {
+        // Run Ml-PAC-Condition
+        Class[] pacConditions = new Class[]{MLPacCondition.class};
+        PACSearchFramework psf = new PACSearchFramework();
+        psf.setAnytimeSearchClass(SearchAwarePACSearchImpl.class);
+        Experiment experiment = new MLPacExperiment();
+
+        PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+        runner.runExperimentBatch(domains,pacConditions,epsilons,deltas,experiment);
+    }
 
     private void runOpenBased(Class[] domains,double[] epsilons, double[] deltas) {
         // Run trivial and ratio-based on all domains
@@ -264,6 +276,11 @@ public class PACExperimentRunner {
         if(args[0].equals("RunOpenBased")){
             logger.info("********** OPEN BASED CONDITION");
             runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
+        }
+        
+        if(args[0].equals("MLPac")){
+            logger.info("********** ML-PAC CONDITION");
+            runner.runMLPac(domains,epsilonValues,DEFAULT_DELTAS);
         }
 
         if(args[0].equals("BoundedCostBased")){
