@@ -71,7 +71,6 @@ public class MLPacPreprocess {
 
 					int problemAttemptIndx = 1;
 					SearchResultImpl result = (SearchResultImpl) algorithm.search(domain);
-					searchResultsList.add(result);
 
 					// if another solution is possible - continue searing
 					while (result.hasSolution()) {
@@ -80,11 +79,9 @@ public class MLPacPreprocess {
 						
 						// continue to search another solution:
 						result = (SearchResultImpl) algorithm.continueSearch();
-						searchResultsList.add(result);
 					}
 
 					System.out.println("------------------");
-					System.out.println(searchResultsList.size());
 					System.out.println("------------------");
 
 				}
@@ -108,7 +105,7 @@ public class MLPacPreprocess {
 		int problemInstance = instance;
 		int attempt = attemptCounter++;
 		
-		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(searchResult,optimalCost,inputEpsilon);
+		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResultIncludeTarget(searchResult,optimalCost,inputEpsilon);
 
 		double generated = features.get(PacFeature.GENERATED);
 		double expanded = features.get(PacFeature.EXPANDED);
