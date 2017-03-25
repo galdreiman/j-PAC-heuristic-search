@@ -9,12 +9,13 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.AnytimeSearchAlgorithm;
+import org.cs4j.core.MLPacFeatureExtractor;
+import org.cs4j.core.MLPacFeatureExtractor.PacFeature;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.AnytimePTS;
-import org.cs4j.core.algorithms.AnytimePTSForMLPac;
 import org.cs4j.core.algorithms.SearchResultImpl;
+import org.cs4j.core.algorithms.pac.AnytimePTSForMLPac;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
@@ -60,11 +61,8 @@ public class MLPacPreprocess {
 				String inputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).inputPath;
 
 				AnytimeSearchAlgorithm algorithm = getAnytimeAlg();
-				List<SearchResultImpl> searchResultsList = new ArrayList<>();
-				output = new OutputResult(
-						DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
-						"ML_PAC_ConditionPreprocessFeatures", -1, -1, null, false, true);
-				output.writeln(getHeaderLineFeatures());
+				
+				
 
 				for (int i = fromInstance; i <= toInstance; ++i) {
 					logger.info("\rSolving " + domainClass.getName() + "\t instance " + i);
@@ -102,34 +100,31 @@ public class MLPacPreprocess {
 		}
 	}
 
-	private static String getHeaderLineFeatures() {
-		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
-				"h1","g2", "h2", "g3","h3","oprimal_cost", "w", "is-W-opt" };
-		return String.join(",", attributes);
-	}
-
-	private static void ExtractFeaturesToFile(SearchResultImpl searchResult, SearchDomain domain, Class domainClass,
+	@SuppressWarnings("rawtypes")
+	public static void ExtractFeaturesToFile(SearchResultImpl searchResult, SearchDomain domain, Class domainClass,
 			int attemptCounter, int instance, double optimalCost, double inputEpsilon) {
 
 		String domainName = domainClass.getSimpleName();
 		int problemInstance = instance;
 		int attempt = attemptCounter++;
+		
+		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(searchResult,optimalCost,inputEpsilon);
 
-		long generated = searchResult.getGenerated();
-		long expanded = searchResult.getExpanded();
-		long reopened = searchResult.getReopened();
-		double U = searchResult.getBestSolution().getCost();
-		int g = searchResult.getBestSolution().getLength();
-		double initialH = domain.initialState().getH();
+		double generated = features.get(PacFeature.GENERATED);
+		double expanded = features.get(PacFeature.EXPANDED);
+		double reopened = features.get(PacFeature.ROPENED);
+		double U = features.get(PacFeature.COST);
+		double g = features.get(PacFeature.LENGTH);
+		double initialH = features.get(PacFeature.H_0);
 		
-		double g1 = (double) searchResult.getExtras().get("g_1");
-		double h1 = (double) searchResult.getExtras().get("h_1");
+		double g1 = features.get(PacFeature.G_1);
+		double h1 = features.get(PacFeature.H_1);
 		
-		double g2 = (double) searchResult.getExtras().get("g_2");
-		double h2 = (double) searchResult.getExtras().get("h_2");
+		double g2 = features.get(PacFeature.G_2);
+		double h2 = features.get(PacFeature.H_2);
 		
 
-		boolean isWOptimal = isWOpttimal(U, g, optimalCost, inputEpsilon);
+		boolean isWOptimal = features.get(PacFeature.IS_W_OPT) == 1? true : false;
 
 		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
 				reopened + "", U + "", g + "", initialH + "", g1+ "",h1+ "",g2+ "",h2+ "",optimalCost+"",inputEpsilon +"", isWOptimal + "" };
@@ -143,16 +138,7 @@ public class MLPacPreprocess {
 
 	}
 
-	
-
-	private static boolean isWOpttimal(double U, int g, double optimalCost, double inputEpsilon) {
-		// a solution consider as W-optimal iff:
-		// g(n) + h*(n)(1+epsilon) < U
-
-		return g + (optimalCost * inputEpsilon) < U;
-	}
-
-	private static AnytimeSearchAlgorithm getAnytimeAlg() {
+	public static AnytimeSearchAlgorithm getAnytimeAlg() {
 		AnytimeSearchAlgorithm algorithm = new AnytimePTSForMLPac() {
 			@Override
 			public SearchResult search(SearchDomain domain) {
