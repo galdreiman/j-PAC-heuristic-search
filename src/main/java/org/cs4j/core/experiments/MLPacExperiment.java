@@ -19,7 +19,7 @@ public class MLPacExperiment extends StandardExperiment {
 		psf.setAdditionalParameter("anytimeSearch", AnytimePTSForMLPac.class.getName());
 	}
 
-	@SuppressWarnings("rawtypes")
+	
 	public static void main(String[] args) {
 
 		Class[] domains = { VacuumRobot.class };
