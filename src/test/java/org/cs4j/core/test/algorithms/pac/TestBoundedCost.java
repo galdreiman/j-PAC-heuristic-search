@@ -1,17 +1,16 @@
 package org.cs4j.core.test.algorithms.pac;
 
-import junit.framework.Assert;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.algorithms.pac.*;
+import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
 import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
-import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
-import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.junit.Test;
+
+import junit.framework.Assert;
 
 /**
  * Created by Roni Stern on 03/03/2017.
