@@ -1,4 +1,0 @@
-InstanceID,Found,Depth,Cost,Iterations,Generated,Expanded,Cpu Time,Wall Time,delta,epsilon,pacCondition
-51,1,455,455.0,4,90870,54065,452,516,0.1,0.2,org.cs4j.core.algorithms.pac.conditions.MLPacCondition,
-52,1,630,630.0,8,100893,59463,390,437,0.1,0.2,org.cs4j.core.algorithms.pac.conditions.MLPacCondition,
-53,1,554,554.0,7,67872,40943,249,241,0.1,0.2,org.cs4j.core.algorithms.pac.conditions.MLPacCondition,
