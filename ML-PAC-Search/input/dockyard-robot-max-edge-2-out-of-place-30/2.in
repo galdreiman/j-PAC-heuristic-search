@@ -1,0 +1,48 @@
+locs: 5
+cranes: 5
+boxes: 8
+piles: 5
+robots: 1
+
+location 0
+adjacent: 0 1 1 1 1
+cranes: 1
+piles: 1
+
+location 1
+adjacent: 1 0 1 1 1
+cranes: 1
+piles: 3
+
+location 2
+adjacent: 2 1 0 1 1
+cranes: 1
+piles: 2
+
+location 3
+adjacent: 1 1 1 0 2
+cranes: 1
+piles: 4
+
+location 4
+adjacent: 2 2 2 2 0
+cranes: 1
+piles: 0
+
+pile 0
+2 
+
+pile 1
+0 1 4 5 7 
+
+pile 3
+3 6 
+
+container 0 0
+container 1 0
+container 2 1
+container 3 1
+container 4 4
+container 5 0
+container 6 1
+container 7 4
