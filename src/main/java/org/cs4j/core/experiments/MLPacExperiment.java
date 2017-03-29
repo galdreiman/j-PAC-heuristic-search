@@ -4,8 +4,6 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.algorithms.pac.AnytimePTSForMLPac;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
-import org.cs4j.core.domains.DockyardRobot;
-import org.cs4j.core.domains.FifteenPuzzle;
 import org.cs4j.core.domains.VacuumRobot;
 
 public class MLPacExperiment extends StandardExperiment {
@@ -25,7 +23,7 @@ public class MLPacExperiment extends StandardExperiment {
 	public static void main(String args[]) {
 
 		Class[] domains = { VacuumRobot.class, };
-		Class[] pacConditions = { VacuumRobot.class};//, DockyardRobot.class, FifteenPuzzle.class };
+		Class[] pacConditions = { MLPacCondition.class};//, DockyardRobot.class, FifteenPuzzle.class };
 		double[] epsilons = { 0.2, 0.5, 0.7 };
 		double[] deltas = { 0.2, 0.5, 0.7 };
 

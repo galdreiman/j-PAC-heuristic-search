@@ -21,7 +21,7 @@ import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
 
-public class MLPacCondition extends AbstractPACCondition {
+public class MLPacCondition extends RatioBasedPACCondition {
 
 	private final static Logger logger = Logger.getLogger(MLPacCondition.class);
 
