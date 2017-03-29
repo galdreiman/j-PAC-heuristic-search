@@ -1,9 +1,12 @@
 package org.cs4j.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+
+import weka.core.Attribute;
 
 public class MLPacFeatureExtractor {
 
@@ -13,6 +16,10 @@ public class MLPacFeatureExtractor {
 		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,IS_W_OPT;
 		
 		
+	}
+	
+	public static String getFeaturesHeader(){
+		return "domain,instance,index,generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,oprimal_cost,w,is-W-opt";
 	}
 	
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResultIncludeTarget(SearchResult result, double optimalCost, double inputEpsilon){
@@ -65,5 +72,14 @@ public class MLPacFeatureExtractor {
 		logger.debug("h*(n)[" + optimalCost +"](1+epsilon)[" + (1+inputEpsilon) +"] < U[" +U+"]");
 
 		return  (optimalCost * (1+inputEpsilon) ) < U;
+	}
+
+	public static ArrayList<Attribute> getAttributes() {
+		String[] lables = MLPacFeatureExtractor.getHeaderLineFeatures().split(",");
+		ArrayList<Attribute> atts = new ArrayList<>();
+		for(int i = 3; i < lables.length -1; ++i){
+			atts.add(new Attribute(lables[i]));
+		}
+		return atts;
 	}
 }

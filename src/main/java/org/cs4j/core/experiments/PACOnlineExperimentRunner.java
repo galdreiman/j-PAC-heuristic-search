@@ -103,7 +103,7 @@ public class PACOnlineExperimentRunner {
 			logger.info("Running anytime for domain " + domainClass.getName());
 			try {
 				// Prepare experiment for a new domain
-				output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputPath, "PAC", -1, -1, null, false,
+				output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputPath, "PAC_Output", -1, -1, null, false,
 						true);
 				this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
 
@@ -122,6 +122,7 @@ public class PACOnlineExperimentRunner {
 				}
 			} catch (IOException e) {
 				logger.error(e);
+				e.printStackTrace();
 			} finally {
 				if (output != null)
 					output.close();
