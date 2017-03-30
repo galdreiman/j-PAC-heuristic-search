@@ -83,12 +83,13 @@ public class OutputResult {
 		this.currentResult = new StringBuilder();
 	}
 
-	public OutputResult(String pathPrefix, String filePrefix, double epsilon,
-			boolean reopenPolicyBln, boolean overwriteFile) throws IOException {
 
-		this.basicResultsPath = pathPrefix + "/" + filePrefix;
-		String pathPostfix = epsilon == -1 ? "" :  "_e" + epsilon;
-		this.fname = this.basicResultsPath + pathPostfix + ".csv";
+// TODO: RONI-GAL: This is not the correct place for this. OutputResults doesn't have anything to do with epsilons. 
+
+	public OutputResult(String pathPrefix, String filePrefix, boolean overwriteFile) throws IOException {
+
+		this.basicResultsPath = pathPrefix + File.separator + filePrefix;
+		this.fname = this.basicResultsPath + ".csv";
 		File f = new File(this.fname);
 		boolean fileExists = f.exists();
 		if (fileExists && !overwriteFile) {
@@ -135,23 +136,6 @@ public class OutputResult {
 	 */
 	public OutputResult(String pathPrefix, boolean overwrite) throws IOException {
 		this(pathPrefix, null, -1, -1, null, false, overwrite);
-	}
-
-	/**
-	 * Create a general output result (without references of weight or reopening
-	 * policy in the name), and overwrites the file if it already exists
-	 *
-	 * @param pathPrefix
-	 *            The prefix of the output path
-	 * @param filePrefix
-	 *            The prefix to the specific file
-	 * @param overwrite
-	 *            Whether to overwrite the output file if it exists
-	 *
-	 * @throws IOException
-	 */
-	public OutputResult(String pathPrefix, String filePrefix, boolean overwrite) throws IOException {
-		this(pathPrefix, filePrefix, -1, -1, null, false, overwrite);
 	}
 
 	/**

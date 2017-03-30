@@ -49,7 +49,7 @@ public class MLPacPreprocess {
 
 				String outFile = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath;
 				try {
-					output = new OutputResult(outFile, "MLPacPreprocess", epsilon, false, true);
+					output = new OutputResult(outFile, "MLPacPreprocess-"+epsilon, true);
 				} catch (IOException e1) {
 					logger.error("Failed to create output ML PAC preprocess csv file at: " + outFile, e1);
 				}

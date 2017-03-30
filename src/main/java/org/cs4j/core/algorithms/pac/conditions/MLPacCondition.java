@@ -15,6 +15,7 @@ import org.cs4j.core.mains.DomainExperimentData;
 
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.trees.J48;
+import weka.classifiers.trees.RandomForest;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -70,6 +71,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 			this.classifier.buildClassifier(data);
 		} catch (Exception e) {
 			logger.error("ERROR initializing classifier: ", e);
+			throw new RuntimeException(e);
 		}
 	}
 	

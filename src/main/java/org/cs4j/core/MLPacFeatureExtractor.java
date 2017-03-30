@@ -29,7 +29,7 @@ public class MLPacFeatureExtractor {
 		Double U = result.getBestSolution().getCost();
 		int g = result.getBestSolution().getLength();
 		
-		features.put(PacFeature.IS_W_OPT, new Double(isWOpttimal(U, g, optimalCost, inputEpsilon)==true? 1.0 : 0.0));
+		features.put(PacFeature.IS_W_OPT, new Double(isWOpttimal(U, optimalCost, inputEpsilon)==true? 1.0 : 0.0));
 		
 		return features;
 	}
@@ -65,13 +65,13 @@ public class MLPacFeatureExtractor {
 
 	
 
-	public static boolean isWOpttimal(double U, int g, double optimalCost, double inputEpsilon) {
+	public static boolean isWOpttimal(double U, double optimalCost, double inputEpsilon) {
 		// a solution consider as W-optimal iff:
 		// h*(n)(1+epsilon) < U
 		
 		logger.debug("h*(n)[" + optimalCost +"](1+epsilon)[" + (1+inputEpsilon) +"] < U[" +U+"]");
 
-		return  (optimalCost * (1+inputEpsilon) ) < U;
+		return  U<= optimalCost * (1+inputEpsilon);
 	}
 
 	public static ArrayList<Attribute> getAttributes() {
