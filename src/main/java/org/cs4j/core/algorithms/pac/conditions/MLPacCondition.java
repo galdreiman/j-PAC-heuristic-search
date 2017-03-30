@@ -88,7 +88,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		Instance ins = new DenseInstance(size);
 		Instances dataset = new Instances("testdata", this.attributes, 1);
 		dataset.setClassIndex(dataset.numAttributes() - 1);
-		
+
 
 		int indx = 0;
 		for(Entry<PacFeature, Double> entry : features.entrySet()){
@@ -98,13 +98,13 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		
 		double classResult = -1;
 		try {
-			classResult = this.classifier.classifyInstance(ins);
+			classResult = this.classifier.distributionForInstance(ins)[0]; // TODO: GAL WILL CHECK IF WE NEED THE ZERO OR THE ONE CLASS
 		} catch (Exception e) {
 			logger.error("ERROR: Failed to classify instance: " + ins.toString(),e);
 		}
 		
 		logger.debug("Classification result for instance: [" + ins.toString() +"] is ["+ classResult +"]");
-		return classResult >= (1-this.delta);
+		return classResult <= (1-this.delta);
 	}
 
 }

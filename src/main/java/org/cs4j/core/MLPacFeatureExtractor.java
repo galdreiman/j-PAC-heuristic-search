@@ -15,7 +15,19 @@ public class MLPacFeatureExtractor {
 	public enum PacFeature{
 		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,IS_W_OPT;
 		
-		
+		public static PacFeature getPacFeature(String name){
+			switch (name){
+				case "g_0": return G_0;
+				case "g_1": return G_1;
+				case "g_2": return G_2;
+				case "h_0": return H_0;
+				case "h_1": return H_1;
+				case "h_2": return H_2;
+
+				default:
+					throw new IllegalStateException("Bad feature name "+name);
+			}
+		}
 	}
 	
 	public static String getFeaturesHeader(){
@@ -42,14 +54,36 @@ public class MLPacFeatureExtractor {
 		features.put(PacFeature.ROPENED, new Double(result.getReopened()));
 		Double U = result.getBestSolution().getCost();
 		features.put(PacFeature.COST, new Double(U));
-		int g = result.getBestSolution().getLength();
-		features.put(PacFeature.LENGTH, new Double(g));
-		features.put(PacFeature.H_0, new Double((double) result.getExtras().get("h_0")));
-		features.put(PacFeature.G_1, new Double((double) result.getExtras().get("g_1")));
-		features.put(PacFeature.H_1, new Double((double) result.getExtras().get("h_1")));
-		features.put(PacFeature.G_2, new Double((double) result.getExtras().get("g_2")));
-		features.put(PacFeature.H_2, new Double((double) result.getExtras().get("h_2")));
-		
+		int length = result.getBestSolution().getLength();
+		features.put(PacFeature.LENGTH, new Double(length));
+
+		// Get h and g values of the first nodes on the found path
+		SearchResult.Solution solution = result.getBestSolution();
+		double g=0;
+		SearchDomain.State parent = null;
+		SearchDomain.State current;
+		double h;
+		int maxPrefix = 3;
+		int i=0;
+		for(i=0;i<solution.getLength()&& i<maxPrefix;i++){
+			current = solution.getStates().get(0);
+			if(parent!=null)
+				g+=solution.getOperators().get(i).getCost(current, parent);
+			h=current.getH();
+
+			features.put(PacFeature.getPacFeature("h_" + i), h);
+			features.put(PacFeature.getPacFeature("g_" + i), g);
+
+			parent = current;
+		}
+
+		while(i<maxPrefix){
+			features.put(PacFeature.getPacFeature("h_" + i), -1.0);
+			features.put(PacFeature.getPacFeature("g_" + i), -1.0);
+			i++;
+		}
+
+
 		return features;
 	}
 	
