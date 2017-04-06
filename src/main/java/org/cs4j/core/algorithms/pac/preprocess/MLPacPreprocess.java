@@ -139,7 +139,7 @@ public class MLPacPreprocess {
 		double g2 = features.get(PacFeature.G_2);
 		double h2 = features.get(PacFeature.H_2);
 
-		boolean isWOptimal = features.get(PacFeature.IS_W_OPT) == 1 ? true : false;
+		int isWOptimal =  features.get(PacFeature.IS_W_OPT).intValue();
 
 		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
 				reopened + "", U + "", g + "", initialH + "", g1 + "", h1 + "", g2 + "", h2 + "", optimalCost + "",

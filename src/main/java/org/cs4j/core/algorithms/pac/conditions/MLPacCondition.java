@@ -97,14 +97,16 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		}
 		
 		double classResult = -1;
+		double res = -1;
 		try {
+			res = this.classifier.classifyInstance(ins);
 			classResult = this.classifier.distributionForInstance(ins)[0]; // TODO: GAL WILL CHECK IF WE NEED THE ZERO OR THE ONE CLASS
 		} catch (Exception e) {
 			logger.error("ERROR: Failed to classify instance: " + ins.toString(),e);
 		}
 		
 		logger.debug("Classification result for instance: [" + ins.toString() +"] is ["+ classResult +"]");
-		return classResult <= (1-this.delta);
+		return classResult >= (1-this.delta);
 	}
 
 }

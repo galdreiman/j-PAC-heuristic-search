@@ -39,7 +39,6 @@ public class MLPacFeatureExtractor {
 		Map<PacFeature,Double> features = extractFeaturesFromSearchResult(result);
 		
 		Double U = result.getBestSolution().getCost();
-		int g = result.getBestSolution().getLength();
 		
 		features.put(PacFeature.IS_W_OPT, new Double(isWOpttimal(U, optimalCost, inputEpsilon)==true? 1.0 : 0.0));
 		
