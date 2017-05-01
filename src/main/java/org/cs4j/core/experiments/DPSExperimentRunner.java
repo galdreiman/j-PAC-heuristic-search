@@ -56,7 +56,7 @@ public class DPSExperimentRunner {
             try {
                 // Prepare experiment for a new domain
                 output = new OutputResult(DomainExperimentData.get(domainClass,
-                        DomainExperimentData.RunType.TEST).outputPath, "DPS", -1, -1, null, false,true);
+                        DomainExperimentData.RunType.TEST).outputOnlinePath, "DPS", -1, -1, null, false,true);
                 this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
                 for (double epsilon : epsilons) {
                     runParams.put("weight", 1+epsilon);

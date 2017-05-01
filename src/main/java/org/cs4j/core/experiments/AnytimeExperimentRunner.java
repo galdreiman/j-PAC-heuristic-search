@@ -136,7 +136,7 @@ public class AnytimeExperimentRunner {
             logger.info("Running anytime for class "+domainClass.getName());
             runner.run(domainClass, algorithm,
                     DomainExperimentData.get(domainClass,RunType.TEST).inputPath,
-                    DomainExperimentData.get(domainClass,RunType.TEST).outputPath,
+                    DomainExperimentData.get(domainClass,RunType.TEST).outputOnlinePath,
                     DomainExperimentData.get(domainClass,RunType.TEST).fromInstance,
                     DomainExperimentData.get(domainClass,RunType.TEST).toInstance,
                     domainParams);

@@ -42,12 +42,17 @@ public abstract class AnytimePACSearch extends AbstractAnytimeSearch {
     protected SearchResultImpl _search() {
 
         try{
-            return super._search();
+            SearchResultImpl result = super._search();
+            result.setExtras("epsilon", new Double(this.epsilon));
+            result.setExtras("delta", new Double(this.delta));
+            return result;
         }
         catch(PACConditionSatisfied exception){
             // If the PAC conditions was satisfied, prepare the results objects
             result.setExtras("fmin",this.maxFmin); // Record the lower bound for future analysis @TODO: Not super elegant
             result.setExtras("pac-condition-statisfied",exception.conditionSatisfied); // Record the lower bound for future analysis @TODO: Not super elegant
+            result.setExtras("epsilon", new Double(this.epsilon));
+            result.setExtras("delta", new Double(this.delta));
             result.stopTimer();
 
             this.totalSearchResults.increase(this.result);

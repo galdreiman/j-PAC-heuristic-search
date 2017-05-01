@@ -145,7 +145,7 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 	 */
 	private void dumpCDFsToFile() {
 		String outputFileName = DomainExperimentData.get(domain.getClass(),
-				DomainExperimentData.RunType.TRAIN).outputPath + this.getClass().getSimpleName() + "-statistics.csv";
+				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + this.getClass().getSimpleName() + "-statistics.csv";
 
 		try {
 			// Create output file and dir if does not exists already (mainly the

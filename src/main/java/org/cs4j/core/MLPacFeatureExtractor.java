@@ -13,7 +13,7 @@ public class MLPacFeatureExtractor {
 	private final static Logger logger = Logger.getLogger(MLPacFeatureExtractor.class);
 	
 	public enum PacFeature{
-		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,IS_W_OPT;
+		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,W,IS_W_OPT;
 		
 		public static PacFeature getPacFeature(String name){
 			switch (name){
@@ -51,20 +51,19 @@ public class MLPacFeatureExtractor {
 		features.put(PacFeature.GENERATED, new Double(result.getGenerated()));
 		features.put(PacFeature.EXPANDED, new Double(result.getExpanded()));
 		features.put(PacFeature.ROPENED, new Double(result.getReopened()));
+
 		Double U = result.getBestSolution().getCost();
 		features.put(PacFeature.COST, new Double(U));
-		int length = result.getBestSolution().getLength();
-		features.put(PacFeature.LENGTH, new Double(length));
 
 		// Get h and g values of the first nodes on the found path
 		SearchResult.Solution solution = result.getBestSolution();
-		double g=0;
+		double g=0.0;
 		SearchDomain.State parent = null;
 		SearchDomain.State current;
 		double h;
 		int maxPrefix = 3;
 		int i=0;
-		for(i=0;i<solution.getLength()&& i<maxPrefix;i++){
+		for(;i<solution.getLength()&& i<maxPrefix;i++){
 			current = solution.getStates().get(0);
 			if(parent!=null)
 				g+=solution.getOperators().get(i).getCost(current, parent);
@@ -75,6 +74,8 @@ public class MLPacFeatureExtractor {
 
 			parent = current;
 		}
+
+		features.put(PacFeature.W, 1.0 + (Double) result.getExtras().get("epsilon"));
 
 		while(i<maxPrefix){
 			features.put(PacFeature.getPacFeature("h_" + i), -1.0);

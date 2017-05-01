@@ -31,16 +31,20 @@ public class DomainExperimentData {
 	static {
 		// All instances set configuration
 		domainToExperimentDataAll = new HashMap<>();
+
+
+
 		domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/fifteenpuzzle/states15",
-				"./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
+				"./preprocessResults/FifteenPuzzle/", "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(Pancakes.class,
-				new DomainExperimentData("./input/pancakes/generated-40", "./results/pancakes/", 1, NUM_OF_INSTANCES));
+				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
-				"./input/gridpathfinding/brc202d.map", "./results/GridPathFinding/", 1, NUM_OF_INSTANCES));
+				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-5-dirt", "./preprocessResults/vacuumrobot/", 1, NUM_OF_INSTANCES));
+				"./input/vacuumrobot/generated-5-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
+						"./preprocessResults/dockyard-robot-max-edge-2-out-of-place-30/",
 						"./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, 90));
 
 		// Training set configuration
@@ -80,14 +84,17 @@ public class DomainExperimentData {
 	}
 
 	public String inputPath; // The directory where the problem instances are
-	public String outputPath; // The directory where to output the experimental
+	public String outputPreprocessPath; // The directory where to output the experimental
 								// results
+	public String outputOnlinePath; // The directory where to output the experimental
+							// results
 	public int fromInstance; // The problem instance to start from
 	public int toInstance; // // The problem instance to finish at (inclusive)
 
-	public DomainExperimentData(String inputPath, String outputPath, int fromInstance, int toInstance) {
+	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance) {
 		this.inputPath = inputPath;
-		this.outputPath = outputPath;
+		this.outputPreprocessPath = outputPreprocessPath;
+		this.outputOnlinePath = outputOnlinePath;
 		this.fromInstance = fromInstance;
 		this.toInstance = toInstance;
 	}
@@ -102,7 +109,7 @@ public class DomainExperimentData {
 	 *            to instance
 	 */
 	public DomainExperimentData subset(int fromInstance, int toInstance) {
-		return new DomainExperimentData(this.inputPath, this.outputPath, fromInstance, toInstance);
+		return new DomainExperimentData(this.inputPath, this.outputPreprocessPath, this.outputOnlinePath, fromInstance, toInstance);
 	}
 
 }

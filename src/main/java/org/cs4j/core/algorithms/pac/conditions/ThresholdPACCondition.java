@@ -48,7 +48,7 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
         SortedMap<Double, Double> costToCDF = computeCDF(statistics);
 
         // Dump statistics (for DEBUG)
-        dumpCDFToFile(DomainExperimentData.get(domain.getClass(),RunType.TRAIN).outputPath
+        dumpCDFToFile(DomainExperimentData.get(domain.getClass(),RunType.TRAIN).outputPreprocessPath
                 +this.getClass().getSimpleName()+"-statistics.csv", costToCDF);
 
         // Compute threshold

@@ -23,7 +23,7 @@ public class PacPreprocessRunner {
 
 	public double[] run(Class domainClass, HashMap<String, String> domainParams) {
 		String inputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).inputPath;
-		String outputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).outputPath;
+		String outputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).outputPreprocessPath;
 		int fromInstance = DomainExperimentData.get(domainClass, RunType.TRAIN).fromInstance;
 		int toInstance = DomainExperimentData.get(domainClass, RunType.TRAIN).toInstance;
 		return run(domainClass,inputPath,outputPath,fromInstance,toInstance,domainParams);
@@ -137,7 +137,7 @@ public class PacPreprocessRunner {
 			logger.info("Running PacPreprocessRunner on domain "+domainClass.getSimpleName());
 			runner.run(domainClass,
 					DomainExperimentData.get(domainClass,RunType.ALL).inputPath,
-					DomainExperimentData.get(domainClass,RunType.ALL).outputPath,
+					DomainExperimentData.get(domainClass,RunType.ALL).outputPreprocessPath,
 					DomainExperimentData.get(domainClass,RunType.ALL).fromInstance,
 					DomainExperimentData.get(domainClass,RunType.ALL).toInstance,
 					domainParams);

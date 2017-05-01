@@ -154,7 +154,7 @@ public class StatisticsGenerator {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPreprocessPath,
                         "StatisticsGenerator", -1, -1, null, false, true);
                 generator.printResultsHeaders(output,
                         new String[]{"InstanceID", "h", "opt"},

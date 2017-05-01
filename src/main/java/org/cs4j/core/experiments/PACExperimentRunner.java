@@ -151,7 +151,7 @@ public class PACExperimentRunner {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPreprocessPath,
                         "openBasedStatistics", -1, -1, null, false, true);
                 generator.printResultsHeaders(output,
                         new String[]{"InstanceID", "h", "opt"},
@@ -179,7 +179,7 @@ public class PACExperimentRunner {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath,
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPreprocessPath,
                         "ThesholdBasedStatisticsGenerator", -1, -1, null, false, true);
                 generator.run(domainClass,domainParams);
                 output.close();

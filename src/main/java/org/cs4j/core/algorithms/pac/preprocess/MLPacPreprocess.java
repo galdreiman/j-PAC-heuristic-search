@@ -46,9 +46,9 @@ public class MLPacPreprocess {
 		for (Class domainClass : domains) {
 			for (double epsilon : inputEpsilon) {
 
-				String outFile = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPath;
+				String outFile = DomainExperimentData.get(domainClass, RunType.TRAIN).outputPreprocessPath;
 				try {
-					output = new OutputResult(outFile, "MLPacPreprocess-"+epsilon, true);
+					output = new OutputResult(outFile, "MLPacPreprocess_e"+epsilon, true);
 				} catch (IOException e1) {
 					logger.error("Failed to create output ML PAC preprocess csv file at: " + outFile, e1);
 				}
@@ -78,7 +78,7 @@ public class MLPacPreprocess {
 					int toInstance = DomainExperimentData.get(domainClass, RunType.TRAIN).toInstance;
 					String inputPath = DomainExperimentData.get(domainClass, RunType.TRAIN).inputPath;
 
-					AnytimeSearchAlgorithm algorithm = getAnytimeAlg();
+					AnytimeSearchAlgorithm algorithm = getAnytimeAlg(epsilon);
 
 					for (int i = fromInstance; i <= toInstance; ++i) {
 						logger.info("\rSolving " + domainClass.getName() + "\t instance " + i);
@@ -139,7 +139,7 @@ public class MLPacPreprocess {
 		double g2 = features.get(PacFeature.G_2);
 		double h2 = features.get(PacFeature.H_2);
 
-		int isWOptimal =  features.get(PacFeature.IS_W_OPT).intValue();
+		boolean isWOptimal =  features.get(PacFeature.IS_W_OPT).intValue() == 1? true : false;
 
 		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
 				reopened + "", U + "", g + "", initialH + "", g1 + "", h1 + "", g2 + "", h2 + "", optimalCost + "",
@@ -154,12 +154,13 @@ public class MLPacPreprocess {
 
 	}
 
-	public static AnytimeSearchAlgorithm getAnytimeAlg() {
+	public static AnytimeSearchAlgorithm getAnytimeAlg(double epsilon) {
 		AnytimeSearchAlgorithm algorithm = new AnytimePTS() {
 			@Override
 			public SearchResult search(SearchDomain domain) {
 				double initialH = domain.initialState().getH();
 				SearchResult results = super.search(domain);
+				results.getExtras().put("epsilon", epsilon);
 				results.getExtras().put("initial-h", initialH);
 				return results;
 			}
@@ -171,6 +172,8 @@ public class MLPacPreprocess {
 				this.result = new SearchResultImpl();
 				if(this.totalSearchResults==null)
 					this.totalSearchResults=this.result;
+
+				result.getExtras().put("epsilon", epsilon);
 
 				result.startTimer();
 

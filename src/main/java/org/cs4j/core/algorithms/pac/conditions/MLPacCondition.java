@@ -28,6 +28,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 	private AbstractClassifier classifier;
 	private ArrayList<Attribute> attributes;
+	private Instances dataset;
 	
 
 	@Override
@@ -37,7 +38,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		// read ML_PAC_Condition_Preprocess.csv and train the model (the output
 		// of the training process)
 		String inputDataPath = DomainExperimentData.get(domain.getClass(),
-				DomainExperimentData.RunType.TRAIN).outputPath + "MLPacPreprocess_e"+epsilon+".csv";
+				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
 		this.setupAndGetClassifier(inputDataPath);
 		this.setupAttributes();
 	}
@@ -47,7 +48,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		
 	}
 
-	private Instances getInputInstance(String inputDataPath) {
+	private void getInputInstance(String inputDataPath) {
 		logger.debug("getInputInstance | input file: " + inputDataPath);
 		CSVLoader loader = new CSVLoader();
 		Instances data = null;
@@ -58,7 +59,14 @@ public class MLPacCondition extends RatioBasedPACCondition {
 			logger.error("ERROR: failed to read input data for classifier: " + inputDataPath,e);
 		}
 
-		return data;
+//		for(int i =0; i < data.size(); ++i){
+//			data.get(i).deleteAttributeAt(0);
+//			data.get(i).deleteAttributeAt(1);
+//			data.get(i).deleteAttributeAt(2);
+//		}
+
+		this.dataset = data;
+		this.dataset.setClassIndex(data.numAttributes() - 1);
 	}
 
 	private void setupAndGetClassifier(String inputDataPath) {
@@ -66,12 +74,11 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		this.classifier = new J48();
 		try {
 			this.classifier.setOptions(options);
-			Instances data = this.getInputInstance(inputDataPath);
-			data.setClassIndex(data.numAttributes() - 1);
-			this.classifier.buildClassifier(data);
+			this.getInputInstance(inputDataPath);
+			logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
+			this.classifier.buildClassifier(this.dataset);
 		} catch (Exception e) {
 			logger.error("ERROR initializing classifier: ", e);
-			throw new RuntimeException(e);
 		}
 	}
 	
@@ -81,32 +88,36 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 	@Override
 	public boolean shouldStop(SearchResult incumbentSolution) {
-		
+
+	    //Extract features from an incumbent solution
 		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(incumbentSolution);
 		int size = features.size();
-		
+
+		// Init a classifier input instance
 		Instance ins = new DenseInstance(size);
-		Instances dataset = new Instances("testdata", this.attributes, 1);
-		dataset.setClassIndex(dataset.numAttributes() - 1);
 
-
+        // Add features to the input instance
 		int indx = 0;
 		for(Entry<PacFeature, Double> entry : features.entrySet()){
 			ins.setValue(indx++, entry.getValue());
-			ins.setDataset(dataset);
+			ins.setDataset(this.dataset);
 		}
 		
-		double classResult = -1;
-		double res = -1;
+		double[] distributeResult = {};
+		double classificationResult = -1;
+
+		// Classify
 		try {
-			res = this.classifier.classifyInstance(ins);
-			classResult = this.classifier.distributionForInstance(ins)[0]; // TODO: GAL WILL CHECK IF WE NEED THE ZERO OR THE ONE CLASS
+			classificationResult = this.classifier.classifyInstance(ins);
+			distributeResult = this.classifier.distributionForInstance(ins); // TODO: GAL WILL CHECK IF WE NEED THE ZERO OR THE ONE CLASS
 		} catch (Exception e) {
-			logger.error("ERROR: Failed to classify instance: " + ins.toString(),e);
+			logger.error("ERROR: Failed to classify instance: ",e);
 		}
-		
-		logger.debug("Classification result for instance: [" + ins.toString() +"] is ["+ classResult +"]");
-		return classResult >= (1-this.delta);
+
+		logger.debug("distribute  result for instance: [" + ins.toString() +"] is ["+ distributeResult[0] +"]");
+		logger.debug("classification  result for instance: [" + ins.toString() +"] is ["+ classificationResult +"]");
+		boolean pacConditionResult = distributeResult[0] >= (1-this.delta);
+		return pacConditionResult;
 	}
 
 }
