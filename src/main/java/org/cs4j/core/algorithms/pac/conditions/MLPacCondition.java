@@ -59,14 +59,9 @@ public class MLPacCondition extends RatioBasedPACCondition {
 			logger.error("ERROR: failed to read input data for classifier: " + inputDataPath,e);
 		}
 
-//		for(int i =0; i < data.size(); ++i){
-//			data.get(i).deleteAttributeAt(0);
-//			data.get(i).deleteAttributeAt(1);
-//			data.get(i).deleteAttributeAt(2);
-//		}
 
 		this.dataset = data;
-		this.dataset.setClassIndex(data.numAttributes() - 1);
+		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
 	}
 
 	private void setupAndGetClassifier(String inputDataPath) {

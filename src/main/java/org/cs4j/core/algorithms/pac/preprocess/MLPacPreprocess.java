@@ -119,9 +119,11 @@ public class MLPacPreprocess {
 	public static void ExtractFeaturesToFile(SearchResultImpl searchResult, SearchDomain domain, Class domainClass,
 			int attemptCounter, int instance, double optimalCost, double inputEpsilon) {
 
-		String domainName = domainClass.getSimpleName();
-		int problemInstance = instance;
-		int attempt = attemptCounter++;
+//		String domainName = domainClass.getSimpleName();
+//		int problemInstance = instance;
+//		int attempt = attemptCounter++;
+
+		// "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt"
 
 		Map<PacFeature, Double> features = MLPacFeatureExtractor
 				.extractFeaturesFromSearchResultIncludeTarget(searchResult, optimalCost, inputEpsilon);
@@ -130,20 +132,21 @@ public class MLPacPreprocess {
 		double expanded = features.get(PacFeature.EXPANDED);
 		double reopened = features.get(PacFeature.ROPENED);
 		double U = features.get(PacFeature.COST);
-		double g = features.get(PacFeature.LENGTH);
-		double initialH = features.get(PacFeature.H_0);
 
-		double g1 = features.get(PacFeature.G_1);
-		double h1 = features.get(PacFeature.H_1);
+		double g1 = features.get(PacFeature.G_0);
+		double h1 = features.get(PacFeature.H_0);
 
 		double g2 = features.get(PacFeature.G_2);
 		double h2 = features.get(PacFeature.H_2);
 
+		double g3 = features.get(PacFeature.G_2);
+		double h3 = features.get(PacFeature.H_2);
+
+		double w = 1.0 + (Double) searchResult.getExtras().get("epsilon");
+
 		boolean isWOptimal =  features.get(PacFeature.IS_W_OPT).intValue() == 1? true : false;
 
-		String[] lineParts = { domainName, problemInstance + "", attempt + "", generated + "", expanded + "",
-				reopened + "", U + "", g + "", initialH + "", g1 + "", h1 + "", g2 + "", h2 + "", optimalCost + "",
-				inputEpsilon + "", isWOptimal + "" };
+		String[] lineParts = {generated+"",expanded+"",reopened+"",U+"",g1+"",h1+"",g2+"",h2+"",g3+"",h3+"",w+"",isWOptimal+""};
 		String line = String.join(",", lineParts);
 		logger.debug("adding new features to table: " + line);
 		try {

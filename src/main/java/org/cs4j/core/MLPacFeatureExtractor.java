@@ -31,7 +31,8 @@ public class MLPacFeatureExtractor {
 	}
 	
 	public static String getFeaturesHeader(){
-		return "domain,instance,index,generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,oprimal_cost,w,is-W-opt";
+//		return "domain,instance,index,generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
 	}
 	
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResultIncludeTarget(SearchResult result, double optimalCost, double inputEpsilon){
@@ -47,7 +48,9 @@ public class MLPacFeatureExtractor {
 	
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResult(SearchResult result){
 		Map<PacFeature,Double> features = new HashMap<>();
-		
+
+		// "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt"
+
 		features.put(PacFeature.GENERATED, new Double(result.getGenerated()));
 		features.put(PacFeature.EXPANDED, new Double(result.getExpanded()));
 		features.put(PacFeature.ROPENED, new Double(result.getReopened()));
@@ -74,14 +77,13 @@ public class MLPacFeatureExtractor {
 
 			parent = current;
 		}
-
-		features.put(PacFeature.W, 1.0 + (Double) result.getExtras().get("epsilon"));
-
 		while(i<maxPrefix){
 			features.put(PacFeature.getPacFeature("h_" + i), -1.0);
 			features.put(PacFeature.getPacFeature("g_" + i), -1.0);
 			i++;
 		}
+
+		features.put(PacFeature.W, 1.0 + (Double) result.getExtras().get("epsilon"));
 
 
 		return features;

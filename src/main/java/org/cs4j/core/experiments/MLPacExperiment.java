@@ -24,8 +24,11 @@ public class MLPacExperiment extends StandardExperiment {
 
 		Class[] domains = { VacuumRobot.class, };
 		Class[] pacConditions = { MLPacCondition.class};//, DockyardRobot.class, FifteenPuzzle.class };
-		double[] epsilons = { 0.2, 0.7 };
-		double[] deltas = { 0.2, 0.5, 0.7 };
+//		double[] epsilons = { 0.2, 0.7 };
+//		double[] deltas = { 0.2, 0.5, 0.7 };
+
+		double[] epsilons = { 0.7 };
+		double[] deltas = { 0.2, 0.5 };
 
 		Experiment experiment = new MLPacExperiment();
 		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
