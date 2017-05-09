@@ -24,7 +24,7 @@ public class TestMLPacCondition {
     public void testSetupOneClass() throws IOException{
         SearchDomain instance = TestUtils.createVacuumRobot(5,"71");
         double delta = 0.2;
-        double epsilon = 0.7;
+        double epsilon = 0.5;
 
         MLPacCondition condition = new MLPacCondition();
 
@@ -71,7 +71,7 @@ public class TestMLPacCondition {
                     Assert.assertTrue(result.hasSolution());
                     newExpanded = result.getExpanded();
                     Assert.assertTrue("oldExpanded="+oldExpanded+", newExpanded="+newExpanded,
-                            oldExpanded>=newExpanded);
+                            oldExpanded >= newExpanded);
 
 
                     oldExpanded = result.getExpanded();

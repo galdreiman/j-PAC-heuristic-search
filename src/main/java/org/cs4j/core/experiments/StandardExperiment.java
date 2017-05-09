@@ -48,7 +48,7 @@ public class StandardExperiment implements Experiment
             // are constant for
             // this run (w,
             // domain, etc.)
-
+            resultsData.add(instance.getClass().getSimpleName());
             output.appendNewResult(resultsData.toArray());
             output.newline();
         } catch (OutOfMemoryError e) {

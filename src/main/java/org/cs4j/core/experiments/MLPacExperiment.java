@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
-import org.cs4j.core.domains.VacuumRobot;
+import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
+import org.cs4j.core.domains.*;
 
 public class MLPacExperiment extends StandardExperiment {
 
@@ -22,13 +24,11 @@ public class MLPacExperiment extends StandardExperiment {
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) {
 
-		Class[] domains = { VacuumRobot.class, };
-		Class[] pacConditions = { MLPacCondition.class};//, DockyardRobot.class, FifteenPuzzle.class };
-//		double[] epsilons = { 0.2, 0.7 };
-//		double[] deltas = { 0.2, 0.5, 0.7 };
+		Class[] domains = { VacuumRobot.class, DockyardRobot.class,  GridPathFinding.class, Pancakes.class };
+		Class[] pacConditions = { MLPacCondition.class,  OpenBasedPACCondition.class};
 
-		double[] epsilons = { 0.7 };
-		double[] deltas = { 0.2, 0.5 };
+		double[] epsilons = { 0.1, 0.2, 0.5 };
+		double[] deltas = { 0.0, 0.2, 0.5, 0.9, 0.99 };
 
 		Experiment experiment = new MLPacExperiment();
 		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();

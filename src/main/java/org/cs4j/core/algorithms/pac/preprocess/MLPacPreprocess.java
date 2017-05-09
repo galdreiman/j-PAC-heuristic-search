@@ -16,6 +16,9 @@ import org.cs4j.core.algorithms.AnytimePTS;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.PACUtils;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
@@ -36,10 +39,9 @@ public class MLPacPreprocess {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
 
-		Class[] domains = { VacuumRobot.class};// , DockyardRobot.class,
-//													 FifteenPuzzle.class };
+		Class[] domains = { VacuumRobot.class, DockyardRobot.class,  GridPathFinding.class, Pancakes.class };
 
-		double[] inputEpsilon = { 0.2, 0.5, 0.7 }; // TODO: get input from user
+		double[] inputEpsilon = {0.1, 0.2, 0.5, }; // TODO: get input from user
 													// (from console,
 		// e.g. args[] or whatever)
 

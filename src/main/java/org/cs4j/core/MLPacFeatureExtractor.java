@@ -31,7 +31,6 @@ public class MLPacFeatureExtractor {
 	}
 	
 	public static String getFeaturesHeader(){
-//		return "domain,instance,index,generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
 		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
 	}
 	
@@ -68,8 +67,13 @@ public class MLPacFeatureExtractor {
 		int i=0;
 		for(;i<solution.getLength()&& i<maxPrefix;i++){
 			current = solution.getStates().get(0);
-			if(parent!=null)
-				g+=solution.getOperators().get(i).getCost(current, parent);
+			if(parent!=null){
+				try {
+					g += solution.getOperators().get(i).getCost(current, parent);
+				}catch (Exception e) {
+					logger.error("Failed to calculate g properly", e);
+				}
+			}
 			h=current.getH();
 
 			features.put(PacFeature.getPacFeature("h_" + i), h);

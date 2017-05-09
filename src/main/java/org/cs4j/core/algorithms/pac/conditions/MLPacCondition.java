@@ -14,8 +14,9 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.trees.J48;
-import weka.classifiers.trees.RandomForest;
+import weka.classifiers.meta.FilteredClassifier;
 import weka.core.Attribute;
 import weka.core.DenseInstance;
 import weka.core.Instance;
@@ -41,6 +42,29 @@ public class MLPacCondition extends RatioBasedPACCondition {
 				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
 		this.setupAndGetClassifier(inputDataPath);
 		this.setupAttributes();
+
+		// Test the model
+		try {
+			Evaluation eTest = new Evaluation(this.dataset);
+			eTest.evaluateModel(this.classifier, this.dataset);
+
+			// Print the result à la Weka explorer:
+			String strSummary = eTest.toSummaryString();
+			logger.info(strSummary);
+
+			// Get the confusion matrix
+			double[][] cmMatrix = eTest.confusionMatrix();
+			String cmStr = "";
+			for(int i = 0; i< cmMatrix.length; ++i){
+				for(int j=0; j< cmMatrix[i].length; ++j){
+					cmStr += " " + cmMatrix[i][j];
+				}
+				cmStr += "\n";
+			}
+			logger.info("Confusion Matrix: \n" + cmStr + "\n");
+		} catch(Exception e){
+			logger.error("Failed to evaluate classifier: " + this.classifier.getClass().getSimpleName(), e);
+		}
 	}
 
 	private void setupAttributes() {
@@ -65,10 +89,8 @@ public class MLPacCondition extends RatioBasedPACCondition {
 	}
 
 	private void setupAndGetClassifier(String inputDataPath) {
-		String[] options = { "-U" };
 		this.classifier = new J48();
 		try {
-			this.classifier.setOptions(options);
 			this.getInputInstance(inputDataPath);
 			logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
 			this.classifier.buildClassifier(this.dataset);
@@ -95,9 +117,14 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		int indx = 0;
 		for(Entry<PacFeature, Double> entry : features.entrySet()){
 			ins.setValue(indx++, entry.getValue());
-			ins.setDataset(this.dataset);
 		}
-		
+		ins.setDataset(this.dataset);
+
+		// Create local dataset from the instance
+//		Instances localDataSet = new Instances("MlPac",MLPacFeatureExtractor.getAttributes(), 500);
+//		localDataSet.setClassIndex(this.dataset.size() -1);
+//		localDataSet.add(ins);
+
 		double[] distributeResult = {};
 		double classificationResult = -1;
 
@@ -107,6 +134,11 @@ public class MLPacCondition extends RatioBasedPACCondition {
 			distributeResult = this.classifier.distributionForInstance(ins); // TODO: GAL WILL CHECK IF WE NEED THE ZERO OR THE ONE CLASS
 		} catch (Exception e) {
 			logger.error("ERROR: Failed to classify instance: ",e);
+		}
+
+		if(distributeResult.length <= 1){
+			// in case of only one or less labels the classifier probably did not trained properly on more then one label
+			return false;
 		}
 
 		logger.debug("distribute  result for instance: [" + ins.toString() +"] is ["+ distributeResult[0] +"]");

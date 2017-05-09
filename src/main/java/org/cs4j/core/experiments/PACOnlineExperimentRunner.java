@@ -1,5 +1,6 @@
 package org.cs4j.core.experiments;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -75,6 +76,7 @@ public class PACOnlineExperimentRunner {
             columnNames.add(columnName);
         columnNames.addAll(runParamColumns);
         String toPrint = String.join(",", columnNames);
+        toPrint += ",Domain";
         output.writeln(toPrint);
     }
 
@@ -104,7 +106,8 @@ public class PACOnlineExperimentRunner {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputOnlinePath, "VacuumRobot/PAC_Output", -1, -1, null, false,
+                String domainName = domainClass.getSimpleName();
+                output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputOnlinePath, domainName+ File.separator + "PAC_Output", -1, -1, null, false,
                         true);
                 this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
 
