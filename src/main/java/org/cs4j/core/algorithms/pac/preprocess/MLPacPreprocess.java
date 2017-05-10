@@ -41,7 +41,7 @@ public class MLPacPreprocess {
 
 		Class[] domains = { VacuumRobot.class, DockyardRobot.class,  GridPathFinding.class, Pancakes.class };
 
-		double[] inputEpsilon = {0.1, 0.2, 0.5, }; // TODO: get input from user
+		double[] inputEpsilon = {0.1, 0.2, 0.3, }; // TODO: get input from user
 													// (from console,
 		// e.g. args[] or whatever)
 
