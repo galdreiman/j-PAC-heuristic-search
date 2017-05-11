@@ -39,7 +39,7 @@ public class MLPacPreprocess {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
 
-		Class[] domains = { VacuumRobot.class, DockyardRobot.class,  GridPathFinding.class, Pancakes.class };
+		Class[] domains = { VacuumRobot.class, GridPathFinding.class,   Pancakes.class};
 
 		double[] inputEpsilon = {0.1, 0.2, 0.3, }; // TODO: get input from user
 													// (from console,
