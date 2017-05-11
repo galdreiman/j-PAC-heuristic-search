@@ -143,7 +143,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 		logger.debug("distribute  result for instance: [" + ins.toString() +"] is ["+ distributeResult[0] +"]");
 		logger.debug("classification  result for instance: [" + ins.toString() +"] is ["+ classificationResult +"]");
-		boolean pacConditionResult = distributeResult[0] >= (1-this.delta);
+		boolean pacConditionResult = distributeResult[1] >= (1-this.delta);
 		return pacConditionResult;
 	}
 
