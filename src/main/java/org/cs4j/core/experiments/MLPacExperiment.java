@@ -3,9 +3,7 @@ package org.cs4j.core.experiments;
 import org.apache.log4j.Logger;
 import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
-import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
-import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
-import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
+import org.cs4j.core.algorithms.pac.conditions.*;
 import org.cs4j.core.domains.*;
 
 public class MLPacExperiment extends StandardExperiment {
@@ -25,10 +23,10 @@ public class MLPacExperiment extends StandardExperiment {
 	public static void main(String args[]) {
 
 		Class[] domains = { Pancakes.class, VacuumRobot.class, GridPathFinding.class };
-		Class[] pacConditions = { MLPacCondition.class,  /*OpenBasedPACCondition.class*/};
+		Class[] pacConditions = { MLPacCondition.class,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
 
 		double[] epsilons = { 0.1, 0.2, 0.3 };
-		double[] deltas = {  0.0, 0.2, 0.5, 0.9, 0.99 };
+		double[] deltas = {  0.0, 0.05, 0.1, 0.2, 0.5, };
 
 		Experiment experiment = new MLPacExperiment();
 		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();

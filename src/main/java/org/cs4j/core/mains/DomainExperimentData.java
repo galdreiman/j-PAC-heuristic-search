@@ -37,7 +37,7 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/fifteenpuzzle/states15",
 				"./preprocessResults/FifteenPuzzle/", "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(Pancakes.class,
-				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES));
+				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES,"./input/pancakes/generated-for-pac-stats-10"));
 		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
 				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES));
 		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
@@ -90,13 +90,19 @@ public class DomainExperimentData {
 							// results
 	public int fromInstance; // The problem instance to start from
 	public int toInstance; // // The problem instance to finish at (inclusive)
+	public String pacInputPathFormat;
 
 	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance) {
+		this(inputPath,outputPreprocessPath,outputOnlinePath,fromInstance,toInstance,"");
+	}
+
+	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance, String pacInputPathFormat) {
 		this.inputPath = inputPath;
 		this.outputPreprocessPath = outputPreprocessPath;
 		this.outputOnlinePath = outputOnlinePath;
 		this.fromInstance = fromInstance;
 		this.toInstance = toInstance;
+		this.pacInputPathFormat = pacInputPathFormat;
 	}
 
 	/**

@@ -19,6 +19,7 @@ import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
 import org.cs4j.core.algorithms.pac.StatesCollector;
 import org.cs4j.core.domains.DockyardRobot;
 import org.cs4j.core.domains.FifteenPuzzle;
+import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
@@ -146,7 +147,7 @@ public class StatisticsGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        Class[] domains = {VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
+        Class[] domains = {Pancakes.class};//{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 

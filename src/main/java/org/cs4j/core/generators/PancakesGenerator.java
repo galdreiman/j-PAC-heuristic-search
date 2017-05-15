@@ -129,90 +129,67 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
     }
 
     public static void main(String args[]) throws IOException {
-        int instancesCount;
+
         int size;
         String previousInstancesDir = null;
         int previousInstancesCount = 0;
-        int pancakesNum = 201;
+        int pancakesNum = 0;
 
-        // In case no arguments were given - let's specify them here
-        if (args.length == 0) {
-            args = new String[3];
+        for(pancakesNum = 10; pancakesNum <= 100; pancakesNum += 10) {
+
+            // In case no arguments were given - let's specify them here
+
             System.out.println("[WARNING] Using local arguments");
             // Output directory
-            args[0] = "C:\\Users\\Daniel\\Documents\\gilond\\Master\\ResearchData\\input\\pancakes\\generated-"+pancakesNum;
+            String outDir = "C:\\Users\\user\\workspace\\PAC\\PACBurlap\\PacDaniel\\input\\pancakes\\generated-for-pac-stats-" + pancakesNum;
             // Count of pancakes (number of instances)
-            args[1] = "100";
+            int instancesCount = 100;
             // Size of problem
-            args[2] = pancakesNum+"";
-            // Previous instance ID
-            //args[3] = "input\\pancakes\\generated";
-        }
+            size = pancakesNum;
 
-        if (args.length == 4) {
-            previousInstancesDir = args[3];
-        }
 
-        if (args.length < 3) {
-            System.out.println("Usage: <OutputPath> <Count> <Size>");
-            System.exit(-1);
-        }
-        File outputDirectory = new File(args[0]);
-        if (!outputDirectory.isDirectory()) {
-            throw new IOException("Invalid directory: " + args[0]);
-        }
-        // Required number of instances
-        try {
-            instancesCount = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid # of instances: " + args[1]);
-        }
-        // Size of each problem
-        try {
-            size = Integer.parseInt(args[2]);
+            File outputDirectory = new File(outDir);
+            if (!outputDirectory.isDirectory()) {
+                outputDirectory.mkdir();
+            }
+
             // The size must be at least 2
             if (size < 2) {
                 throw new NumberFormatException();
             }
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid size of Pancakes problem (must be >= 2): " + args[1]);
-        }
 
-        // This set is used in order to avoid duplicates
-        Set<String> instances = new HashSet<>();
 
-        // Fill in previous instances (in order to avoid duplicates)
-        if (previousInstancesDir != null) {
-            File prev = new File(previousInstancesDir);
-            if (prev.exists()) {
-                for(File current : prev.listFiles(new FileFilter() {
-                    @Override
-                    public boolean accept(File pathname) {
-                        return pathname.getName().endsWith("in");
+            // This set is used in order to avoid duplicates
+            Set<String> instances = new HashSet<>();
+
+            // Fill in previous instances (in order to avoid duplicates)
+            if (previousInstancesDir != null) {
+                File prev = new File(previousInstancesDir);
+                if (prev.exists()) {
+                    for (File current : prev.listFiles(pathname -> pathname.getName().endsWith("in"))) {
+                        instances.add(Utils.fileToString(current));
+                        ++previousInstancesCount;
                     }
-                })) {
-                    instances.add(Utils.fileToString(current));
-                    ++previousInstancesCount;
                 }
             }
-        }
 
-        // Now, create the problems
-        PancakesGenerator generator = new PancakesGenerator();
-        // Loop over the required number of instances
-        for (int i = 0; i < instancesCount; ++i) {
-            int pancakeNumber = i + 1;
-            System.out.println("[INFO] Generating instance # " + pancakeNumber + " ...");
-            FileWriter fw = new FileWriter(new File(outputDirectory, pancakeNumber + ".in"));
-            String instance = null;
-            while (instance == null || instances.contains(instance)) {
-                instance = generator.generateInstance(size);
+            // Now, create the problems
+            PancakesGenerator generator = new PancakesGenerator();
+            // Loop over the required number of instances
+            for (int i = 0; i < instancesCount; ++i) {
+                int pancakeNumber = i + 1;
+                System.out.println("[INFO] Generating instance # " + pancakeNumber + " ...");
+                FileWriter fw = new FileWriter(new File(outputDirectory, pancakeNumber + ".in"));
+                String instance = null;
+                while (instance == null || instances.contains(instance)) {
+                    instance = generator.generateInstance(size);
+                }
+                instances.add(instance);
+                fw.write(instance);
+                fw.close();
+                System.out.println(" Done.");
             }
-            instances.add(instance);
-            fw.write(instance);
-            fw.close();
-            System.out.println(" Done.");
+            assert instances.size() == instancesCount + previousInstancesCount;
         }
-        assert instances.size() == instancesCount + previousInstancesCount;
     }
 }
