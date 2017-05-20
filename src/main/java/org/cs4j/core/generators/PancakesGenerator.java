@@ -135,7 +135,7 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
         int previousInstancesCount = 0;
         int pancakesNum = 0;
 
-        for(pancakesNum = 10; pancakesNum <= 100; pancakesNum += 10) {
+        for(pancakesNum = 10; pancakesNum <= 45; pancakesNum += 5) {
 
             // In case no arguments were given - let's specify them here
 

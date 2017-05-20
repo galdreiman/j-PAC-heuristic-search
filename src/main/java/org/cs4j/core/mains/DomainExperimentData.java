@@ -35,17 +35,17 @@ public class DomainExperimentData {
 
 
 		domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/fifteenpuzzle/states15",
-				"./preprocessResults/FifteenPuzzle/", "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES));
+				"./preprocessResults/FifteenPuzzle/", "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(Pancakes.class,
-				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES,"./input/pancakes/generated-for-pac-stats-10"));
+				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES,"./input/pancakes/generated-for-pac-stats-%d","./preprocessResults/pancakes/%d"));
 		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
-				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES));
+				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-5-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES));
+				"./input/vacuumrobot/generated-5-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
 						"./preprocessResults/dockyard-robot-max-edge-2-out-of-place-30/",
-						"./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, 90));
+						"./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, 90,"",""));
 
 		// Training set configuration
 		int trainEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);
@@ -91,18 +91,20 @@ public class DomainExperimentData {
 	public int fromInstance; // The problem instance to start from
 	public int toInstance; // // The problem instance to finish at (inclusive)
 	public String pacInputPathFormat;
+	public String outputPreprocessPathFormat;
 
-	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance) {
-		this(inputPath,outputPreprocessPath,outputOnlinePath,fromInstance,toInstance,"");
-	}
+//	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance) {
+//		this(inputPath,outputPreprocessPath,outputOnlinePath,fromInstance,toInstance,"");
+//	}
 
-	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance, String pacInputPathFormat) {
+	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance, String pacInputPathFormat,String outputPreprocessPathFormat) {
 		this.inputPath = inputPath;
 		this.outputPreprocessPath = outputPreprocessPath;
 		this.outputOnlinePath = outputOnlinePath;
 		this.fromInstance = fromInstance;
 		this.toInstance = toInstance;
 		this.pacInputPathFormat = pacInputPathFormat;
+		this.outputPreprocessPathFormat = outputPreprocessPathFormat;
 	}
 
 	/**
@@ -115,7 +117,7 @@ public class DomainExperimentData {
 	 *            to instance
 	 */
 	public DomainExperimentData subset(int fromInstance, int toInstance) {
-		return new DomainExperimentData(this.inputPath, this.outputPreprocessPath, this.outputOnlinePath, fromInstance, toInstance);
+		return new DomainExperimentData(this.inputPath, this.outputPreprocessPath, this.outputOnlinePath, fromInstance, toInstance,"","");
 	}
 
 }

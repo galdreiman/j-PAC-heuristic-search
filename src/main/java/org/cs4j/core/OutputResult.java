@@ -56,13 +56,13 @@ public class OutputResult {
 				pathPrefix = "./results/{" + rand + "}_" + this.fname;
 			}
 		}
-		if (filePrefix != null) {
-			File f = new File(pathPrefix);
-			String dirName = f.getParent();
-			String baseName = filePrefix + f.getName();
-			pathPrefix = dirName + "/" + baseName;
-		}
-		this.basicResultsPath = pathPrefix;
+//		if (filePrefix != null) {
+//			File f = new File(pathPrefix);
+//			String dirName = f.getParent();
+//			String baseName = filePrefix;
+//			pathPrefix = pathPrefix + "/" + filePrefix;
+//		}
+		this.basicResultsPath = pathPrefix + "/" + filePrefix;
 		String pathPostfix = ((wg == -1) || (wh == -1)) ? "" : (int) wg + "_" + (int) wh + "_" + reopenPolicyStr;
 		this.fname = this.basicResultsPath + pathPostfix + ".csv";
 		File f = new File(this.fname);
