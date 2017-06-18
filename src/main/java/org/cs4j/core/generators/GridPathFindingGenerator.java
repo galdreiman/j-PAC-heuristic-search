@@ -559,7 +559,7 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         for (int i = 0; i < outputPaths.length; ++i) {
             args[0] = outputPaths[i];
             args[1] = mapFiles[i];
-            args[2] = "100";
+            args[2] = "5000";
 
             // Read the output directory
             File outputDirectory = new File(args[0]);

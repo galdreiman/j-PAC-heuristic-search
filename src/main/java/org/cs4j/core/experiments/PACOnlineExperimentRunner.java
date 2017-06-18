@@ -52,7 +52,7 @@ public class PACOnlineExperimentRunner {
         }
     }
 
-    private String runParamsToLog(SortedMap<String, Object> runParams) {
+    protected String runParamsToLog(SortedMap<String, Object> runParams) {
         StringBuilder builder = new StringBuilder();
         for (String param : runParams.keySet()) {
             builder.append(param);
@@ -77,6 +77,8 @@ public class PACOnlineExperimentRunner {
         columnNames.addAll(runParamColumns);
         String toPrint = String.join(",", columnNames);
         toPrint += ",Domain";
+        toPrint +=",OPT";
+        toPrint +=",is_epsilon";
         output.writeln(toPrint);
     }
 

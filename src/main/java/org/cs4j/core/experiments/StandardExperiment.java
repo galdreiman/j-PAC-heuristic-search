@@ -5,12 +5,15 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
-import org.cs4j.core.algorithms.pac.PACSearchFramework;
+import org.cs4j.core.algorithms.pac.PACStatistics;
+import org.cs4j.core.algorithms.pac.PACUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
+import java.util.concurrent.atomic.DoubleAccumulator;
+
 
 /**
  * Created by Roni Stern on 01/03/2017.
@@ -49,6 +52,18 @@ public class StandardExperiment implements Experiment
             // this run (w,
             // domain, etc.)
             resultsData.add(instance.getClass().getSimpleName());
+
+            // add OPT value
+            PACStatistics stats = PACUtils.getPACStatistics(instance.getClass());
+            double opt = stats.instanceToOptimal.get(instanceId);
+            resultsData.add(opt);
+
+            // add isEpsilon: isEpsilon= W*OPT >= Cost
+            double cost = Double.parseDouble(resultsData.get(3).toString());
+            double epsilon = Double.parseDouble(resultsData.get(10).toString());
+            int isEpsilon = opt * (1+epsilon) >= cost == true? 1 : 0;
+            resultsData.add(isEpsilon);
+
             output.appendNewResult(resultsData.toArray());
             output.newline();
         } catch (OutOfMemoryError e) {

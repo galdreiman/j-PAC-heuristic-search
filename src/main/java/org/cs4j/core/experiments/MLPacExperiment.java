@@ -22,14 +22,14 @@ public class MLPacExperiment extends StandardExperiment {
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) {
 
-		Class[] domains = { Pancakes.class, VacuumRobot.class, GridPathFinding.class };
-		Class[] pacConditions = { MLPacCondition.class,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
+		Class[] domains = {  VacuumRobot.class };
+		Class[] pacConditions = { MLPacCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
 
-		double[] epsilons = { 0.1, 0.2, 0.3 };
-		double[] deltas = {  0.0, 0.05, 0.1, 0.2, 0.5, };
+		double[] epsilons = { 0.0, 0.05, 0.1, 0.2, 0.3   };
+		double[] deltas = {   0.0, 0.05, 0.1, 0.2, 0.3,0.8  };
 
 		Experiment experiment = new MLPacExperiment();
-		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunnerForIncInstances();
 		runner.runExperimentBatch(domains, pacConditions, epsilons, deltas, experiment);
 
 	}

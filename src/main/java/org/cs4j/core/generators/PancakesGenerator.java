@@ -141,7 +141,7 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
 
             System.out.println("[WARNING] Using local arguments");
             // Output directory
-            String outDir = "C:\\Users\\user\\workspace\\PAC\\PACBurlap\\PacDaniel\\input\\pancakes\\generated-for-pac-stats-" + pancakesNum;
+            String outDir = "input\\pancakes\\generated-for-pac-stats-" + pancakesNum;
             // Count of pancakes (number of instances)
             int instancesCount = 100;
             // Size of problem

@@ -1,3 +1,3 @@
-map: input/gridpathfinding/raw/maps/ost003d.map
-start: 105,162
-goals: 164,51
+map: input/GridPathFinding/raw/maps/ost003d.map
+start: 117,83
+goals: 42,137

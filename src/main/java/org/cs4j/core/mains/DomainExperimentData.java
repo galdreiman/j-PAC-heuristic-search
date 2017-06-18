@@ -17,8 +17,8 @@ public class DomainExperimentData {
 		TRAIN, TEST, ALL, DEBUG
 	}
 
-	private static final double TRAIN_PRESENTAGE = 0.5;
-	private static final int NUM_OF_INSTANCES = 100;
+	private static final double TRAIN_PRESENTAGE = 0.9;
+	private static final int NUM_OF_INSTANCES = 5000;
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
@@ -41,7 +41,7 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
 				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-5-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES,"",""));
+				"./input/vacuumrobot/generated-10-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
 						"./preprocessResults/dockyard-robot-max-edge-2-out-of-place-30/",

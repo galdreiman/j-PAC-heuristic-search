@@ -84,11 +84,11 @@ public class StatesCollector implements SearchAwarePACCondition{
 
     @Override
     public double getEpsilon() {
-        throw new IllegalStateException("Dont need epsilon here");
+        return 0;
     }
 
     @Override
     public double getDelta() {
-        throw new IllegalStateException("Dont need delta here");
+        return 0;
     }
 }

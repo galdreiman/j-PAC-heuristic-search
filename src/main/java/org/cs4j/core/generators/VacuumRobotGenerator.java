@@ -24,19 +24,83 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     private static final int TOO_MUCH_ERRORS_RESTART_INSTANCE_GENERATION = 1000;
 
     private static final int[][] POSSIBLE_DELTAS =
-            new int[][] {
+            new int[][]{
                     {0, 1},
                     {0, -1},
                     {-1, 0},
                     {1, 0}
             };
 
+    public static void main(String args[]) throws IOException {
+        int instancesCount;
+        int mapWidth;
+        int mapHeight;
+        double obstaclesPercentage;
+        int dirtyCount;
+
+        // TODO: Read all the input parameters from a single file
+        //        if (args.length != 6) {
+        //            System.out.println("Usage: <OutputPath> <Count> <Width> <Height> <ObstaclesPercentage> <DirtyCount>");
+        //            System.exit(-1);
+        //        }
+
+        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input\\vacuumrobot\\generated-10-dirt";
+        File outputDirectory = new File(outFileDirStr);
+        if (!outputDirectory.isDirectory()) {
+            throw new IOException("Invalid directory: " + outFileDirStr);
+        }
+        // Required number of instances
+        try {
+            instancesCount = Integer.parseInt(args[1]);
+        } catch (Exception e) {
+        //            throw new IOException("Invalid # of instances: " + args[1]);
+            instancesCount = 5000;
+        }
+        // Required width of the map
+        try {
+            mapWidth = Integer.parseInt(args[2]);
+        } catch (Exception e) {
+        //            throw new IOException("Invalid map width: " + args[2]);
+            mapWidth = 200;
+        }
+        // Required height of the map
+        try {
+            mapHeight = Integer.parseInt(args[3]);
+        } catch (Exception e) {
+        // throw new IOException("Invalid map height: " + args[3]);
+            mapHeight = 200;
+        }
+        // Required height of the map
+        try {
+            obstaclesPercentage = Double.parseDouble(args[4]);
+        } catch (Exception e) {
+        //            throw new IOException("Invalid percentage of obstacles: " + args[4]);
+            obstaclesPercentage = 0.999999;
+        }
+        // Required count of dirty locations
+        try {
+            dirtyCount = Integer.parseInt(args[5]);
+        } catch (Exception e) {
+        //            throw new IOException("Invalid count of dirty locations: " + args[5]);
+            dirtyCount = 10;
+        }
+
+        VacuumRobotGenerator generator = new VacuumRobotGenerator();
+
+        for (int i = 0; i < instancesCount; ++i) {
+            System.out.println("[INFO] Generating instance # " + (i + 1) + " ...");
+            FileWriter fw = new FileWriter(new File(outputDirectory, (i + 1) + ".in"));
+            fw.write(generator.generateInstance(mapWidth, mapHeight, obstaclesPercentage, dirtyCount));
+            fw.close();
+            System.out.println(" Done.");
+        }
+    }
+
     /**
      * Calculate the index of the location in a one-dimensional array
      *
      * @param x The horizontal location
      * @param y The vertical location
-     *
      * @return The calculated index
      */
     private int index(int x, int y, int mapWidth) {
@@ -47,7 +111,6 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
      * Calculate the index of the location in a one-dimensional array
      *
      * @param location A location represented as a pair of integers
-     *
      * @return The calculated index
      */
     private int index(PairInt location, int mapWidth) {
@@ -58,7 +121,6 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
      * Creates a Pair object with the dimensions of the given location
      *
      * @param locationIndex The index of the location in a 1-dimensional array
-     *
      * @return The calculated Pair
      */
     private PairInt location2d(int locationIndex, int mapWidth) {
@@ -73,28 +135,14 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     /**
      * Checks whether the given location is valid on the map
      *
-     * @param map The map to check on
+     * @param map   The map to check on
      * @param index The index to check (1-dimensional)
-     *
-     * NOTE: The function doesn't check the robot is not located in the given location
-     *
+     *              <p>
+     *              NOTE: The function doesn't check the robot is not located in the given location
      * @return Whether the location is free
      */
     private boolean _isFree(char[] map, int index) {
         return index >= 0 && index < map.length && !this._isBlocked(map, index);
-    }
-
-    /**
-     * Checks whether the robot is located in the given location
-     *
-     * @param map The map to check on
-     * @param index The index to check (1-dimensional)
-     *
-     * @return Whether the robot is located at the given location
-     */
-    private boolean _isRobotHere(char[] map, int index) {
-        assert index >= 0 && index < map.length;
-        return map[index] == VacuumRobotGenerator.ROBOT_CHARACTER;
     }
 
     /**
@@ -111,19 +159,30 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     // }
 
     /**
+     * Checks whether the robot is located in the given location
+     *
+     * @param map   The map to check on
+     * @param index The index to check (1-dimensional)
+     * @return Whether the robot is located at the given location
+     */
+    private boolean _isRobotHere(char[] map, int index) {
+        assert index >= 0 && index < map.length;
+        return map[index] == VacuumRobotGenerator.ROBOT_CHARACTER;
+    }
+
+    /**
      * Return whether the given location is dirty (contained in the given dirty locations array)
      *
      * @param possibleDirtyLocations The array of dirty locations to search in
-     * @param locationIndex The index to check (1-dimensional)
-     * @param mapCopy (OPTIONAL) A copy of the map which is checked for impossible places for dirty locations
-     *
+     * @param locationIndex          The index to check (1-dimensional)
+     * @param mapCopy                (OPTIONAL) A copy of the map which is checked for impossible places for dirty locations
      * @return Whether the given location is dirty
      */
     private boolean _isDirty(int[] possibleDirtyLocations, int locationIndex, char[] mapCopy) {
         for (int possibleDirtyLocation : possibleDirtyLocations) {
             if (possibleDirtyLocation == locationIndex) {
                 return true;
-            // If we have the copy of the map here, check if that dirty location was already checked
+                // If we have the copy of the map here, check if that dirty location was already checked
             } else if (mapCopy != null && mapCopy[locationIndex] == VacuumRobotGenerator.IMPOSSIBLE_DIRTY_CHARACTER) {
                 return true;
             }
@@ -134,23 +193,22 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     /**
      * The function checks whether the location at the given map is blocked by obstacles, such that the robot
      * can't move
-     *
+     * <p>
      * Blocked location means something like that (# means obstacle):
-     *
-     *      # # #
-     *      # V #
-     *      # # #
-     *
+     * <p>
+     * # # #
+     * # V #
+     * # # #
+     * <p>
      * NOTE: In case there are no diagonal moves, the following state is also blocked:
-     *      . # .
-     *      # V #
-     *      . # .
+     * . # .
+     * # V #
+     * . # .
      *
-     * @param w The width of the map
-     * @param h The height of the map
-     * @param map The map on which all the locations recede
+     * @param w     The width of the map
+     * @param h     The height of the map
+     * @param map   The map on which all the locations recede
      * @param index The index of the location to check
-     *
      * @return Whether the location os blocked
      */
     private boolean _isLocationBlocked(int w, int h, char[] map, int index) {
@@ -189,17 +247,16 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     /**
      * Generates a single instance of VacuumRobot domain
      *
-     * @param w Required width of the grid
-     * @param h Required height of the grid
+     * @param w                   Required width of the grid
+     * @param h                   Required height of the grid
      * @param obstaclesPercentage Required percentage of obstacles on the grid
-     * @param dirtyCount The required count of dirty locations
-     *
+     * @param dirtyCount          The required count of dirty locations
      * @return An array which represents a grid, with the required parameters (size, obstacles percentage and dirty)
      */
     private char[] _generateInstance(int w, int h, double obstaclesPercentage, int dirtyCount) {
         int mapSize = w * h;
         assert obstaclesPercentage >= 0.0d && obstaclesPercentage < 100.0d;
-        int obstaclesCount = (int)Math.ceil(mapSize * (obstaclesPercentage / 100));
+        int obstaclesCount = (int) Math.ceil(mapSize * (obstaclesPercentage / 100));
         int freeLocationsCount = mapSize - obstaclesCount;
         // Assure count of dirty cells isn't too big (at most the number of free cells - 1 (for robot start position)
         assert dirtyCount <= freeLocationsCount - 1;
@@ -218,7 +275,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
         Random obstaclesRandom = new Random();
         int foundObstaclesCount = 0;
         while (foundObstaclesCount < obstaclesCount) {
-            int obstacleIndex = (int)Math.ceil(obstaclesRandom.nextDouble() * (mapSize - 1));
+            int obstacleIndex = (int) Math.ceil(obstaclesRandom.nextDouble() * (mapSize - 1));
             // If not already filled by an obstacle
             if (!this._isBlocked(map, obstacleIndex)) {
                 map[obstacleIndex] = VacuumRobotGenerator.OBSTACLE_CHARACTER;
@@ -233,7 +290,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
         boolean robotPositionFound = false;
         PairInt robotLocation = null;
         while (!robotPositionFound) {
-            int robotPositionIndex = (int)Math.ceil(robotLocationRandom.nextDouble() * (mapSize - 1));
+            int robotPositionIndex = (int) Math.ceil(robotLocationRandom.nextDouble() * (mapSize - 1));
             if (!this._isBlocked(map, robotPositionIndex) && !this._isLocationBlocked(w, h, map, robotPositionIndex)) {
                 map[robotPositionIndex] = VacuumRobotGenerator.ROBOT_CHARACTER;
                 robotLocation = this.location2d(robotPositionIndex, w);
@@ -252,7 +309,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
 
         // Let's prepare a copy of the map and each time a dirty location fails, fill its place, such that it will
         // be never generated next time
-        char [] mapCopy = new char[map.length];
+        char[] mapCopy = new char[map.length];
         System.arraycopy(map, 0, mapCopy, 0, map.length);
 
         // Used to break on too much random errors
@@ -261,7 +318,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
         // Now, fill the dirty locations
         int foundDirtyCount = 0;
         while (foundDirtyCount < dirtyCount && freeLocationsCount > 0) {
-            int dirtyLocation = (int)Math.ceil(dirtyLocationRandom.nextDouble() * (mapSize - 1));
+            int dirtyLocation = (int) Math.ceil(dirtyLocationRandom.nextDouble() * (mapSize - 1));
             // If not already filled by an obstacle
             if (!this._isBlocked(map, dirtyLocation) &&
                     !this._isRobotHere(map, dirtyLocation) &&
@@ -306,11 +363,10 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
     /**
      * The function generates a single instance of the VacuumRobot domain and returns its string representation
      *
-     * @param w Required width of the grid
-     * @param h Required height of the grid
+     * @param w                   Required width of the grid
+     * @param h                   Required height of the grid
      * @param obstaclesPercentage Required percentage of obstacles on the grid
-     * @param dirtyCount The required count of dirty locations
-     *
+     * @param dirtyCount          The required count of dirty locations
      * @return A string representation of the generated instance
      */
     public String generateInstance(int w, int h, double obstaclesPercentage, int dirtyCount) {
@@ -338,63 +394,5 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
             }
         }
         return sb.toString();
-    }
-
-    public static void main(String args[]) throws IOException {
-        int instancesCount;
-        int mapWidth;
-        int mapHeight;
-        double obstaclesPercentage;
-        int dirtyCount;
-
-        // TODO: Read all the input parameters from a single file
-        if (args.length != 6) {
-            System.out.println("Usage: <OutputPath> <Count> <Width> <Height> <ObstaclesPercentage> <DirtyCount>");
-            System.exit(-1);
-        }
-        File outputDirectory = new File(args[0]);
-        if (!outputDirectory.isDirectory()) {
-            throw new IOException("Invalid directory: " + args[0]);
-        }
-        // Required number of instances
-        try {
-            instancesCount = Integer.parseInt(args[1]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid # of instances: " + args[1]);
-        }
-        // Required width of the map
-        try {
-            mapWidth = Integer.parseInt(args[2]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid map width: " + args[2]);
-        }
-        // Required height of the map
-        try {
-            mapHeight = Integer.parseInt(args[3]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid map height: " + args[3]);
-        }
-        // Required height of the map
-        try {
-            obstaclesPercentage = Double.parseDouble(args[4]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid percentage of obstacles: " + args[4]);
-        }
-        // Required count of dirty locations
-        try {
-            dirtyCount = Integer.parseInt(args[5]);
-        } catch (NumberFormatException e) {
-            throw new IOException("Invalid count of dirty locations: " + args[5]);
-        }
-
-        VacuumRobotGenerator generator = new VacuumRobotGenerator();
-
-        for (int i = 0; i < instancesCount; ++i) {
-            System.out.println("[INFO] Generating instance # " + (i + 1) + " ...");
-            FileWriter fw = new FileWriter(new File(outputDirectory, (i + 1) + ".in"));
-            fw.write(generator.generateInstance(mapWidth, mapHeight, obstaclesPercentage, dirtyCount));
-            fw.close();
-            System.out.println(" Done.");
-        }
     }
 }

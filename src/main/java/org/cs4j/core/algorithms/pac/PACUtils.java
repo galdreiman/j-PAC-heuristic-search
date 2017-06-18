@@ -64,8 +64,8 @@ public class PACUtils {
             while(line!=null){
                 parts = line.split(",");
                 instanceId = (int)(Double.parseDouble(parts[0]));
-                optimal = Double.parseDouble(parts[1]);
-                initialH = Double.parseDouble(parts[2]);
+                initialH = Double.parseDouble(parts[1]);
+                optimal = Double.parseDouble(parts[2]);
 
                 instanceToOptimal.put(instanceId,optimal);
                 instanceToInitialH.put(instanceId,initialH);

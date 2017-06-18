@@ -1,3 +1,3 @@
-map: input/gridpathfinding/raw/maps/brc202d.map
-start: 267,280
-goals: 501,425
+map: input/GridPathFinding/raw/maps/brc202d.map
+start: 250,283
+goals: 426,21

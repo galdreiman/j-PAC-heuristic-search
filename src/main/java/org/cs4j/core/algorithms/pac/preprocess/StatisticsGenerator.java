@@ -17,10 +17,7 @@ import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
 import org.cs4j.core.algorithms.pac.StatesCollector;
-import org.cs4j.core.domains.DockyardRobot;
-import org.cs4j.core.domains.FifteenPuzzle;
-import org.cs4j.core.domains.Pancakes;
-import org.cs4j.core.domains.VacuumRobot;
+import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 
@@ -52,17 +49,19 @@ public class StatisticsGenerator {
         SearchResult result = psf.search(domain);
         StatesCollector collector = (StatesCollector) psf.getPACCondition();
 
+
         SearchDomain.State state;
         Map<Double,Double> hToOptimal = new TreeMap<>();
-        for(Double h : collector.hToRepresentativeState.keySet()){
-            logger.info("Collecting statistics for state representing states with h="+h+"...");
-            state = domain.unpack(collector.hToRepresentativeState.get(h));
-            domain.setInitialState(state);
+//        for(Double h : collector.hToRepresentativeState.keySet()){
+//            logger.info("Collecting statistics for state representing states with h="+h+"...");
+            state = domain.initialState(); //unpack(collector.hToRepresentativeState.get(h));
+//            domain.setInitialState(state);
+            double h = state.getH();
 
             optimal = solveOptimally(domain);
             hToOptimal.put(h,optimal);
 
-        }
+//        }
         return hToOptimal;
     }
 
@@ -116,8 +115,8 @@ public class StatisticsGenerator {
                     SortedMap<String, String> domainParams,
                     SortedMap<String,Object> runParams) {
         SearchDomain domain;
-        int fromInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).fromInstance;
-        int toInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).toInstance;
+        int fromInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.ALL).fromInstance;
+        int toInstance= DomainExperimentData.get(domainClass,DomainExperimentData.RunType.ALL).toInstance;
         String inputPath = DomainExperimentData.get(domainClass,DomainExperimentData.RunType.TRAIN).inputPath;
         Map<Double,Double> hToOptimal;
         Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
@@ -147,7 +146,7 @@ public class StatisticsGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        Class[] domains = {Pancakes.class};//{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class};
+        Class[] domains = {VacuumRobot.class};//{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class,GridPathFinding.class};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
@@ -155,7 +154,7 @@ public class StatisticsGenerator {
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
                 // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPreprocessPath,
+                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPath,
                         "StatisticsGenerator", -1, -1, null, false, true);
                 generator.printResultsHeaders(output,
                         new String[]{"InstanceID", "h", "opt"},
