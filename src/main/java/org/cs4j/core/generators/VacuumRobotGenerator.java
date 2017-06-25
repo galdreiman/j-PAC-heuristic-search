@@ -54,7 +54,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
             instancesCount = Integer.parseInt(args[1]);
         } catch (Exception e) {
         //            throw new IOException("Invalid # of instances: " + args[1]);
-            instancesCount = 5000;
+            instancesCount = 50000;
         }
         // Required width of the map
         try {

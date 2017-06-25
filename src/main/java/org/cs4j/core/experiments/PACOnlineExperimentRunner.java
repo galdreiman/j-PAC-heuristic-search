@@ -121,7 +121,7 @@ public class PACOnlineExperimentRunner {
                         for (double delta : deltas) {
                             runParams.put("delta", delta);
                             runParams.put("pacCondition", pacConditionClass.getName());
-                            this.run(experiment, domainClass, RunType.TEST, output,
+                            this.run(experiment, domainClass, RunType.TEST, output, // TODO: GAL: Dont forget to retrieve to TEST!!!!!!
                                     domainParams, runParams);
                         }
                     }

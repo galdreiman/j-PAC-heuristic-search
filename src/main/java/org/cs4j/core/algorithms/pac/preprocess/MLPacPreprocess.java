@@ -1,9 +1,11 @@
 package org.cs4j.core.algorithms.pac.preprocess;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.AnytimeSearchAlgorithm;
@@ -23,6 +25,10 @@ import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
+import weka.classifiers.AbstractClassifier;
+import weka.classifiers.trees.J48;
+import weka.core.Instances;
+import weka.core.converters.CSVLoader;
 
 public class MLPacPreprocess {
 
@@ -105,6 +111,25 @@ public class MLPacPreprocess {
 						System.out.println("------------------");
 
 					}
+					output.close();
+
+					// -------------------------------------------------
+					// 3. train a model
+					// -------------------------------------------------
+					String inputDataPath = DomainExperimentData.get(domainClass,
+							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
+					List<AbstractClassifier> classifiers = setupAndGetClassifier(inputDataPath, Arrays.asList("J48"));
+
+					// save model to file
+					for(AbstractClassifier cls : classifiers){
+						ObjectOutputStream oos = new ObjectOutputStream(
+								new FileOutputStream(DomainExperimentData.get(domainClass,
+										DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".model"));
+						oos.writeObject(cls);
+						oos.flush();
+					}
+
+
 
 				} catch (Exception e) {
 					logger.error(e);
@@ -116,6 +141,56 @@ public class MLPacPreprocess {
 				}
 			}
 		}
+
+		// train a model
+
+		// save model to file
+	}
+
+	private static List<AbstractClassifier> setupAndGetClassifier(String inputDataPath, List<String> classifierTypes) {
+		List<AbstractClassifier> classifiers = new ArrayList<>();
+
+		for (String classifierType : classifierTypes) {
+
+			AbstractClassifier classifier = null;
+			switch (classifierType) {
+				case "J48":
+					classifier = new J48();
+			}
+
+			classifiers.add(classifier);
+		}
+
+
+		for(AbstractClassifier cls : classifiers) {
+			try {
+				Instances dataset = getInputInstance(inputDataPath);
+				logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
+				cls.buildClassifier(dataset);
+			} catch (Exception e) {
+				logger.error("ERROR initializing classifier: ", e);
+			}
+		}
+
+		return classifiers;
+	}
+
+
+	private static Instances getInputInstance(String inputDataPath) {
+		logger.debug("getInputInstance | input file: " + inputDataPath);
+		CSVLoader loader = new CSVLoader();
+		Instances data = null;
+		try {
+			loader.setSource(new File(inputDataPath));
+			data = loader.getDataSet();
+		} catch (IOException e) {
+			logger.error("ERROR: failed to read input data for classifier: " + inputDataPath,e);
+		}
+
+
+		Instances dataset = data;
+		dataset.setClassIndex(dataset.numAttributes() - 1);
+		return dataset;
 	}
 
 	@SuppressWarnings("rawtypes")

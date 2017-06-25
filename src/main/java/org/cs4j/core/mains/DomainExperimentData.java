@@ -17,8 +17,8 @@ public class DomainExperimentData {
 		TRAIN, TEST, ALL, DEBUG
 	}
 
-	private static final double TRAIN_PRESENTAGE = 0.9;
-	private static final int NUM_OF_INSTANCES = 5000;
+	private static final double TRAIN_PRESENTAGE = 0.9; // TODO: GAL: Change back to 0.9!
+	private static final int NUM_OF_INSTANCES = 10;
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;

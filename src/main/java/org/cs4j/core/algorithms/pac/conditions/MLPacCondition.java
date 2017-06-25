@@ -1,7 +1,9 @@
 package org.cs4j.core.algorithms.pac.conditions;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +16,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.classifiers.meta.FilteredClassifier;
@@ -38,32 +41,19 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 		// read ML_PAC_Condition_Preprocess.csv and train the model (the output
 		// of the training process)
+		String inputModelPath = DomainExperimentData.get(domain.getClass(),
+				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".model";
 		String inputDataPath = DomainExperimentData.get(domain.getClass(),
 				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
-		this.setupAndGetClassifier(inputDataPath);
-		this.setupAttributes();
-
-		// Test the model
 		try {
-			Evaluation eTest = new Evaluation(this.dataset);
-			eTest.evaluateModel(this.classifier, this.dataset);
+			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
+			this.classifier = (AbstractClassifier) ois.readObject();
+			ois.close();
 
-			// Print the result à la Weka explorer:
-			String strSummary = eTest.toSummaryString();
-			logger.info(strSummary);
-
-			// Get the confusion matrix
-			double[][] cmMatrix = eTest.confusionMatrix();
-			String cmStr = "";
-			for(int i = 0; i< cmMatrix.length; ++i){
-				for(int j=0; j< cmMatrix[i].length; ++j){
-					cmStr += " " + cmMatrix[i][j];
-				}
-				cmStr += "\n";
-			}
-			logger.info("Confusion Matrix: \n" + cmStr + "\n");
-		} catch(Exception e){
-			logger.error("Failed to evaluate classifier: " + this.classifier.getClass().getSimpleName(), e);
+			this.getInputInstance(inputDataPath);
+		} catch (Exception e) {
+			logger.error("Failed to load model for input file [" +
+					inputDataPath + "]", e);
 		}
 	}
 

@@ -43,10 +43,11 @@ public class PACOnlineExperimentRunnerForIncInstances extends PACOnlineExperimen
                 //batch run setup:
                 this.fromInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).fromInstance;
                 this.toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).toInstance;
-                int instancesDelta = (this.fromInstance - this.toInstance +1) / this.numOfBatches;
+                int instancesDelta = (this.toInstance - this.fromInstance +1) / this.numOfBatches;
+                int iterNum = 1;
 
                 for(this.currToInstance = this.fromInstance; this.currToInstance <= this.toInstance; this.currToInstance += instancesDelta) {
-                    int batchCount = this.currToInstance - this.fromInstance;
+                    int batchCount = instancesDelta * iterNum ++;
                     output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).outputOnlinePath, domainName + File.separator + "PAC_Output_"+batchCount, -1, -1, null, false,
                             true);
                     this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
@@ -89,7 +90,7 @@ public class PACOnlineExperimentRunnerForIncInstances extends PACOnlineExperimen
         String inputPath = DomainExperimentData.get(domainClass, runType).inputPath;
 
         // search on this domain and algo and weight the 100 instances
-        for (int i = this.fromInstance; i <= this.currToInstance; ++i) {
+        for (int i = this.fromInstance; i <= this.currToInstance -1; ++i) {
             logger.info("\rSolving " + domainClass.getName() + "\t instance " + i + "\t" + runParamsToLog(runParams));
             domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
             experiment.run(domain, output, i, runParams);

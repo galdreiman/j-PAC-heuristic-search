@@ -79,17 +79,17 @@ public class StatisticsGenerator {
         if(result.hasSolution()) {
             return result.getBestSolution().getCost();
         }
-        else{
-            IDAstar idAstar = new IDAstar();
-            logger.info("A* failed, running IDA*...");
-            result= idAstar.search(domain);
-            if(result.hasSolution())
-                return result.getBestSolution().getCost();
+//        else{
+//            IDAstar idAstar = new IDAstar();
+//            logger.info("A* failed, running IDA*...");
+//            result= idAstar.search(domain);
+//            if(result.hasSolution())
+//                return result.getBestSolution().getCost();
             else {
                 logger.warn("Couldn't solve an instance");
                 return -1.0;
             }
-        }
+//        }
     }
 
 

@@ -23,13 +23,13 @@ public class MLPacExperiment extends StandardExperiment {
 	public static void main(String args[]) {
 
 		Class[] domains = {  VacuumRobot.class };
-		Class[] pacConditions = { MLPacCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
+		Class[] pacConditions = { MLPacCondition.class, RatioBasedPACCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
 
-		double[] epsilons = { 0.0, 0.05, 0.1, 0.2, 0.3   };
-		double[] deltas = {   0.0, 0.05, 0.1, 0.2, 0.3,0.8  };
+		double[] epsilons = { 0.0/*, 0.05, 0.1, 0.2, 0.3*/   };
+		double[] deltas = {  0.0/*, 0.05, 0.1, 0.2, 0.3 */ };
 
 		Experiment experiment = new MLPacExperiment();
-		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunnerForIncInstances();
+		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
 		runner.runExperimentBatch(domains, pacConditions, epsilons, deltas, experiment);
 
 	}
