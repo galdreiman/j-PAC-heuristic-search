@@ -48,7 +48,7 @@ public class MLPacPreprocess {
 
 		Class[] domains = {  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
 
-		double[] inputEpsilon = {0.05 };//0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
+		double[] inputEpsilon = {0.05}; //0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
 													// (from console,
 		// e.g. args[] or whatever)
 
@@ -157,6 +157,7 @@ public class MLPacPreprocess {
 		switch (classifierType) {
 		    case "J48":
 				classifier = new J48();
+				((J48)classifier).setUseLaplace(true);
 				break;
             case "NN":
                 classifier = new MultilayerPerceptron();
