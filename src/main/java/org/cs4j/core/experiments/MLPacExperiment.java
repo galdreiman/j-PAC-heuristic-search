@@ -10,6 +10,7 @@ public class MLPacExperiment extends StandardExperiment {
 
 	private final static Logger logger = Logger.getLogger(MLPacExperiment.class);
 
+
 	public MLPacExperiment() {
 		super(new PACSearchFramework());
 		logger.info("Init ML-PAC Experiment");
@@ -23,10 +24,11 @@ public class MLPacExperiment extends StandardExperiment {
 	public static void main(String args[]) {
 
 		Class[] domains = {  VacuumRobot.class };
-		Class[] pacConditions = { MLPacCondition.class, RatioBasedPACCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
+		Class[] pacConditions = { MLPacConditionNN.class,MLPacConditionJ48.class, RatioBasedPACCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
 
-		double[] epsilons = { 0.0/*, 0.05, 0.1, 0.2, 0.3*/   };
-		double[] deltas = {  0.0/*, 0.05, 0.1, 0.2, 0.3 */ };
+		double[] epsilons = { 0.0, 0.05, 0.1, 0.2, 0.3   };
+		double[] deltas = {  0.0, 0.05, 0.1, 0.2, 0.3  };
+
 
 		Experiment experiment = new MLPacExperiment();
 		PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();

@@ -26,6 +26,7 @@ import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.core.converters.CSVLoader;
@@ -47,7 +48,7 @@ public class MLPacPreprocess {
 
 		Class[] domains = {  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
 
-		double[] inputEpsilon = {0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
+		double[] inputEpsilon = {0.05 };//0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
 													// (from console,
 		// e.g. args[] or whatever)
 
@@ -116,18 +117,21 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
 					// 3. train a model
 					// -------------------------------------------------
+                    List<String> clsTypes = Arrays.asList("J48", "NN");
 					String inputDataPath = DomainExperimentData.get(domainClass,
 							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
-					List<AbstractClassifier> classifiers = setupAndGetClassifier(inputDataPath, Arrays.asList("J48"));
 
-					// save model to file
-					for(AbstractClassifier cls : classifiers){
-						ObjectOutputStream oos = new ObjectOutputStream(
-								new FileOutputStream(DomainExperimentData.get(domainClass,
-										DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".model"));
-						oos.writeObject(cls);
-						oos.flush();
-					}
+                    // save model to file
+                    for(String clsType: clsTypes) {
+
+                        AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType);
+                        ObjectOutputStream oos = new ObjectOutputStream(
+                                    new FileOutputStream(DomainExperimentData.get(domainClass,
+                                            DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e" + epsilon + "_"+clsType+".model"));
+                            oos.writeObject(cls);
+                            oos.flush();
+
+                    }
 
 
 
@@ -147,32 +151,32 @@ public class MLPacPreprocess {
 		// save model to file
 	}
 
-	private static List<AbstractClassifier> setupAndGetClassifier(String inputDataPath, List<String> classifierTypes) {
-		List<AbstractClassifier> classifiers = new ArrayList<>();
+	private static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType) {
 
-		for (String classifierType : classifierTypes) {
-
-			AbstractClassifier classifier = null;
-			switch (classifierType) {
-				case "J48":
-					classifier = new J48();
+        AbstractClassifier classifier = null;
+		switch (classifierType) {
+		    case "J48":
+				classifier = new J48();
+				break;
+            case "NN":
+                classifier = new MultilayerPerceptron();
+                ((MultilayerPerceptron)classifier).setLearningRate(0.1);
+                ((MultilayerPerceptron)classifier).setMomentum(0.2);
+                ((MultilayerPerceptron)classifier).setTrainingTime(2000);
+                ((MultilayerPerceptron)classifier).setHiddenLayers("3");
+				break;
 			}
 
-			classifiers.add(classifier);
-		}
-
-
-		for(AbstractClassifier cls : classifiers) {
 			try {
 				Instances dataset = getInputInstance(inputDataPath);
 				logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
-				cls.buildClassifier(dataset);
+                classifier.buildClassifier(dataset);
 			} catch (Exception e) {
 				logger.error("ERROR initializing classifier: ", e);
 			}
-		}
 
-		return classifiers;
+
+		return classifier;
 	}
 
 

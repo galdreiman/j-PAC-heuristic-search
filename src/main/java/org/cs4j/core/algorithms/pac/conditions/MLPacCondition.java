@@ -13,6 +13,7 @@ import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.MLPacFeatureExtractor.PacFeature;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.experiments.MLPacExperiment;
 import org.cs4j.core.mains.DomainExperimentData;
 
 import weka.classifiers.AbstractClassifier;
@@ -33,6 +34,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 	private AbstractClassifier classifier;
 	private ArrayList<Attribute> attributes;
 	private Instances dataset;
+	protected static String clsType;
 	
 
 	@Override
@@ -42,9 +44,10 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		// read ML_PAC_Condition_Preprocess.csv and train the model (the output
 		// of the training process)
 		String inputModelPath = DomainExperimentData.get(domain.getClass(),
-				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".model";
+				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+"_"+ this.clsType+".model";
 		String inputDataPath = DomainExperimentData.get(domain.getClass(),
 				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
+		this.setupAttributes();
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
 			this.classifier = (AbstractClassifier) ois.readObject();
@@ -78,20 +81,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
 	}
 
-	private void setupAndGetClassifier(String inputDataPath) {
-		this.classifier = new J48();
-		try {
-			this.getInputInstance(inputDataPath);
-			logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
-			this.classifier.buildClassifier(this.dataset);
-		} catch (Exception e) {
-			logger.error("ERROR initializing classifier: ", e);
-		}
-	}
-	
-	
 
-	
 
 	@Override
 	public boolean shouldStop(SearchResult incumbentSolution) {
@@ -101,19 +91,16 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		int size = features.size();
 
 		// Init a classifier input instance
-		Instance ins = new DenseInstance(size);
+		Instance ins = new DenseInstance(size + 1);
 
         // Add features to the input instance
 		int indx = 0;
 		for(Entry<PacFeature, Double> entry : features.entrySet()){
 			ins.setValue(indx++, entry.getValue());
 		}
-		ins.setDataset(this.dataset);
 
-		// Create local dataset from the instance
-//		Instances localDataSet = new Instances("MlPac",MLPacFeatureExtractor.getAttributes(), 500);
-//		localDataSet.setClassIndex(this.dataset.size() -1);
-//		localDataSet.add(ins);
+		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
+		ins.setDataset(this.dataset);
 
 		double[] distributeResult = {};
 		double classificationResult = -1;
