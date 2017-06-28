@@ -33,6 +33,46 @@ public class MLPacFeatureExtractor {
 	public static String getFeaturesHeader(){
 		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
 	}
+
+	public static String getFeaturesARFFHeader(){
+		StringBuilder b = new StringBuilder();
+		b.append("% Title: PAC MachineLearning dataset \n");
+		b.append("% \n");
+		b.append("% \n");
+
+		b.append("@RELATION ML-PAC");
+		b.append("\n");
+		b.append("\n");
+		b.append("@ATTRIBUTE generated  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE expanded  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE reopened  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE cost  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g1  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h1  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g2  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h2  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g3  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h3  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE w  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE is-W-opt  {true,false}");
+		b.append("\n");
+		b.append("\n");
+		b.append("@DATA");
+		b.append("\n");
+//		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		return b.toString();
+	}
 	
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResultIncludeTarget(SearchResult result, double optimalCost, double inputEpsilon){
 		logger.debug("MLPacFeatureExtractor:extractFeaturesFromSearchResult");

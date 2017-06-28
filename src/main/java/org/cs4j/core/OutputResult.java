@@ -82,14 +82,9 @@ public class OutputResult {
 		this.writer = new FileWriter(f);
 		this.currentResult = new StringBuilder();
 	}
-
-
-// TODO: RONI-GAL: This is not the correct place for this. OutputResults doesn't have anything to do with epsilons. 
-
-	public OutputResult(String pathPrefix, String filePrefix, boolean overwriteFile) throws IOException {
-
+	public OutputResult(String pathPrefix, String filePrefix, boolean overwriteFile,String postfix) throws IOException {
 		this.basicResultsPath = pathPrefix + File.separator + filePrefix;
-		this.fname = this.basicResultsPath + ".csv";
+		this.fname = this.basicResultsPath + postfix;
 		File f = new File(this.fname);
 		boolean fileExists = f.exists();
 		if (fileExists && !overwriteFile) {
@@ -106,6 +101,13 @@ public class OutputResult {
 		}
 		this.writer = new FileWriter(f);
 		this.currentResult = new StringBuilder();
+	}
+
+// TODO: RONI-GAL: This is not the correct place for this. OutputResults doesn't have anything to do with epsilons. 
+
+	public OutputResult(String pathPrefix, String filePrefix, boolean overwriteFile) throws IOException {
+		this(pathPrefix,filePrefix,overwriteFile,".csv");
+
 	}
 
 	public OutputResult(String pathPrefix, double wg, double wh, boolean reopenPolicy) throws IOException {

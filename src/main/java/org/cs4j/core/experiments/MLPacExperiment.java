@@ -26,7 +26,7 @@ public class MLPacExperiment extends StandardExperiment {
 		Class[] domains = {  VacuumRobot.class };
 		Class[] pacConditions = { MLPacConditionNN.class,MLPacConditionJ48.class, RatioBasedPACCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
 
-		double[] epsilons = { 0.05};// 0.0, 0.05, 0.1, 0.2, 0.3   };
+		double[] epsilons = {  0.0, 0.05, 0.1, 0.2, 0.3   };
 		double[] deltas = {  0.0, 0.05, 0.1, 0.2, 0.3  };
 
 

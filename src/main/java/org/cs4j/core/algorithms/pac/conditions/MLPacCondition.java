@@ -13,6 +13,7 @@ import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.MLPacFeatureExtractor.PacFeature;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.experiments.MLPacExperiment;
 import org.cs4j.core.mains.DomainExperimentData;
 
@@ -46,14 +47,15 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		String inputModelPath = DomainExperimentData.get(domain.getClass(),
 				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+"_"+ this.clsType+".model";
 		String inputDataPath = DomainExperimentData.get(domain.getClass(),
-				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
+				DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".arff";
 		this.setupAttributes();
 		try {
 			ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
 			this.classifier = (AbstractClassifier) ois.readObject();
 			ois.close();
 
-			this.getInputInstance(inputDataPath);
+			this.dataset = MLPacPreprocess.getInputInstance(inputDataPath);
+			this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
 		} catch (Exception e) {
 			logger.error("Failed to load model for input file [" +
 					inputDataPath + "]", e);
@@ -95,9 +97,35 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
         // Add features to the input instance
 		int indx = 0;
-		for(Entry<PacFeature, Double> entry : features.entrySet()){
-			ins.setValue(indx++, entry.getValue());
-		}
+//		for(Entry<PacFeature, Double> entry : features.entrySet()){
+//			ins.setValue(indx++, entry.getValue());
+//		}
+
+		double generated = features.get(PacFeature.GENERATED);
+		ins.setValue(indx++,generated);
+		double expanded = features.get(PacFeature.EXPANDED);
+		ins.setValue(indx++,expanded);
+		double reopened = features.get(PacFeature.ROPENED);
+		ins.setValue(indx++,reopened);
+		double U = features.get(PacFeature.COST);
+		ins.setValue(indx++,U);
+		double g1 = features.get(PacFeature.G_0);
+		ins.setValue(indx++,g1);
+		double h1 = features.get(PacFeature.H_0);
+		ins.setValue(indx++,h1);
+		double g2 = features.get(PacFeature.G_2);
+		ins.setValue(indx++,g2);
+		double h2 = features.get(PacFeature.H_2);
+		ins.setValue(indx++,h2);
+		double g3 = features.get(PacFeature.G_2);
+		ins.setValue(indx++,g3);
+		double h3 = features.get(PacFeature.H_2);
+		ins.setValue(indx++,h3);
+		double w = 1.0 + (Double) incumbentSolution.getExtras().get("epsilon");
+		ins.setValue(indx++,w);
+
+		logger.info("instance to classify: "+ins.toString());
+
 
 		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
 		ins.setDataset(this.dataset);

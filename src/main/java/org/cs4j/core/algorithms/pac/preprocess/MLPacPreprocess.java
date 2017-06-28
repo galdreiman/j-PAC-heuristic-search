@@ -1,9 +1,6 @@
 package org.cs4j.core.algorithms.pac.preprocess;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
 
@@ -47,22 +44,23 @@ public class MLPacPreprocess {
 	public static void main(String[] args) {
 
 		Class[] domains = {  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
-
-		double[] inputEpsilon = {0.05}; //0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
+		double[] inputEpsilon = {0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
 													// (from console,
-		// e.g. args[] or whatever)
+
+
+		String outfilePostfix = ".arff";
 
 		for (Class domainClass : domains) {
 			for (double epsilon : inputEpsilon) {
 
 				String outFile = DomainExperimentData.get(domainClass, RunType.TRAIN).outputPreprocessPath;
 				try {
-					output = new OutputResult(outFile, "MLPacPreprocess_e"+epsilon, true);
+					output = new OutputResult(outFile, "MLPacPreprocess_e"+epsilon, true,outfilePostfix);
 				} catch (IOException e1) {
-					logger.error("Failed to create output ML PAC preprocess csv file at: " + outFile, e1);
+					logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
 				}
 
-				String tableHeader = MLPacFeatureExtractor.getFeaturesHeader();
+				String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeader();
 				try {
 					output.writeln(tableHeader);
 				} catch (IOException e1) {
@@ -119,9 +117,11 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
                     List<String> clsTypes = Arrays.asList("J48", "NN");
 					String inputDataPath = DomainExperimentData.get(domainClass,
-							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+".csv";
+							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+outfilePostfix;
 
-                    // save model to file
+					// -------------------------------------------------
+                    // 4. save model to file
+					// -------------------------------------------------
                     for(String clsType: clsTypes) {
 
                         AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType);
@@ -146,9 +146,6 @@ public class MLPacPreprocess {
 			}
 		}
 
-		// train a model
-
-		// save model to file
 	}
 
 	private static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType) {
@@ -181,13 +178,16 @@ public class MLPacPreprocess {
 	}
 
 
-	private static Instances getInputInstance(String inputDataPath) {
+	public static Instances getInputInstance(String inputDataPath) {
 		logger.debug("getInputInstance | input file: " + inputDataPath);
-		CSVLoader loader = new CSVLoader();
 		Instances data = null;
 		try {
-			loader.setSource(new File(inputDataPath));
-			data = loader.getDataSet();
+			BufferedReader reader = new BufferedReader(
+					new FileReader(inputDataPath));
+			data = new Instances(reader);
+			reader.close();
+			// setting class attribute
+			data.setClassIndex(data.numAttributes() - 1);
 		} catch (IOException e) {
 			logger.error("ERROR: failed to read input data for classifier: " + inputDataPath,e);
 		}
