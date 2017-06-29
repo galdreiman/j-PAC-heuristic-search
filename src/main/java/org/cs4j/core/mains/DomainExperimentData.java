@@ -3,6 +3,7 @@ package org.cs4j.core.mains;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.domains.*;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,9 +40,9 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(Pancakes.class,
 				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES,"./input/pancakes/generated-for-pac-stats-%d","./preprocessResults/pancakes/%d"));
 		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
-				"./input/gridpathfinding/brc202d.map", "./preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES,"",""));
+				"./input/gridpathfinding/brc202d.map", "."+ File.separator+"preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-				"./input/vacuumrobot/generated-10-dirt", "./preprocessResults/VacuumRobot/","./results/VacuumRobot/", 1, NUM_OF_INSTANCES,"",""));
+				"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt", "."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator,"."+File.separator+"results"+File.separator+"VacuumRobot"+File.separator, 1, NUM_OF_INSTANCES,"",""));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
 						"./preprocessResults/dockyard-robot-max-edge-2-out-of-place-30/",

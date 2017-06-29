@@ -44,7 +44,8 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
         //            System.exit(-1);
         //        }
 
-        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input\\vacuumrobot\\generated-10-dirt";
+        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt";
+
         File outputDirectory = new File(outFileDirStr);
         if (!outputDirectory.isDirectory()) {
             throw new IOException("Invalid directory: " + outFileDirStr);
