@@ -18,7 +18,7 @@ public class DomainExperimentData {
 	}
 
 	private static final double TRAIN_PRESENTAGE = 0.9; // TODO: GAL: Change back to 0.9!
-	private static final int NUM_OF_INSTANCES = 100; // up to 50,000 instances
+	private static final int NUM_OF_INSTANCES = 5000; // up to 50,000 instances
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
