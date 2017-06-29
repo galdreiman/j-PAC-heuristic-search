@@ -22,10 +22,7 @@ import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.trees.J48;
 import weka.classifiers.meta.FilteredClassifier;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instance;
-import weka.core.Instances;
+import weka.core.*;
 import weka.core.converters.CSVLoader;
 
 public class MLPacCondition extends RatioBasedPACCondition {
@@ -97,38 +94,44 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
         // Add features to the input instance
 		int indx = 0;
-//		for(Entry<PacFeature, Double> entry : features.entrySet()){
-//			ins.setValue(indx++, entry.getValue());
-//		}
+
+		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
+		ins.setDataset(this.dataset);
 
 		double generated = features.get(PacFeature.GENERATED);
-		ins.setValue(indx++,generated);
+//		Attribute generated = new Attribute("generated");
+		ins.setValue(new Attribute("generated",indx++),generated);
 		double expanded = features.get(PacFeature.EXPANDED);
-		ins.setValue(indx++,expanded);
+		ins.setValue(new Attribute("expanded",indx++),expanded);
 		double reopened = features.get(PacFeature.ROPENED);
-		ins.setValue(indx++,reopened);
+		ins.setValue(new Attribute("reopened",indx++),reopened);
 		double U = features.get(PacFeature.COST);
-		ins.setValue(indx++,U);
+		ins.setValue(new Attribute("cost",indx++),U);
 		double g1 = features.get(PacFeature.G_0);
-		ins.setValue(indx++,g1);
+		ins.setValue(new Attribute("g1",indx++),g1);
 		double h1 = features.get(PacFeature.H_0);
-		ins.setValue(indx++,h1);
+		ins.setValue(new Attribute("h1",indx++),h1);
 		double g2 = features.get(PacFeature.G_2);
-		ins.setValue(indx++,g2);
+		ins.setValue(new Attribute("g2",indx++),g2);
 		double h2 = features.get(PacFeature.H_2);
-		ins.setValue(indx++,h2);
+		ins.setValue(new Attribute("h2",indx++),h2);
 		double g3 = features.get(PacFeature.G_2);
-		ins.setValue(indx++,g3);
+		ins.setValue(new Attribute("g3",indx++),g3);
 		double h3 = features.get(PacFeature.H_2);
-		ins.setValue(indx++,h3);
+		ins.setValue(new Attribute("h3",indx++),h3);
 		double w = 1.0 + (Double) incumbentSolution.getExtras().get("epsilon");
-		ins.setValue(indx++,w);
+		ins.setValue(new Attribute("w",indx++),w);
+
+		FastVector fvNominalVal = new FastVector(2);
+		fvNominalVal.addElement("true");
+		fvNominalVal.addElement("false");
+		Attribute classAtt = new Attribute("is-W-opt", fvNominalVal,indx++);
+		ins.setValue( classAtt,"false");
 
 		logger.info("instance to classify: "+ins.toString());
 
 
-		this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
-		ins.setDataset(this.dataset);
+
 
 		double[] distributeResult = {};
 		double classificationResult = -1;
@@ -148,7 +151,7 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 		logger.debug("distribute  result for instance: [" + ins.toString() +"] is ["+ distributeResult[0] +"]");
 		logger.debug("classification  result for instance: [" + ins.toString() +"] is ["+ classificationResult +"]");
-		boolean pacConditionResult = distributeResult[1] >= (1-this.delta);
+		boolean pacConditionResult = distributeResult[0] >= (1-this.delta);
 		return pacConditionResult;
 	}
 
