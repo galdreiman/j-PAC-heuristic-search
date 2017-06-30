@@ -5,6 +5,7 @@ import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.conditions.*;
 import org.cs4j.core.domains.*;
+import org.cs4j.core.pac.conf.PacConfig;
 
 public class MLPacExperiment extends StandardExperiment {
 
@@ -23,11 +24,11 @@ public class MLPacExperiment extends StandardExperiment {
 	@SuppressWarnings("rawtypes")
 	public static void main(String args[]) {
 
-		Class[] domains = {  VacuumRobot.class };
-		Class[] pacConditions = { MLPacConditionNN.class,MLPacConditionJ48.class, RatioBasedPACCondition.class};//,  OpenBasedPACCondition.class, TrivialPACCondition.class, RatioBasedPACCondition.class};
+		Class[] domains = PacConfig.instance.onlineDomains();
+		Class[] pacConditions = PacConfig.instance.onlinePacConditions();
 
-		double[] epsilons = {  0.0, 0.05, 0.1, 0.2, 0.3   };
-		double[] deltas = {  0.0, 0.05, 0.1, 0.2, 0.3  };
+		double[] epsilons = PacConfig.instance.inputOnlineEpsilons();
+		double[] deltas = PacConfig.instance.inputOnlineDeltas();
 
 
 		Experiment experiment = new MLPacExperiment();

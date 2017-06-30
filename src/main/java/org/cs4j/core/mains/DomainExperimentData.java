@@ -2,6 +2,7 @@ package org.cs4j.core.mains;
 
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.domains.*;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.File;
 import java.util.HashMap;
@@ -18,8 +19,8 @@ public class DomainExperimentData {
 		TRAIN, TEST, ALL, DEBUG
 	}
 
-	private static final double TRAIN_PRESENTAGE = 0.9; // TODO: GAL: Change back to 0.9!
-	private static final int NUM_OF_INSTANCES = 5000; // up to 50,000 instances
+	private static final double TRAIN_PRESENTAGE = PacConfig.instance.trainRatio();
+	private static final int NUM_OF_INSTANCES = PacConfig.instance.numInstances();
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
@@ -35,18 +36,44 @@ public class DomainExperimentData {
 
 
 
-		domainToExperimentDataAll.put(FifteenPuzzle.class, new DomainExperimentData("./input/fifteenpuzzle/states15",
-				"./preprocessResults/FifteenPuzzle/", "./results/FifteenPuzzle/", 1, NUM_OF_INSTANCES,"",""));
+		domainToExperimentDataAll.put(FifteenPuzzle.class,
+				new DomainExperimentData("./input/fifteenpuzzle/states15",
+				"."+File.separator+"preprocessResults"+File.separator+"FifteenPuzzle"+File.separator,
+				"."+File.separator+"results"+File.separator+"FifteenPuzzle"+File.separator,
+				1, NUM_OF_INSTANCES,
+				"",
+				""));
 		domainToExperimentDataAll.put(Pancakes.class,
-				new DomainExperimentData("./input/pancakes/generated-40", "./preprocessResults/pancakes/","./results/pancakes/", 1, NUM_OF_INSTANCES,"./input/pancakes/generated-for-pac-stats-%d","./preprocessResults/pancakes/%d"));
-		domainToExperimentDataAll.put(GridPathFinding.class, new DomainExperimentData(
-				"./input/gridpathfinding/brc202d.map", "."+ File.separator+"preprocessResults/GridPathFinding/","./results/GridPathFinding/", 1, NUM_OF_INSTANCES,"",""));
-		domainToExperimentDataAll.put(VacuumRobot.class, new DomainExperimentData(
-				"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt", "."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator,"."+File.separator+"results"+File.separator+"VacuumRobot"+File.separator, 1, NUM_OF_INSTANCES,"",""));
+				new DomainExperimentData("."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-40",
+						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator,
+						"."+File.separator+"results"+File.separator+"pancakes"+File.separator,
+						1, NUM_OF_INSTANCES,
+						"."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-for-pac-stats-%d",
+						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator+"%d"));
+		domainToExperimentDataAll.put(GridPathFinding.class,
+				new DomainExperimentData(
+				"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",
+				"."+ File.separator+"preprocessResults"+File.separator+"GridPathFinding"+File.separator,
+				"."+File.separator+"results"+File.separator+"GridPathFinding"+File.separator,
+				1, NUM_OF_INSTANCES,
+				"",
+				""));
+		domainToExperimentDataAll.put(VacuumRobot.class,
+				new DomainExperimentData(
+				"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt",
+						"."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator,
+						"."+File.separator+"results"+File.separator+"VacuumRobot"+File.separator,
+						1, NUM_OF_INSTANCES,
+						"",
+						""));
 		domainToExperimentDataAll.put(DockyardRobot.class,
-				new DomainExperimentData("./input/dockyard-robot-max-edge-2-out-of-place-30",
-						"./preprocessResults/dockyard-robot-max-edge-2-out-of-place-30/",
-						"./results/dockyard-robot-max-edge-2-out-of-place-30/", 1, 90,"",""));
+				new DomainExperimentData("."+File.separator+"input"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30",
+						"."+File.separator+"preprocessResults"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
+						"."+File.separator+"results"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
+						1,
+						90,
+						"",
+						""));
 
 		// Training set configuration
 		int trainEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);

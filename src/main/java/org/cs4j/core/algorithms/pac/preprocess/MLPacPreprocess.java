@@ -22,6 +22,7 @@ import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
+import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
@@ -43,9 +44,8 @@ public class MLPacPreprocess {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
 
-		Class[] domains = {  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
-		double[] inputEpsilon = {0.0, 0.05, 0.1, 0.2, 0.3 }; // TODO: get input from user
-													// (from console,
+		double[] inputEpsilon = PacConfig.instance.inputPreprocessEpsilons();
+		Class[] domains = PacConfig.instance.prepocessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
 
 
 		String outfilePostfix = ".arff";
