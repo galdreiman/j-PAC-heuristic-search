@@ -6,6 +6,7 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.collections.PairInt;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Utils;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.*;
 import java.util.*;
@@ -535,7 +536,7 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
 
 
     public static void mainGenerateInstaceFromPreparedMap() throws IOException {
-    	String args[] = new String[3];
+    	String localArgs[] = new String[3];
         String[] outputPaths =
                 new String[]{
                         "input/GridPathFinding/brc202d.map",
@@ -550,30 +551,30 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
                 };
 
         /*
-        if (args.length != 3) {
+        if (localArgs.length != 3) {
             System.out.println("Usage: <OutputPath> <MapFile> <Count>");
             System.exit(-1);
         }
         */
 
         for (int i = 0; i < outputPaths.length; ++i) {
-            args[0] = outputPaths[i];
-            args[1] = mapFiles[i];
-            args[2] = "5000";
+            localArgs[0] = outputPaths[i];
+            localArgs[1] = mapFiles[i];
+            localArgs[2] = PacConfig.instance.pacPreprocessNumInstances() +"";
 
             // Read the output directory
-            File outputDirectory = new File(args[0]);
+            File outputDirectory = new File(localArgs[0]);
             if (!outputDirectory.isDirectory()) {
-                throw new IOException("Invalid directory: " + args[0]);
+                throw new IOException("Invalid directory: " + localArgs[0]);
             }
             // Read the map file
-            String mapFile = args[1];
+            String mapFile = localArgs[1];
             if (!(new File(mapFile).exists())) {
                 System.out.println("Map file " + mapFile + " doesn't exist");
             }
             // Read required count of instances
             // Required number of instances
-            int instancesCount = GridPathFindingGenerator.readIntNumber(args[2], 1, -1, "# of instances");
+            int instancesCount = GridPathFindingGenerator.readIntNumber(localArgs[2], 1, -1, "# of instances");
 
             GridPathFindingGenerator generator = new GridPathFindingGenerator();
 

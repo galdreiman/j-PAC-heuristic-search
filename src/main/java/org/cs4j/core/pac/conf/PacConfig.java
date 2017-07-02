@@ -19,6 +19,11 @@ public interface PacConfig extends Config {
     //-----------------------------------------
     // statistics generator
     //-----------------------------------------
+    String STATS_GEN= ".statisticsGenerator";
+    @Key(PAC + STATS_GEN +".numInstances")
+    @DefaultValue("50000")
+    int pacPreprocessNumInstances();
+
 
     //-----------------------------------------
     // PAC Preprocess
@@ -51,9 +56,9 @@ public interface PacConfig extends Config {
     @DefaultValue("0.0,0.05,0.1,0.2,0.3")
     double[] inputOnlineEpsilons();
 
-    @Key(PAC + ONLINE +".inputEpsilons")
+    @Key(PAC + ONLINE +".inputDeltas")
     @Separator(",")
-    @DefaultValue("0.0,0.05,0.1,0.2,0.3")
+    @DefaultValue("0.0,0.1,0.2,0.3,0.8")
     double[] inputOnlineDeltas();
 
     @Key(PAC + ONLINE +".domains")
