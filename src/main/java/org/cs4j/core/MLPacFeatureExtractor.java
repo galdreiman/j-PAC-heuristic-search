@@ -12,8 +12,40 @@ public class MLPacFeatureExtractor {
 
 	private final static Logger logger = Logger.getLogger(MLPacFeatureExtractor.class);
 
-	public static String getFeaturesARFFHeaderForPredictedStats() {
-		return "Temp getFeaturesARFFHeaderForPredictedStats";
+	public static String getFeaturesARFFHeaderForPredictedStats(boolean withTarget) {
+		StringBuilder b = new StringBuilder();
+		b.append("% Title: PAC MachineLearning dataset \n");
+		b.append("% \n");
+		b.append("% \n");
+
+		b.append("@RELATION ML-PAC-STATISTICS-PREDICTOR");
+		b.append("\n");
+		b.append("\n");
+
+		b.append("@ATTRIBUTE initialH  NUMERIC\n");
+
+		for(int i =0; i < 3; i++) {
+			b.append(String.format("@ATTRIBUTE childH-%d  NUMERIC\n", i));
+			b.append(String.format("@ATTRIBUTE childG-%d  NUMERIC\n", i));
+			b.append(String.format("@ATTRIBUTE childDepth-%d  NUMERIC\n", i));
+
+			for(int j =0; j < 3; j++) {
+				b.append(String.format("@ATTRIBUTE grandchildH-%d-%d  NUMERIC\n", i,j));
+				b.append(String.format("@ATTRIBUTE grandchildG-%d-%d  NUMERIC\n", i,j));
+				b.append(String.format("@ATTRIBUTE grandchildDepth-%d-%d  NUMERIC\n", i,j));
+			}
+		}
+
+		if(withTarget) {
+			b.append("@ATTRIBUTE opt-cost  NUMERIC");
+		}
+		b.append("\n");
+		b.append("\n");
+		b.append("@DATA");
+		b.append("\n");
+
+
+		return b.toString();
 	}
 
 	public enum PacFeature{

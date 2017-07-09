@@ -24,6 +24,7 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
@@ -148,7 +149,7 @@ public class MLPacPreprocess {
 
 	}
 
-	private static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType) {
+	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType) {
 
         AbstractClassifier classifier = null;
 		switch (classifierType) {
@@ -163,7 +164,10 @@ public class MLPacPreprocess {
                 ((MultilayerPerceptron)classifier).setTrainingTime(2000);
                 ((MultilayerPerceptron)classifier).setHiddenLayers("3");
 				break;
+            case "Regression":
+                classifier = new LinearRegression();
 			}
+
 
 			try {
 				Instances dataset = getInputInstance(inputDataPath);
