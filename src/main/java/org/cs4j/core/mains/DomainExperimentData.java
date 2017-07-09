@@ -20,7 +20,7 @@ public class DomainExperimentData {
 	}
 
 	private static final double TRAIN_PRESENTAGE = PacConfig.instance.trainRatio();
-	private static final int NUM_OF_INSTANCES = PacConfig.instance.numInstances();
+	private static final int NUM_OF_INSTANCES = 100;//PacConfig.instance.numInstances();
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
@@ -38,6 +38,7 @@ public class DomainExperimentData {
 
 		domainToExperimentDataAll.put(FifteenPuzzle.class,
 				new DomainExperimentData("./input/fifteenpuzzle/states15",
+						"./input/fifteenpuzzle/states%d",
 				"."+File.separator+"preprocessResults"+File.separator+"FifteenPuzzle"+File.separator,
 				"."+File.separator+"results"+File.separator+"FifteenPuzzle"+File.separator,
 				1, NUM_OF_INSTANCES,
@@ -45,6 +46,7 @@ public class DomainExperimentData {
 				""));
 		domainToExperimentDataAll.put(Pancakes.class,
 				new DomainExperimentData("."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-40",
+						"."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-%d",
 						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator,
 						"."+File.separator+"results"+File.separator+"pancakes"+File.separator,
 						1, NUM_OF_INSTANCES,
@@ -53,6 +55,7 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(GridPathFinding.class,
 				new DomainExperimentData(
 				"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",
+						"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",
 				"."+ File.separator+"preprocessResults"+File.separator+"gridpathfinding"+File.separator,
 				"."+File.separator+"results"+File.separator+"gridpathfinding"+File.separator,
 				1, NUM_OF_INSTANCES,
@@ -61,13 +64,15 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(VacuumRobot.class,
 				new DomainExperimentData(
 				"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt",
+						"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-%d-dirt",
 						"."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator,
 						"."+File.separator+"results"+File.separator+"VacuumRobot"+File.separator,
 						1, NUM_OF_INSTANCES,
-						"",
+						"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-%d-dirt",
 						""));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("."+File.separator+"input"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30",
+						"."+File.separator+"input"+File.separator+"dockyard-robot-max-edge-2-out-of-place-%d",
 						"."+File.separator+"preprocessResults"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						"."+File.separator+"results"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						1,
@@ -112,6 +117,7 @@ public class DomainExperimentData {
 	}
 
 	public String inputPath; // The directory where the problem instances are
+	public String inputPathFormat; // The directory where the problem instances are
 	public String outputPreprocessPath; // The directory where to output the experimental
 								// results
 	public String outputOnlinePath; // The directory where to output the experimental
@@ -125,8 +131,10 @@ public class DomainExperimentData {
 //		this(inputPath,outputPreprocessPath,outputOnlinePath,fromInstance,toInstance,"");
 //	}
 
-	public DomainExperimentData(String inputPath, String outputPreprocessPath, String outputOnlinePath, int fromInstance, int toInstance, String pacInputPathFormat,String outputPreprocessPathFormat) {
+	public DomainExperimentData(String inputPath, String inputPathFormat, String outputPreprocessPath, String outputOnlinePath, int fromInstance,
+								int toInstance, String pacInputPathFormat,String outputPreprocessPathFormat) {
 		this.inputPath = inputPath;
+		this.inputPathFormat = inputPathFormat;
 		this.outputPreprocessPath = outputPreprocessPath;
 		this.outputOnlinePath = outputOnlinePath;
 		this.fromInstance = fromInstance;
@@ -145,7 +153,7 @@ public class DomainExperimentData {
 	 *            to instance
 	 */
 	public DomainExperimentData subset(int fromInstance, int toInstance) {
-		return new DomainExperimentData(this.inputPath, this.outputPreprocessPath, this.outputOnlinePath, fromInstance, toInstance,"","");
+		return new DomainExperimentData(this.inputPath,this.inputPathFormat, this.outputPreprocessPath, this.outputOnlinePath, fromInstance, toInstance,"","");
 	}
 
 }

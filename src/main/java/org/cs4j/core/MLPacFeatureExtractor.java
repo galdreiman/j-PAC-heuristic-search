@@ -11,7 +11,11 @@ import weka.core.Attribute;
 public class MLPacFeatureExtractor {
 
 	private final static Logger logger = Logger.getLogger(MLPacFeatureExtractor.class);
-	
+
+	public static String getFeaturesARFFHeaderForPredictedStats() {
+		return "Temp getFeaturesARFFHeaderForPredictedStats";
+	}
+
 	public enum PacFeature{
 		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,W,IS_W_OPT;
 		

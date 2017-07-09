@@ -25,6 +25,7 @@ public class PACUtils {
     private static Map<Class, PACStatistics> domainToPACStatistics
             = new HashMap<>();
 
+
     public static PACStatistics getPACStatistics(Class domainClass)
     {
         // If already cached, no need to parse from disk
@@ -33,6 +34,19 @@ public class PACUtils {
 
         String statisticsFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath
                 +File.separator+PACStatistics.STATISTICS_FILE_NAME;
+        PACStatistics statistics =  parsePACStatisticsFile(statisticsFile);
+        domainToPACStatistics.put(domainClass,statistics);
+        return statistics;
+    }
+
+    public static PACStatistics getPACStatistics(Class domainClass, RunType rt, int domainParam)
+    {
+        // If already cached, no need to parse from disk
+        if(domainToPACStatistics.containsKey(domainClass))
+            return domainToPACStatistics.get(domainClass);
+
+        String statisticsFile = String.format(DomainExperimentData.get(domainClass,rt).inputPathFormat
+                +File.separator+PACStatistics.STATISTICS_FILE_NAME, domainParam);
         PACStatistics statistics =  parsePACStatisticsFile(statisticsFile);
         domainToPACStatistics.put(domainClass,statistics);
         return statistics;

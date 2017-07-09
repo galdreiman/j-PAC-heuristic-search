@@ -364,10 +364,10 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
 
         String[] mapFiles =
                 new String[]{
-                        "input/Gridpathfinding/raw/mazes/maze1/maze512-1-6-100.map",
-                        //"input/Gridpathfinding/raw/mazes/maze512-2-2.map",
-                        //"input/Gridpathfinding/raw/mazes/maze512-8-6.map",
-                        //"input/Gridpathfinding/raw/mazes/maze512-32-8.map",
+                        "input/gridpathfinding/raw/mazes/maze1/maze512-1-6-100.map",
+                        //"input/gridpathfinding/raw/mazes/maze512-2-2.map",
+                        //"input/gridpathfinding/raw/mazes/maze512-8-6.map",
+                        //"input/gridpathfinding/raw/mazes/maze512-32-8.map",
                 };
         double obstaclesPercentages[] = new double[]{98};
 
@@ -446,14 +446,14 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
     public static void mainGenerateInstancesFromMovingAISceneFiles() throws IOException {
         Random rand = new Random();
         Map<String, String> inputOutput = new HashMap<>();
-        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-1-6.map.scen",
-                "input/Gridpathfinding/generated/maze512-1-6");
-        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-2-2.map.scen",
-                "input/Gridpathfinding/generated/maze512-2-2");
-        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-8-6.map.scen",
-                "input/Gridpathfinding/generated/maze512-8-6");
-        inputOutput.put("input/Gridpathfinding/moving-ai/maze512-32-8.map.scen",
-                "input/Gridpathfinding/generated/maze512-32-8");
+        inputOutput.put("input/gridpathfinding/moving-ai/maze512-1-6.map.scen",
+                "input/gridpathfinding/generated/maze512-1-6");
+        inputOutput.put("input/gridpathfinding/moving-ai/maze512-2-2.map.scen",
+                "input/gridpathfinding/generated/maze512-2-2");
+        inputOutput.put("input/gridpathfinding/moving-ai/maze512-8-6.map.scen",
+                "input/gridpathfinding/generated/maze512-8-6");
+        inputOutput.put("input/gridpathfinding/moving-ai/maze512-32-8.map.scen",
+                "input/gridpathfinding/generated/maze512-32-8");
 
         // The number of instances to generate from each map
         int instancesCount = 100;
@@ -539,15 +539,15 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
     	String localArgs[] = new String[3];
         String[] outputPaths =
                 new String[]{
-                        "input/GridPathFinding/brc202d.map",
-                        "input/GridPathFinding/den400d.map",
-                        "input/GridPathFinding/ost003d.map"
+                        "input/gridpathfinding/brc202d.map",
+                        "input/gridpathfinding/den400d.map",
+                        "input/gridpathfinding/ost003d.map"
                 };
         String[] mapFiles =
                 new String[]{
-                        "input/GridPathFinding/raw/maps/brc202d.map",
-                        "input/GridPathFinding/raw/maps/den400d.map",
-                        "input/GridPathFinding/raw/maps/ost003d.map"
+                        "input/gridpathfinding/raw/maps/brc202d.map",
+                        "input/gridpathfinding/raw/maps/den400d.map",
+                        "input/gridpathfinding/raw/maps/ost003d.map"
                 };
 
         /*

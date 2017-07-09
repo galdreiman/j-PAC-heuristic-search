@@ -45,7 +45,7 @@ public class MLPacPreprocess {
 	public static void main(String[] args) {
 
 		double[] inputEpsilon = PacConfig.instance.inputPreprocessEpsilons();
-		Class[] domains = PacConfig.instance.prepocessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
+		Class[] domains = PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
 
 
 		String outfilePostfix = ".arff";

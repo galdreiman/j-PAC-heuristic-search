@@ -20,6 +20,7 @@ import org.cs4j.core.algorithms.pac.StatesCollector;
 import org.cs4j.core.domains.*;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.pac.conf.PacConfig;
 
 /**
  * Created by Roni Stern on 28/02/2017.
@@ -146,26 +147,30 @@ public class StatisticsGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        Class[] domains = {VacuumRobot.class};//{VacuumRobot.class, DockyardRobot.class, FifteenPuzzle.class,GridPathFinding.class};
+        Class[] domains = {Pancakes.class}; //PacConfig.instance.pacDomains();
+        int[] domainLevel = {12,16,20};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
         for(Class domainClass : domains) {
-            logger.info("Running anytime for domain " + domainClass.getName());
-            try {
-                // Prepare experiment for a new domain
-                output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPath,
-                        "StatisticsGenerator", -1, -1, null, false, true);
-                generator.printResultsHeaders(output,
-                        new String[]{"InstanceID", "h", "opt"},
-                        new TreeMap<>());
-                generator.run(domainClass,output,new TreeMap<>(),new TreeMap<>());
-                output.close();
-        }catch(IOException e){
-                logger.error(e);
-            }finally{
-                if(output!=null)
-                output.close();
+            for(int level : domainLevel) {
+                logger.info("Running anytime for domain " + domainClass.getName());
+                try {
+                    // Prepare experiment for a new domain
+                    String inputFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPathFormat, level);
+                    output = new OutputResult(inputFile,
+                            "StatisticsGenerator", -1, -1, null, false, true);
+                    generator.printResultsHeaders(output,
+                            new String[]{"InstanceID", "h", "opt"},
+                            new TreeMap<>());
+                    generator.run(domainClass, output, new TreeMap<>(), new TreeMap<>());
+                    output.close();
+                } catch (IOException e) {
+                    logger.error(e);
+                } finally {
+                    if (output != null)
+                        output.close();
+                }
             }
         }
     }

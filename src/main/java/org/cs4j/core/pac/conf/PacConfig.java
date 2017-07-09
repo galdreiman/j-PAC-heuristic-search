@@ -24,6 +24,11 @@ public interface PacConfig extends Config {
     @DefaultValue("50000")
     int pacPreprocessNumInstances();
 
+    @Key(PAC + STATS_GEN +".domains")
+    @DefaultValue("VacuumRobot")
+    @ConverterClass(ClassConverter.class)
+    Class[] pacDomains();
+
 
     //-----------------------------------------
     // PAC Preprocess
@@ -43,9 +48,9 @@ public interface PacConfig extends Config {
     double trainRatio();
 
     @Key(PAC + PREPROCESS +".domains")
-    @DefaultValue("VacuumRobot")
+    @DefaultValue("Pancakes")
     @ConverterClass(ClassConverter.class)
-    Class[] prepocessDomains();
+    Class[] pacPreProcessDomains();
 
     //-----------------------------------------
     // PAC online search

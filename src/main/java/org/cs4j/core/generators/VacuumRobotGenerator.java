@@ -6,6 +6,7 @@ import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.collections.PairInt;
 import org.cs4j.core.domains.GridPathFinding;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.*;
 import java.util.Arrays;
@@ -44,18 +45,15 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
         //            System.exit(-1);
         //        }
 
-        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt";
 
-        File outputDirectory = new File(outFileDirStr);
-        if (!outputDirectory.isDirectory()) {
-            throw new IOException("Invalid directory: " + outFileDirStr);
-        }
+
+
         // Required number of instances
         try {
             instancesCount = Integer.parseInt(args[1]);
         } catch (Exception e) {
         //            throw new IOException("Invalid # of instances: " + args[1]);
-            instancesCount = 50000;
+            instancesCount = PacConfig.instance.pacPreprocessNumInstances();
         }
         // Required width of the map
         try {
@@ -76,16 +74,22 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
             obstaclesPercentage = Double.parseDouble(args[4]);
         } catch (Exception e) {
         //            throw new IOException("Invalid percentage of obstacles: " + args[4]);
-            obstaclesPercentage = 0.999999;
+            obstaclesPercentage = 0.9;
         }
         // Required count of dirty locations
         try {
             dirtyCount = Integer.parseInt(args[5]);
         } catch (Exception e) {
         //            throw new IOException("Invalid count of dirty locations: " + args[5]);
-            dirtyCount = 10;
+            dirtyCount = 15;
         }
 
+        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input"+File.separator+"vacuumrobot"+File.separator+"generated-"+dirtyCount+"-dirt";
+        File outputDirectory = new File(outFileDirStr);
+        if (!outputDirectory.isDirectory()) {
+            outputDirectory.mkdir();
+
+        }
         VacuumRobotGenerator generator = new VacuumRobotGenerator();
 
         for (int i = 0; i < instancesCount; ++i) {
