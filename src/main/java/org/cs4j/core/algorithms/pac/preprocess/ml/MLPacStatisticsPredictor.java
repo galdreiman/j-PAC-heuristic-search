@@ -1,23 +1,14 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
 import org.apache.log4j.Logger;
-import org.cs4j.core.AnytimeSearchAlgorithm;
 import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
-import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.PACUtils;
-import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
-import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
-import org.cs4j.core.domains.Pancakes;
-import org.cs4j.core.experiments.Experiment;
 import org.cs4j.core.experiments.ExperimentUtils;
-import org.cs4j.core.experiments.MLPacExperiment;
-import org.cs4j.core.experiments.PACOnlineExperimentRunner;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
@@ -28,9 +19,8 @@ import weka.core.Instances;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.*;
-
-import static org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess.ExtractFeaturesToFile;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Created by Gal Dreiman on 22/05/2017.
@@ -44,12 +34,12 @@ public class MLPacStatisticsPredictor {
     public static void main(String[] args){
 
 
-        Class[] domains = {Pancakes.class}; //PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
+        Class[] domains = PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
         int trainLevel = 10;
         int testLevel = 15;
         int numOfFeaturesPerNode = 3;
 
-        //train(domains, trainLevel, numOfFeaturesPerNode);
+        train(domains, trainLevel, numOfFeaturesPerNode);
 
         predict(domains, trainLevel, testLevel, numOfFeaturesPerNode);
 
@@ -59,6 +49,8 @@ public class MLPacStatisticsPredictor {
         for (Class domainClass : domains) {
             AbstractClassifier classifier = null;
             Instances dataset = null;
+
+
 
             String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
             String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, testLevel);
@@ -194,10 +186,12 @@ public class MLPacStatisticsPredictor {
                             ins.setValue(new Attribute("grandchildH-"+opIndx+"-"+childOpIndx,indx++),grandchildH);
                             ins.setValue(new Attribute("grandchildG-"+opIndx+"-"+childOpIndx,indx++),grandchildG);
                             ins.setValue(new Attribute("grandchildDepth-"+opIndx+"-"+childOpIndx,indx++),grandchildDepth);
+
                         }
 
 
                     }
+                    ins.setValue(new Attribute("opt-cost",indx++), optimalCost);
 
                     // Classify
                     double classificationResult = -1;
@@ -205,6 +199,7 @@ public class MLPacStatisticsPredictor {
                         return;
                     }
                     try {
+                        logger.info(ins.toString());
                         classificationResult = classifier.classifyInstance(ins);
                     } catch (Exception e) {
                         logger.error("ERROR: Failed to classify instance: ",e);

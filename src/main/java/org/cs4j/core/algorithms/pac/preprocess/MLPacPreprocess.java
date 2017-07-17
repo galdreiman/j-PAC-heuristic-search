@@ -1,24 +1,12 @@
 package org.cs4j.core.algorithms.pac.preprocess;
 
-import java.io.*;
-import java.lang.reflect.Constructor;
-import java.util.*;
-
 import org.apache.log4j.Logger;
-import org.cs4j.core.AnytimeSearchAlgorithm;
-import org.cs4j.core.MLPacFeatureExtractor;
+import org.cs4j.core.*;
 import org.cs4j.core.MLPacFeatureExtractor.PacFeature;
-import org.cs4j.core.OutputResult;
-import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimePTS;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.PACUtils;
-import org.cs4j.core.domains.DockyardRobot;
-import org.cs4j.core.domains.GridPathFinding;
-import org.cs4j.core.domains.Pancakes;
-import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
@@ -28,7 +16,13 @@ import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
-import weka.core.converters.CSVLoader;
+
+import java.io.*;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class MLPacPreprocess {
 

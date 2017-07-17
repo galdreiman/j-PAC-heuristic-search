@@ -147,7 +147,7 @@ public class StatisticsGenerator {
      * @param args
      */
     public static void main(String[] args) {
-        Class[] domains = {Pancakes.class}; //PacConfig.instance.pacDomains();
+        Class[] domains = PacConfig.instance.pacDomains();
         int[] domainLevel = {15};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();

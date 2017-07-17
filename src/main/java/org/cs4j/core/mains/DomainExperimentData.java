@@ -20,7 +20,7 @@ public class DomainExperimentData {
 	}
 
 	private static final double TRAIN_PRESENTAGE = PacConfig.instance.trainRatio();
-	private static final int NUM_OF_INSTANCES = 10;//PacConfig.instance.numInstances();
+	private static final int NUM_OF_INSTANCES = PacConfig.instance.numInstances();
 
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTrain;
 	private static Map<Class<? extends SearchDomain>, DomainExperimentData> domainToExperimentDataTest;
