@@ -8,7 +8,7 @@ import org.aeonbits.owner.ConfigFactory;
  */
 
 @Config.Sources({ "file:~/pac.config",
-        "file:${user.dir}/../conf/pac.config",
+        "file:./conf/pac.config",
         "classpath:pac.config" })
 public interface PacConfig extends Config {
 
