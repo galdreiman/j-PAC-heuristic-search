@@ -1,6 +1,7 @@
 package org.cs4j.core.generators;
 
 import org.cs4j.core.domains.Utils;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.*;
 import java.util.*;
@@ -133,9 +134,8 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
         int size;
         String previousInstancesDir = null;
         int previousInstancesCount = 0;
-        int pancakesNum = 0;
+        int pancakesNum = 20;
 
-        for(pancakesNum = 10; pancakesNum <= 45; pancakesNum += 5) {
 
             // In case no arguments were given - let's specify them here
 
@@ -143,7 +143,7 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
             // Output directory
             String outDir = "input\\pancakes\\generated-for-pac-stats-" + pancakesNum;
             // Count of pancakes (number of instances)
-            int instancesCount = 100;
+            int instancesCount = PacConfig.instance.numInstances();
             // Size of problem
             size = pancakesNum;
 
@@ -190,6 +190,6 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
                 System.out.println(" Done.");
             }
             assert instances.size() == instancesCount + previousInstancesCount;
-        }
+
     }
 }
