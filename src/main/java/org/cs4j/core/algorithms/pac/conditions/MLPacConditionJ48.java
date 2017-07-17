@@ -8,7 +8,7 @@ import org.cs4j.core.SearchDomain;
 public class MLPacConditionJ48  extends MLPacCondition{
 
     static {
-        MLPacCondition.clsType = "NN";
+        MLPacCondition.clsType = "J48";
     }
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
