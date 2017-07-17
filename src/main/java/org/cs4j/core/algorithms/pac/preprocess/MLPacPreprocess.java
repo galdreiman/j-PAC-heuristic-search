@@ -16,6 +16,8 @@ import weka.classifiers.functions.LinearRegression;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -142,8 +144,11 @@ public class MLPacPreprocess {
 		}
 
 	}
+	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType){
+		return setupAndGetClassifier(inputDataPath,classifierType,false,"");
+	}
 
-	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType) {
+	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType, boolean enableDataPreperation,String datasetOtFile) {
 
         AbstractClassifier classifier = null;
 		switch (classifierType) {
@@ -165,6 +170,21 @@ public class MLPacPreprocess {
 
 			try {
 				Instances dataset = getInputInstance(inputDataPath);
+				if(enableDataPreperation){
+					NumericToNominal convert= new NumericToNominal();
+					convert.setInputFormat(dataset);
+					dataset = Filter.useFilter(dataset, convert);
+
+					// save the new dataset to file and overwrite the previous one
+					if(datasetOtFile != null && !datasetOtFile.isEmpty()){
+						BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
+						writer.write(dataset.toString());
+						writer.flush();
+						writer.close();
+					}
+
+
+				}
 				logger.info(String.format("Training Dataset shape: instances [%d], features [%d]", dataset.size(), dataset.get(0).numAttributes()));
                 classifier.buildClassifier(dataset);
 			} catch (Exception e) {

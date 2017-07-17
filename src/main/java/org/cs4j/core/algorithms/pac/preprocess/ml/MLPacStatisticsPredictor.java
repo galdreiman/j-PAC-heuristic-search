@@ -39,7 +39,7 @@ public class MLPacStatisticsPredictor {
         int testLevel = 15;
         int numOfFeaturesPerNode = 3;
 
-        train(domains, trainLevel, numOfFeaturesPerNode);
+//        train(domains, trainLevel, numOfFeaturesPerNode);
 
         predict(domains, trainLevel, testLevel, numOfFeaturesPerNode);
 
@@ -105,13 +105,7 @@ public class MLPacStatisticsPredictor {
                 int toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).toInstance;
                 String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, testLevel);
 
-                WAStar optimalSolver = new WAStar();
-                optimalSolver.setAdditionalParameter("weight","1.0");
-
                 int size = 38; // calculate automatically
-
-
-
 
                 // go over all training set and extract features:
                 for (int i = fromInstance; i <= toInstance; ++i) {
@@ -200,6 +194,7 @@ public class MLPacStatisticsPredictor {
                     }
                     try {
                         logger.info(ins.toString());
+//                        ins.setDataset(dataset);
                         classificationResult = classifier.classifyInstance(ins);
                     } catch (Exception e) {
                         logger.error("ERROR: Failed to classify instance: ",e);
@@ -359,7 +354,8 @@ public class MLPacStatisticsPredictor {
                     // -------------------------------------------------
                     // 3. train + save the model to file
                     // -------------------------------------------------
-                    AbstractClassifier cls = MLPacPreprocess.setupAndGetClassifier(output.getFname(), "Regression");
+                    AbstractClassifier cls =
+                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), "NN",true,outFile+ File.separator + "MLPacStatsPreprocess.arff");
                     String outputModel = outFile+ File.separator + "MLPacStatsPreprocess.model";
                     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
                     oos.writeObject(cls);
