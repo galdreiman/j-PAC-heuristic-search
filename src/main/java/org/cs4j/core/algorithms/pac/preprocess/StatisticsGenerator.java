@@ -148,7 +148,7 @@ public class StatisticsGenerator {
      */
     public static void main(String[] args) {
         Class[] domains = PacConfig.instance.pacDomains();
-        int[] domainLevel = {15};
+        int[] domainLevel = {10,15,20,25,30,35,40,45};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 

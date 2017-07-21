@@ -134,14 +134,21 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
         int size;
         String previousInstancesDir = null;
         int previousInstancesCount = 0;
-        int pancakesNum = 20;
+        int pancakesNumLow = 20;
+        int pancakesNumHigh = 20;
 
 
+        if(args.length == 2){
+            pancakesNumLow = Integer.parseInt(args[0]);
+            pancakesNumHigh = Integer.parseInt(args[1]);
+        }
+
+        for(int pancakesNum = pancakesNumLow; pancakesNum <= pancakesNumHigh; pancakesNum += 5) {
             // In case no arguments were given - let's specify them here
 
             System.out.println("[WARNING] Using local arguments");
             // Output directory
-            String outDir = "input\\pancakes\\generated-for-pac-stats-" + pancakesNum;
+            String outDir = "input"+File.separator+"pancakes"+File.separator+"generated-" + pancakesNum;
             // Count of pancakes (number of instances)
             int instancesCount = PacConfig.instance.numInstances();
             // Size of problem
@@ -190,6 +197,7 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
                 System.out.println(" Done.");
             }
             assert instances.size() == instancesCount + previousInstancesCount;
+        }
 
     }
 }
