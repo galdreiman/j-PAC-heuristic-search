@@ -148,7 +148,7 @@ public class StatisticsGenerator {
      */
     public static void main(String[] args) {
         Class[] domains = PacConfig.instance.pacDomains();
-        int[] domainLevel = {10,15,20,25,30,35,40,45};
+        int[] domainLevel = {20}; //{10,15,20,25,30,35,40,45};
         OutputResult output=null;
         StatisticsGenerator generator = new StatisticsGenerator();
 
@@ -157,7 +157,8 @@ public class StatisticsGenerator {
                 logger.info("Running anytime for domain " + domainClass.getName());
                 try {
                     // Prepare experiment for a new domain
-                    String inputFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPathFormat, level);
+//                    String inputFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPathFormat, level);
+                    String inputFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPath, level);
                     output = new OutputResult(inputFile,
                             "StatisticsGenerator", -1, -1, null, false, true);
                     generator.printResultsHeaders(output,
