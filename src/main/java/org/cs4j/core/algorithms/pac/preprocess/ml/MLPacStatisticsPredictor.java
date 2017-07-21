@@ -28,7 +28,7 @@ import java.util.TreeMap;
  */
 public class MLPacStatisticsPredictor {
     private final static Logger logger = Logger.getLogger(MLPacStatisticsPredictor.class);
-    private static OutputResult output;
+
 
 
 
@@ -40,25 +40,52 @@ public class MLPacStatisticsPredictor {
 
         int numOfFeaturesPerNode = 3;
 
-        for(int trainLevel = 10; trainLevel < 45; trainLevel += 5) {
-            for (PacClassifierType type : clsTypes) {
-                train(domains, trainLevel, numOfFeaturesPerNode, type);
 
-                predict(domains, trainLevel, trainLevel + 5, numOfFeaturesPerNode, type);
+        for(Class domainClass : domains) {
+            for(int trainLevel = 10; trainLevel < 15; trainLevel += 5) {
+                OutputResult output = initOutputResultTable(domainClass, trainLevel + 5);
+
+                for (PacClassifierType type : clsTypes) {
+                    train(domainClass, trainLevel, numOfFeaturesPerNode, type);
+
+                    predict(domainClass, trainLevel, trainLevel + 5, numOfFeaturesPerNode, type, output);
+
+                }
+                if(output != null){
+                    output.close();
+                }
             }
         }
 
     }
 
-    private static void predict(Class[] domains, int trainLevel, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType) {
-        for (Class domainClass : domains) {
+    private static OutputResult initOutputResultTable(Class domainClass, int testLevel) {
+
+        OutputResult output = null;
+        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, testLevel);
+        try {
+            output = new OutputResult(outFile, "MLPacStatsPredictionResults", true, ".csv");
+        } catch (IOException e1) {
+            logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
+        }
+
+        String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevel, testLevel, classifier, domain";
+        try {
+            output.writeln(tableHeader);
+        } catch (IOException e1) {
+            logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
+        }
+        return output;
+    }
+
+    private static void predict(Class domainClass, int trainLevel, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType,OutputResult output) {
+
             AbstractClassifier classifier = null;
             Instances dataset = null;
 
 
 
             String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
-            String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, testLevel);
             String inputModelPath = inFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".model";
             String inputDataPath = inFile + File.separator + "MLPacStatsPreprocess_"+classifierType+".arff";
             try {
@@ -75,18 +102,7 @@ public class MLPacStatisticsPredictor {
 
 
 
-            try {
-                output = new OutputResult(outFile, "MLPacStatsPredictionResults", true, ".csv");
-            } catch (IOException e1) {
-                logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
-            }
 
-            String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevel, testLevel, classifier, domain";
-            try {
-                output.writeln(tableHeader);
-            } catch (IOException e1) {
-                logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
-            }
 
             logger.info("Running anytime for domain " + domainClass.getName());
             try {
@@ -210,25 +226,21 @@ public class MLPacStatisticsPredictor {
 
 
                 }
-                output.close();
 
             } catch (Exception e) {
                 logger.error(e);
-            } finally {
-                if (output != null) {
-                    output.close();
-                }
             }
 
-        }
+
     }
 
-    private static void train(Class[] domains, int trainLevel,int numOfFeaturesPerNode, PacClassifierType classifierType) {
+
+
+    private static void train(Class domainClass, int trainLevel,int numOfFeaturesPerNode, PacClassifierType classifierType) {
         String outfilePostfix = ".arff";
 
-        for (Class domainClass : domains) {
 
-
+                OutputResult output = null;
                 String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
                 try {
                     output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType, true,outfilePostfix);
@@ -375,6 +387,6 @@ public class MLPacStatisticsPredictor {
                         output.close();
                     }
                 }
-        }
+
     }
 }
