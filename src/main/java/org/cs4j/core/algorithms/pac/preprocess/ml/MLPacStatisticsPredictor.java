@@ -8,6 +8,7 @@ import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
+import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.PacConfig;
@@ -35,17 +36,21 @@ public class MLPacStatisticsPredictor {
 
 
         Class[] domains = PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
-        int trainLevel = 10;
-        int testLevel = 15;
+        PacClassifierType[] clsTypes = {PacClassifierType.SMO_REG, PacClassifierType.REGRESSION};
+
         int numOfFeaturesPerNode = 3;
 
-//        train(domains, trainLevel, numOfFeaturesPerNode);
+        for(int trainLevel = 10; trainLevel < 45; trainLevel += 5) {
+            for (PacClassifierType type : clsTypes) {
+                train(domains, trainLevel, numOfFeaturesPerNode, type);
 
-        predict(domains, trainLevel, testLevel, numOfFeaturesPerNode);
+                predict(domains, trainLevel, trainLevel + 5, numOfFeaturesPerNode, type);
+            }
+        }
 
     }
 
-    private static void predict(Class[] domains, int trainLevel, int testLevel, int numOfFeaturesPerNode) {
+    private static void predict(Class[] domains, int trainLevel, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType) {
         for (Class domainClass : domains) {
             AbstractClassifier classifier = null;
             Instances dataset = null;
@@ -54,8 +59,8 @@ public class MLPacStatisticsPredictor {
 
             String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
             String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, testLevel);
-            String inputModelPath = inFile+ File.separator + "MLPacStatsPreprocess.model";
-            String inputDataPath = inFile + File.separator + "MLPacStatsPreprocess.arff";
+            String inputModelPath = inFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".model";
+            String inputDataPath = inFile + File.separator + "MLPacStatsPreprocess_"+classifierType+".arff";
             try {
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
                 classifier = (AbstractClassifier) ois.readObject();
@@ -76,7 +81,7 @@ public class MLPacStatisticsPredictor {
                 logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
             }
 
-            String tableHeader = "instance, h*_prediction, h*_actual";
+            String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevel, testLevel, classifier, domain";
             try {
                 output.writeln(tableHeader);
             } catch (IOException e1) {
@@ -131,8 +136,7 @@ public class MLPacStatisticsPredictor {
                     if(dataset == null){
                         return;
                     }
-                    dataset.setClassIndex(dataset.numAttributes() - 1);
-                    ins.setDataset(dataset);
+
                     ins.setValue(new Attribute("initialH",indx++),initialH);
 
 
@@ -188,13 +192,13 @@ public class MLPacStatisticsPredictor {
                     ins.setValue(new Attribute("opt-cost",indx++), optimalCost);
 
                     // Classify
+                    ins.setDataset(dataset);
                     double classificationResult = -1;
                     if(classifier == null){
                         return;
                     }
                     try {
                         logger.info(ins.toString());
-//                        ins.setDataset(dataset);
                         classificationResult = classifier.classifyInstance(ins);
                     } catch (Exception e) {
                         logger.error("ERROR: Failed to classify instance: ",e);
@@ -202,7 +206,7 @@ public class MLPacStatisticsPredictor {
 
                     logger.info(classificationResult);
 
-                    output.writeln(i+","+classificationResult+","+optimalCost);
+                    output.writeln(i+","+classificationResult+","+optimalCost+","+trainLevel+","+testLevel+","+ classifier.getClass().getSimpleName() +","+ domainClass.getSimpleName());
 
 
                 }
@@ -219,7 +223,7 @@ public class MLPacStatisticsPredictor {
         }
     }
 
-    private static void train(Class[] domains, int trainLevel,int numOfFeaturesPerNode) {
+    private static void train(Class[] domains, int trainLevel,int numOfFeaturesPerNode, PacClassifierType classifierType) {
         String outfilePostfix = ".arff";
 
         for (Class domainClass : domains) {
@@ -227,7 +231,7 @@ public class MLPacStatisticsPredictor {
 
                 String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
                 try {
-                    output = new OutputResult(outFile, "MLPacStatsPreprocess", true,outfilePostfix);
+                    output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType, true,outfilePostfix);
                 } catch (IOException e1) {
                     logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
                 }
@@ -355,8 +359,8 @@ public class MLPacStatisticsPredictor {
                     // 3. train + save the model to file
                     // -------------------------------------------------
                     AbstractClassifier cls =
-                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), "NN",true,outFile+ File.separator + "MLPacStatsPreprocess.arff");
-                    String outputModel = outFile+ File.separator + "MLPacStatsPreprocess.model";
+                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".arff");
+                    String outputModel = outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".model";
                     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
                     oos.writeObject(cls);
                     oos.flush();

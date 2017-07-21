@@ -184,7 +184,7 @@ public class DockyardRobotGenerator extends GeneralInstancesGenerator {
 
         if (args.length == 0) {
             args = new String[7];
-            args[0] = "input\\dockyardrobot\\generated";
+            args[0] = "input"+File.separator+"dockyardrobot"+File.separator+"generated";
             // Count of Problems
             args[1] = 100 + "";
             // Count of Locations

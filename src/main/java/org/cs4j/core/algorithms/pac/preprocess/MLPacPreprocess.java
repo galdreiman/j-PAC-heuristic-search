@@ -12,8 +12,7 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
-import weka.classifiers.functions.LinearRegression;
-import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.*;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.filters.Filter;
@@ -112,14 +111,14 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
 					// 3. train a model
 					// -------------------------------------------------
-                    List<String> clsTypes = Arrays.asList("J48", "NN");
+                    List<PacClassifierType> clsTypes = Arrays.asList(PacClassifierType.J48, PacClassifierType.NN);
 					String inputDataPath = DomainExperimentData.get(domainClass,
 							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+outfilePostfix;
 
 					// -------------------------------------------------
                     // 4. save model to file
 					// -------------------------------------------------
-                    for(String clsType: clsTypes) {
+                    for(PacClassifierType clsType: clsTypes) {
 
                         AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType);
                         ObjectOutputStream oos = new ObjectOutputStream(
@@ -144,28 +143,32 @@ public class MLPacPreprocess {
 		}
 
 	}
-	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType){
+	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, PacClassifierType classifierType){
 		return setupAndGetClassifier(inputDataPath,classifierType,false,"");
 	}
 
-	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, String classifierType, boolean enableDataPreperation,String datasetOtFile) {
+	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, PacClassifierType classifierType, boolean enableDataPreperation,String datasetOtFile) {
 
         AbstractClassifier classifier = null;
 		switch (classifierType) {
-		    case "J48":
+		    case J48:
 				classifier = new J48();
 				((J48)classifier).setUseLaplace(true);
 				break;
-            case "NN":
+            case NN:
                 classifier = new MultilayerPerceptron();
                 ((MultilayerPerceptron)classifier).setLearningRate(0.1);
                 ((MultilayerPerceptron)classifier).setMomentum(0.2);
                 ((MultilayerPerceptron)classifier).setTrainingTime(2000);
                 ((MultilayerPerceptron)classifier).setHiddenLayers("3");
 				break;
-            case "Regression":
-                classifier = new LinearRegression();
-			}
+			case REGRESSION:
+                classifier = new SimpleLinearRegression();
+                break;
+			case SMO_REG:
+				classifier = new SMOreg();
+				break;
+		}
 
 
 			try {

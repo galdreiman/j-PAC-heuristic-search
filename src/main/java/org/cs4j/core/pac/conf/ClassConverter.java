@@ -15,6 +15,8 @@ public class ClassConverter implements Converter<Class> {
     @Override
     public Class convert(Method method, String input) {
 
+        //Pancakes,GridPathFinding,DockyardRobot,VacuumRobot
+
         switch (input){
             case "Pancakes":
                 return Pancakes.class;
@@ -24,6 +26,8 @@ public class ClassConverter implements Converter<Class> {
                 return FifteenPuzzle.class;
             case "RawGraph":
                 return RawGraph.class;
+            case "DockyardRobot":
+                return DockyardRobot.class;
             case "VacuumRobot":
             default:
                 return VacuumRobot.class;
