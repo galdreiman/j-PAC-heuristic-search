@@ -44,38 +44,38 @@ public class PacRocCurveEvaluator {
             logger.info("-----------------------------------------------");
 
             // generate curve
-//            ThresholdCurve tc = new ThresholdCurve();
-//            int classIndex = 0;
-//            Instances curve = tc.getCurve(eval.predictions(), classIndex);
-//
-//            // plot curve
-//            try {
-//                ThresholdVisualizePanel tvp = new ThresholdVisualizePanel();
-//                tvp.setROCString("(Area under ROC = " +
-//                        Utils.doubleToString(ThresholdCurve.getROCArea(curve), 4) + ")");
-//                tvp.setName(curve.relationName());
-//                PlotData2D plotdata = new PlotData2D(curve);
-//                plotdata.setPlotName(curve.relationName());
-//                plotdata.addInstanceNumberAttribute();
-//                // specify which points are connected
-//                boolean[] cp = new boolean[curve.numInstances()];
-//                for (int n = 1; n < cp.length; n++)
-//                    cp[n] = true;
-//                plotdata.setConnectPoints(cp);
-//                // add plot
-//                tvp.addPlot(plotdata);
-//
-//
-//                // display curve
-//                final JFrame jf = new JFrame("WEKA ROC: " + tvp.getName());
-//                jf.setSize(500, 400);
-//                jf.getContentPane().setLayout(new BorderLayout());
-//                jf.getContentPane().add(tvp, BorderLayout.CENTER);
-//                jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-//                jf.setVisible(false);
-//            } catch (Exception e) {
-//                logger.error("Error with native zip: " + e.getMessage());
-//            }
+            ThresholdCurve tc = new ThresholdCurve();
+            int classIndex = 0;
+            Instances curve = tc.getCurve(eval.predictions(), classIndex);
+
+            // plot curve
+            try {
+                ThresholdVisualizePanel tvp = new ThresholdVisualizePanel();
+                tvp.setROCString("(Area under ROC = " +
+                        Utils.doubleToString(ThresholdCurve.getROCArea(curve), 4) + ")");
+                tvp.setName(curve.relationName());
+                PlotData2D plotdata = new PlotData2D(curve);
+                plotdata.setPlotName(curve.relationName());
+                plotdata.addInstanceNumberAttribute();
+                // specify which points are connected
+                boolean[] cp = new boolean[curve.numInstances()];
+                for (int n = 1; n < cp.length; n++)
+                    cp[n] = true;
+                plotdata.setConnectPoints(cp);
+                // add plot
+                tvp.addPlot(plotdata);
+
+
+                // display curve
+                final JFrame jf = new JFrame("WEKA ROC: " + tvp.getName());
+                jf.setSize(500, 400);
+                jf.getContentPane().setLayout(new BorderLayout());
+                jf.getContentPane().add(tvp, BorderLayout.CENTER);
+                jf.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                jf.setVisible(false);
+            } catch (Exception e) {
+                logger.error("Error with native zip: " + e.getMessage());
+            }
         }
     }
 }
