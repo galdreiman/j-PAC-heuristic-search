@@ -51,7 +51,7 @@ public class DomainExperimentData {
 						"."+File.separator+"results"+File.separator+"pancakes"+File.separator,
 						1, NUM_OF_INSTANCES,
 						"."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-for-pac-stats-%d",
-						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator+"%d"));
+						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator+"predicted-stats_%s"));
 		domainToExperimentDataAll.put(GridPathFinding.class,
 				new DomainExperimentData(
 				"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",

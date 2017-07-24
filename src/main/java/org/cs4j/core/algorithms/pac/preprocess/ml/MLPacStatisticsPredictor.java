@@ -40,36 +40,40 @@ public class MLPacStatisticsPredictor {
 
         int numOfFeaturesPerNode = 3;
 
+        int trainLevelLow = 10, trainLevelHigh = 30, trainLevelDelta = 5;
+
+        int testLevel = trainLevelHigh + trainLevelDelta;
 
         for(Class domainClass : domains) {
-            for(int trainLevel = 10; trainLevel < 15; trainLevel += 5) {
-                OutputResult output = initOutputResultTable(domainClass, trainLevel + 5);
 
-                for (PacClassifierType type : clsTypes) {
-                    train(domainClass, trainLevel, numOfFeaturesPerNode, type);
+            OutputResult output = initOutputResultTable(domainClass,testLevel,trainLevelLow ,trainLevelHigh);
 
-                    predict(domainClass, trainLevel, trainLevel + 5, numOfFeaturesPerNode, type, output);
+            for (PacClassifierType type : clsTypes) {
+                train(domainClass, trainLevelLow, trainLevelHigh, trainLevelDelta, numOfFeaturesPerNode, type);
 
-                }
-                if(output != null){
-                    output.close();
-                }
+                predict(domainClass, trainLevelLow, trainLevelHigh, testLevel, numOfFeaturesPerNode, type, output);
+
             }
+            if(output != null){
+                output.close();
+            }
+
         }
 
     }
 
-    private static OutputResult initOutputResultTable(Class domainClass, int testLevel) {
+    private static OutputResult initOutputResultTable(Class domainClass, int testLevel, int trainLevelLow, int trainLevelHigh) {
 
         OutputResult output = null;
-        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, testLevel);
+        String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
         try {
-            output = new OutputResult(outFile, "MLPacStatsPredictionResults", true, ".csv");
+            output = new OutputResult(outFile, "MLPacStatsPredictionResults_"+ testLevel, true, ".csv");
         } catch (IOException e1) {
             logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
         }
 
-        String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevel, testLevel, classifier, domain";
+        String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevelLow, trainLevelHigh, testLevel, classifier, domain";
         try {
             output.writeln(tableHeader);
         } catch (IOException e1) {
@@ -78,16 +82,16 @@ public class MLPacStatisticsPredictor {
         return output;
     }
 
-    private static void predict(Class domainClass, int trainLevel, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType,OutputResult output) {
+    private static void predict(Class domainClass, int trainLevelLow, int trainLevelHigh, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType,OutputResult output) {
 
             AbstractClassifier classifier = null;
             Instances dataset = null;
 
+            String trainFormat = trainLevelLow + "-" + trainLevelHigh;
 
-
-            String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
-            String inputModelPath = inFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".model";
-            String inputDataPath = inFile + File.separator + "MLPacStatsPreprocess_"+classifierType+".arff";
+            String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+            String inputModelPath = inFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".model";
+            String inputDataPath = inFile + File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".arff";
             try {
                 ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
                 classifier = (AbstractClassifier) ois.readObject();
@@ -126,7 +130,7 @@ public class MLPacStatisticsPredictor {
                 int toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).toInstance;
                 String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, testLevel);
 
-                int size = 38; // calculate automatically
+                int size = 39; // calculate automatically
 
                 // go over all training set and extract features:
                 for (int i = fromInstance; i <= toInstance; ++i) {
@@ -154,7 +158,7 @@ public class MLPacStatisticsPredictor {
                     }
 
                     ins.setValue(new Attribute("initialH",indx++),initialH);
-
+                    ins.setValue(new Attribute("DomainLevel",indx++),testLevel);
 
                     for (int opIndx = 0; opIndx < numOfFeaturesPerNode/*domain.getNumOperators(unpackedInitialState)*/; ++opIndx) {
                         // Get the current operator
@@ -222,7 +226,7 @@ public class MLPacStatisticsPredictor {
 
                     logger.info(classificationResult);
 
-                    output.writeln(i+","+classificationResult+","+optimalCost+","+trainLevel+","+testLevel+","+ classifier.getClass().getSimpleName() +","+ domainClass.getSimpleName());
+                    output.writeln(i+","+classificationResult+","+optimalCost+","+trainLevelLow+","+trainLevelHigh+","+testLevel+","+ classifier.getClass().getSimpleName() +","+ domainClass.getSimpleName());
 
 
                 }
@@ -236,14 +240,15 @@ public class MLPacStatisticsPredictor {
 
 
 
-    private static void train(Class domainClass, int trainLevel,int numOfFeaturesPerNode, PacClassifierType classifierType) {
+    private static void train(Class domainClass, int trainLevelLow, int trainLevelHigh, int trainLevelDelta,int numOfFeaturesPerNode, PacClassifierType classifierType) {
         String outfilePostfix = ".arff";
 
 
                 OutputResult output = null;
-                String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainLevel);
+                String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+                String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
                 try {
-                    output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType, true,outfilePostfix);
+                    output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType+"_" +trainFormat, true,outfilePostfix);
                 } catch (IOException e1) {
                     logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
                 }
@@ -257,113 +262,11 @@ public class MLPacStatisticsPredictor {
 
                 logger.info("Running anytime for domain " + domainClass.getName());
                 try {
-                    logger.info("Solving " + domainClass.getName());
 
-                    // -------------------------------------------------
-                    // 1. load PAC statistics (to get optimal solutions
-                    // -------------------------------------------------
+                    for(int trainLevel = trainLevelLow; trainLevel <= trainLevelHigh; trainLevel += trainLevelDelta) {
+                        String tableForDomainLevel = extractTableOfFeatures(domainClass, trainLevel, numOfFeaturesPerNode);
 
-                    PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,trainLevel);
-
-                    // --------------------------------------------------------------
-                    // 2. for each problem from train: extract features
-                    // --------------------------------------------------------------
-
-                    SearchDomain domain;
-                    Map<String, String> domainParams = new TreeMap<>();
-                    Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
-
-                    int fromInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).fromInstance;
-                    int toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).toInstance;
-                    String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, trainLevel);
-
-                    WAStar optimalSolver = new WAStar();
-                    optimalSolver.setAdditionalParameter("weight","1.0");
-
-                    // go over all training set and extract features:
-                    for (int i = fromInstance; i <= toInstance; ++i) {
-                        logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
-                        domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
-
-                        double optimalCost = PACUtils.getOptimalSolution(domainClass, i);
-
-                        //--------------------------------------------
-                        // extract features from all first nodes:
-                        SearchDomain.Operator op;
-                        AnytimeSearchNode childNode;
-
-                        SearchDomain.State initialState = domain.initialState();
-                        AnytimeSearchNode initialNode = new AnytimeSearchNode(domain,initialState);
-
-                        SearchDomain.State unpackedInitialState = domain.unpack(initialNode.packed);
-                        StringBuilder sb = new StringBuilder();
-
-                        double initialH = initialNode.getH();
-
-
-
-                        sb.append(initialH);
-                        sb.append(" ");
-
-                        for (int opIndx = 0; opIndx < numOfFeaturesPerNode/*domain.getNumOperators(unpackedInitialState)*/; ++opIndx) {
-                            // Get the current operator
-                            op = domain.getOperator(unpackedInitialState, opIndx);
-                            // Don't apply the previous operator on the state - in order not to enter a loop
-                            if (op.equals(initialNode.pop)) {
-                                continue;
-                            }
-                            // Get it by applying the operator on the parent state
-                            SearchDomain.State childState = domain.applyOperator(initialState, op);
-                            // Create a search node for this state
-                            childNode = new AnytimeSearchNode(domain,
-                                    childState,
-                                    initialNode,
-                                    initialState,
-                                    op, op.reverse(initialState));
-
-                            double childH = childNode.getH();
-                            double childG = childNode.getG();
-                            double childDepth = childNode.getDepth();
-
-
-
-                            sb.append(childH);
-                            sb.append(" ");
-                            sb.append(childG);
-                            sb.append(" ");
-                            sb.append(childDepth);
-                            sb.append(" ");
-
-                            // go over gran-children:
-                            for(int childOpIndx = 0; childOpIndx < numOfFeaturesPerNode /*domain.getNumOperators(childState)*/; childOpIndx++) {
-
-                                op = domain.getOperator(childState, opIndx);
-                                SearchDomain.State grandchildState = domain.applyOperator(childState, op);
-                                // Create a search node for this state
-                                AnytimeSearchNode grandchildNode = new AnytimeSearchNode(domain,
-                                        grandchildState,
-                                        childNode,
-                                        childState,
-                                        op, op.reverse(childState));
-
-                                double grandchildH = grandchildNode.getH();
-                                double grandchildG = grandchildNode.getG();
-                                double grandchildDepth = grandchildNode.getDepth();
-
-                                sb.append(grandchildH);
-                                sb.append(" ");
-                                sb.append(grandchildG);
-                                sb.append(" ");
-                                sb.append(grandchildDepth);
-                                sb.append(" ");
-                            }
-
-
-                        }
-                        sb.append(optimalCost);
-                        output.writeln(sb.toString().replace(" ", ","));
-
-
+                        output.writeln(tableForDomainLevel.toString());
                     }
                     output.close();
 
@@ -371,8 +274,8 @@ public class MLPacStatisticsPredictor {
                     // 3. train + save the model to file
                     // -------------------------------------------------
                     AbstractClassifier cls =
-                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".arff");
-                    String outputModel = outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+".model";
+                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".arff");
+                    String outputModel = outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".model";
                     ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
                     oos.writeObject(cls);
                     oos.flush();
@@ -388,5 +291,122 @@ public class MLPacStatisticsPredictor {
                     }
                 }
 
+    }
+
+    private static String extractTableOfFeatures(Class domainClass, int trainLevel, int numOfFeaturesPerNode){
+        logger.info("Solving " + domainClass.getName());
+
+        // -------------------------------------------------
+        // 1. load PAC statistics (to get optimal solutions
+        // -------------------------------------------------
+
+        PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,trainLevel);
+
+        // --------------------------------------------------------------
+        // 2. for each problem from train: extract features
+        // --------------------------------------------------------------
+
+        SearchDomain domain;
+        Map<String, String> domainParams = new TreeMap<>();
+        Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
+
+        int fromInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).fromInstance;
+        int toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).toInstance;
+        String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, trainLevel);
+
+        WAStar optimalSolver = new WAStar();
+        optimalSolver.setAdditionalParameter("weight","1.0");
+
+        StringBuilder sb = new StringBuilder();
+
+        // go over all training set and extract features:
+        for (int i = fromInstance; i <= toInstance; ++i) {
+            logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
+            domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
+
+            double optimalCost = PACUtils.getOptimalSolution(domainClass, i);
+
+            //--------------------------------------------
+            // extract features from all first nodes:
+            SearchDomain.Operator op;
+            AnytimeSearchNode childNode;
+
+            SearchDomain.State initialState = domain.initialState();
+            AnytimeSearchNode initialNode = new AnytimeSearchNode(domain,initialState);
+
+            SearchDomain.State unpackedInitialState = domain.unpack(initialNode.packed);
+
+
+            double initialH = initialNode.getH();
+
+
+
+            sb.append(initialH);
+            sb.append(",");
+            sb.append(trainLevel);
+            sb.append(",");
+
+            for (int opIndx = 0; opIndx < numOfFeaturesPerNode/*domain.getNumOperators(unpackedInitialState)*/; ++opIndx) {
+                // Get the current operator
+                op = domain.getOperator(unpackedInitialState, opIndx);
+                // Don't apply the previous operator on the state - in order not to enter a loop
+                if (op.equals(initialNode.pop)) {
+                    continue;
+                }
+                // Get it by applying the operator on the parent state
+                SearchDomain.State childState = domain.applyOperator(initialState, op);
+                // Create a search node for this state
+                childNode = new AnytimeSearchNode(domain,
+                        childState,
+                        initialNode,
+                        initialState,
+                        op, op.reverse(initialState));
+
+                double childH = childNode.getH();
+                double childG = childNode.getG();
+                double childDepth = childNode.getDepth();
+
+
+
+                sb.append(childH);
+                sb.append(",");
+                sb.append(childG);
+                sb.append(",");
+                sb.append(childDepth);
+                sb.append(",");
+
+                // go over gran-children:
+                for(int childOpIndx = 0; childOpIndx < numOfFeaturesPerNode /*domain.getNumOperators(childState)*/; childOpIndx++) {
+
+                    op = domain.getOperator(childState, opIndx);
+                    SearchDomain.State grandchildState = domain.applyOperator(childState, op);
+                    // Create a search node for this state
+                    AnytimeSearchNode grandchildNode = new AnytimeSearchNode(domain,
+                            grandchildState,
+                            childNode,
+                            childState,
+                            op, op.reverse(childState));
+
+                    double grandchildH = grandchildNode.getH();
+                    double grandchildG = grandchildNode.getG();
+                    double grandchildDepth = grandchildNode.getDepth();
+
+                    sb.append(grandchildH);
+                    sb.append(",");
+                    sb.append(grandchildG);
+                    sb.append(",");
+                    sb.append(grandchildDepth);
+                    sb.append(",");
+                }
+
+
+            }
+            sb.append(optimalCost);
+            sb.append("\n");
+
+
+        }
+
+        return sb.toString();
     }
 }

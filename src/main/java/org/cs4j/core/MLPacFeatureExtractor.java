@@ -23,6 +23,7 @@ public class MLPacFeatureExtractor {
 		b.append("\n");
 
 		b.append("@ATTRIBUTE initialH  NUMERIC\n");
+		b.append("@ATTRIBUTE DomainLevel  NUMERIC\n");
 
 		for(int i =0; i < 3; i++) {
 			b.append(String.format("@ATTRIBUTE childH-%d  NUMERIC\n", i));
