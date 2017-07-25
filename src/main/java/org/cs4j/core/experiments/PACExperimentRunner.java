@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.OutputResult;
@@ -12,12 +14,8 @@ import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.FMinCondition;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.SearchAwarePACSearchImpl;
-import org.cs4j.core.algorithms.pac.conditions.BoundedCostPACSearch;
-import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
-import org.cs4j.core.algorithms.pac.conditions.OpenBasedPACCondition;
-import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
-import org.cs4j.core.algorithms.pac.conditions.RatioBasedPACCondition;
-import org.cs4j.core.algorithms.pac.conditions.TrivialPACCondition;
+import org.cs4j.core.algorithms.pac.conditions.*;
+import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.StatisticsGenerator;
 import org.cs4j.core.domains.DockyardRobot;
 import org.cs4j.core.domains.FifteenPuzzle;
@@ -25,6 +23,9 @@ import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.pac.conf.ClassConverter;
+import org.cs4j.core.pac.conf.PacConfig;
+import weka.classifiers.trees.J48;
 
 /**
  * Created by Roni Stern on 28/02/2017.
@@ -33,9 +34,9 @@ import org.cs4j.core.mains.DomainExperimentData;
  */
 public class PACExperimentRunner {
     private final static Logger logger = Logger.getLogger(PACExperimentRunner.class);
-    private final static double[] DEFAULT_EPSILONS = new double[] { 1.0, 0.75, 0.5, 0.25, 0.1,0.0};
-    private final static double[] DEFAULT_DELTAS = new double[] { 1,0.8,0.75,0.5,0.25,0.1,0.0 };
-    private final static Class[] DEFAULT_CLASSES = new Class[]{DockyardRobot.class, GridPathFinding.class, Pancakes.class,VacuumRobot.class,FifteenPuzzle.class, };
+    private final static double[] DEFAULT_EPSILONS = PacConfig.instance.inputOnlineEpsilons();
+    private final static double[] DEFAULT_DELTAS = PacConfig.instance.inputOnlineDeltas();
+    private final static Class[] DEFAULT_CLASSES = PacConfig.instance.onlineDomains(); //new Class[]{DockyardRobot.class, GridPathFinding.class, Pancakes.class,VacuumRobot.class,FifteenPuzzle.class, };
 
     //@TODO: Replace all this with better handling of command line using some known code to do so
     private Class[] getClassesFromCommandLine(String[] args){
@@ -182,7 +183,7 @@ public class PACExperimentRunner {
             try {
                 // Prepare experiment for a new domain
                 output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).outputPreprocessPath,
-                        "ThesholdBasedStatisticsGenerator", -1, -1, null, false, true);
+                        "openBasedStatistics", -1, -1, null, false, true);
                 generator.run(domainClass,domainParams);
                 output.close();
             }catch(IOException e){
@@ -268,6 +269,57 @@ public class PACExperimentRunner {
         runner.runExperimentBatch(domains,epsilons);
     }
 
+    public static void runParalel(){
+
+        Class[] domains= PacConfig.instance.onlineDomains();
+        double[] epsilonValues = PacConfig.instance.inputOnlineEpsilons();
+        double[] deltaValues = PacConfig.instance.inputOnlineDeltas();
+
+        Runnable openBasedExp = () -> {
+            PACExperimentRunner runner = new PACExperimentRunner();
+            logger.info("****************************** collecting stats for open based ");
+            runner.collectStatisticsForOpenBased(domains);
+            logger.info("********** OPEN BASED CONDITION");
+            runner.runOpenBased(domains,epsilonValues,deltaValues);
+        };
+
+        Runnable ratioBasedExp = () -> {
+            PACExperimentRunner runner = new PACExperimentRunner();
+            logger.info("********** ratioBased CONDITION");
+            runner.runBoundedCostBased(domains,epsilonValues);
+        };
+
+        Runnable oracleExp = () -> {
+            PACExperimentRunner runner = new PACExperimentRunner();
+            logger.info("********** oracle CONDITION");
+            runner.runOracleCondition(domains,epsilonValues);
+        };
+
+        Runnable mlExp = () -> {
+            logger.info("********** ML PAC PREPROCESS");
+            MLPacPreprocess.runMLPacPreprocess();
+
+            logger.info("********** ML PAC CONDITION");
+            Class[] pacConditions = {MLPacConditionJ48.class, MLPacConditionNN.class};
+            Experiment experiment = new MLPacExperiment();
+            PACOnlineExperimentRunner runner = new PACOnlineExperimentRunner();
+            runner.runExperimentBatch(domains, pacConditions, epsilonValues, deltaValues, experiment);
+        };
+
+        ExecutorService executor = Executors.newFixedThreadPool(5);
+        executor.execute(openBasedExp);
+        executor.execute(ratioBasedExp);
+        executor.execute(oracleExp);
+        executor.execute(mlExp);
+
+
+        executor.shutdown();
+        while (!executor.isTerminated()) {
+        }
+        System.out.println("Finished all threads");
+
+    }
+
 
     public static void main(String[] args) throws ClassNotFoundException {
         PACExperimentRunner runner = new PACExperimentRunner();
@@ -275,10 +327,10 @@ public class PACExperimentRunner {
         Class[] domains=runner.getClassesFromCommandLine(args);
         Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
         double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
-        if(args[0].equals("RunOpenBased")){
+//        if(args[0].equals("RunOpenBased")){
             logger.info("********** OPEN BASED CONDITION");
             runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
-        }
+//        }
         
         if(args[0].equals("MLPac")){
             logger.info("********** ML-PAC CONDITION");
@@ -317,6 +369,11 @@ public class PACExperimentRunner {
         if(args[0].equals("RunDPS")){
             logger.info("****************************** running DPS ");
             runner.runDPS(domains,epsilonValues);
+        }
+
+        if(args[0].equals("RunAll")){
+            logger.info("RUN ALL EXPERIMENTS");
+            runParalel();
         }
 
     }

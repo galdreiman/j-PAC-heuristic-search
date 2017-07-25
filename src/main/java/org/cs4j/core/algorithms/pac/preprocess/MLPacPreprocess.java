@@ -40,6 +40,11 @@ public class MLPacPreprocess {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static void main(String[] args) {
 
+		runMLPacPreprocess();
+
+	}
+
+	public static void runMLPacPreprocess() {
 		double[] inputEpsilon = PacConfig.instance.inputPreprocessEpsilons();
 		Class[] domains = PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
 
@@ -113,7 +118,7 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
                     List<PacClassifierType> clsTypes = Arrays.asList(PacClassifierType.J48, PacClassifierType.NN);
 					String inputDataPath = DomainExperimentData.get(domainClass,
-							DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+outfilePostfix;
+							RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+outfilePostfix;
 
 					// -------------------------------------------------
                     // 4. save model to file
@@ -123,7 +128,7 @@ public class MLPacPreprocess {
                         AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType);
                         ObjectOutputStream oos = new ObjectOutputStream(
                                     new FileOutputStream(DomainExperimentData.get(domainClass,
-                                            DomainExperimentData.RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e" + epsilon + "_"+clsType+".model"));
+                                            RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e" + epsilon + "_"+clsType+".model"));
                             oos.writeObject(cls);
                             oos.flush();
 
@@ -141,8 +146,8 @@ public class MLPacPreprocess {
 				}
 			}
 		}
-
 	}
+
 	public static AbstractClassifier setupAndGetClassifier(String inputDataPath, PacClassifierType classifierType){
 		return setupAndGetClassifier(inputDataPath,classifierType,false,"");
 	}

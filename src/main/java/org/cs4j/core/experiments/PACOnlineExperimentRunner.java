@@ -109,7 +109,7 @@ public class PACOnlineExperimentRunner {
             try {
                 // Prepare experiment for a new domain
                 String domainName = domainClass.getSimpleName();
-                output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputOnlinePath, domainName+ File.separator + "PAC_Output", -1, -1, null, false,
+                output = new OutputResult(DomainExperimentData.get(domainClass, RunType.TEST).outputOnlinePath, domainName+ File.separator + "PAC_Output_"+ experiment.getClass().getSimpleName(), -1, -1, null, false,
                         true);
                 this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
 
