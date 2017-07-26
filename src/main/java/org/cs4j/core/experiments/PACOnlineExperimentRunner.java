@@ -128,7 +128,6 @@ public class PACOnlineExperimentRunner {
                 }
             } catch (IOException e) {
                 logger.error(e);
-                e.printStackTrace();
             } finally {
                 if (output != null)
                     output.close();

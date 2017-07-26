@@ -105,7 +105,7 @@ public class PACUtils {
     public static List<Tuple<Double,Double>> getHtoOptimalTuples(Class domainClass)
     {
         DomainExperimentData domainDetails = DomainExperimentData.get(domainClass,RunType.TRAIN);
-        String inputFile = domainDetails.outputPreprocessPath+"/openBasedStatistics.csv";
+        String inputFile = domainDetails.outputPreprocessPath+File.separator+"openBasedStatistics.csv";
         List<Tuple<Double,Double>> tuples = new ArrayList<>();
         String[] parts;
         double h,opt;

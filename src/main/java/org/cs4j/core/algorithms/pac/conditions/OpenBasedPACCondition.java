@@ -227,13 +227,12 @@ public class OpenBasedPACCondition extends RatioBasedPACCondition implements Sea
 		for (Tuple<Double, Double> hToOpt : hToOptimalTuples) {
 			// Partition according to h values, but verify that at least 50
 			// instances per partition
-			if (counter >= 50) {
+			 if (counter >= 2) {
 				if (hToOpt._1 != oldH) {
 					// logger.debug("Counter="+counter+", h="+oldH);
 					hToTuples.put(oldH, new ArrayList<>(tuples));
 					counter = 0;
 					tuples.clear();
-					;
 				}
 			}
 			tuples.add(hToOpt);

@@ -51,6 +51,18 @@ public class OpenBasedExperiment  extends StandardExperiment{
             // are constant for
             // this run (w,
             // domain, etc.)
+            resultsData.add(instance.getClass().getSimpleName());
+
+            // add OPT value
+            PACStatistics stats = PACUtils.getPACStatistics(instance.getClass());
+            double opt = stats.instanceToOptimal.get(instanceId);
+            resultsData.add(opt);
+
+            // add isEpsilon: isEpsilon= W*OPT >= Cost
+            double cost = Double.parseDouble(resultsData.get(3).toString());
+            double epsilon = Double.parseDouble(resultsData.get(10).toString());
+            int isEpsilon = opt * (1+epsilon) >= cost == true? 1 : 0;
+            resultsData.add(isEpsilon);
 
             output.appendNewResult(resultsData.toArray());
             output.newline();

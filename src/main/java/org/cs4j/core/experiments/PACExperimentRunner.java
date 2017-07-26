@@ -306,7 +306,7 @@ public class PACExperimentRunner {
             runner.runExperimentBatch(domains, pacConditions, epsilonValues, deltaValues, experiment);
         };
 
-        ExecutorService executor = Executors.newFixedThreadPool(5);
+        ExecutorService executor = Executors.newFixedThreadPool(4);
         executor.execute(openBasedExp);
         executor.execute(ratioBasedExp);
         executor.execute(oracleExp);
@@ -327,27 +327,27 @@ public class PACExperimentRunner {
         Class[] domains=runner.getClassesFromCommandLine(args);
         Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
         double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
-//        if(args[0].equals("RunOpenBased")){
+//        if(args.length > 0 &&args[0].equals("RunOpenBased")){
             logger.info("********** OPEN BASED CONDITION");
             runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
 //        }
         
-        if(args[0].equals("MLPac")){
+        if(args.length > 0 &&args[0].equals("MLPac")){
             logger.info("********** ML-PAC CONDITION");
             runner.runMLPac(domains,epsilonValues,DEFAULT_DELTAS);
         }
 
-        if(args[0].equals("BoundedCostBased")){
+        if(args.length > 0 && args[0].equals("BoundedCostBased")){
             logger.info("********** Bounded Cost Based Search");
             runner.runBoundedCostBased(domains,epsilonValues);
         }
 
 
-        if(args[0].equals("CollectOpenBased")) {
+        if(args.length > 0 &&args[0].equals("CollectOpenBased")) {
             logger.info("****************************** collecting stats for open based ");
             runner.collectStatisticsForOpenBased(domains);
         }
-        if(args[0].equals("CollectThresholdBased")) {
+        if(args.length > 0 &&args[0].equals("CollectThresholdBased")) {
             logger.info("****************************** collecting stats for threshold based ");
             runner.collectStatisticsForThresholdBased(domains);
         }
@@ -356,22 +356,22 @@ public class PACExperimentRunner {
             runner.runThresholdBasedConditions(domains,pacConditions,epsilonValues);
         }
 
-        if(args[0].equals("RunOracle")) {
+        if(args.length > 0 &&args[0].equals("RunOracle")) {
             logger.info("****************************** running Oracle ");
             runner.runOracleCondition(domains,epsilonValues);
         }
 
-        if(args[0].equals("RunFMin")){
+        if(args.length > 0 &&args[0].equals("RunFMin")){
             logger.info("****************************** running f-min ");
             runner.runFMinConditions(domains,epsilonValues);
         }
 
-        if(args[0].equals("RunDPS")){
+        if(args.length > 0 &&args[0].equals("RunDPS")){
             logger.info("****************************** running DPS ");
             runner.runDPS(domains,epsilonValues);
         }
 
-        if(args[0].equals("RunAll")){
+        if(args.length > 0 &&args[0].equals("RunAll")){
             logger.info("RUN ALL EXPERIMENTS");
             runParalel();
         }
