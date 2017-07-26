@@ -148,7 +148,8 @@ public class MLPacFeatureExtractor {
 				try {
 					g += solution.getOperators().get(i).getCost(current, parent);
 				}catch (Exception e) {
-					logger.error("Failed to calculate g properly", e);
+					logger.error("Failed to calculate g properly. Exception: "+ e.getMessage());
+					break;
 				}
 			}
 			h=current.getH();

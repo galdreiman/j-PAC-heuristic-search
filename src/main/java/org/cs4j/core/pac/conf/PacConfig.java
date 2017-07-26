@@ -7,9 +7,8 @@ import org.aeonbits.owner.ConfigFactory;
  * Created by Gal Dreiman on 30/06/2017.
  */
 
-@Config.Sources({ "file:~/pac.config",
-        "file:./conf/pac.config",
-        "classpath:pac.config" })
+@Config.Sources({ "file:./conf/pac.config",
+                  "classpath:pac.config" })
 public interface PacConfig extends Config {
 
     PacConfig instance = ConfigFactory.create(PacConfig.class);

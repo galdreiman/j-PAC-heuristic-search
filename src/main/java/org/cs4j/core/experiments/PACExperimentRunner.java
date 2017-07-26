@@ -1,10 +1,7 @@
 package org.cs4j.core.experiments;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -323,40 +320,56 @@ public class PACExperimentRunner {
 
     public static void main(String[] args) throws ClassNotFoundException {
         PACExperimentRunner runner = new PACExperimentRunner();
+        System.out.println("Hello," +
+                "this is the PAC Experiment Runner" +
+                "\n\n" +
+                "RunOpenBased    OPEN BASED CONDITION \n" +
+                "MLPac    ML-PAC CONDITION \n"+
+                "BoundedCostBased    Bounded Cost Based Search \n"+
+                "CollectOpenBased    ML-PAC CONDITION \n"+
+                "CollectOpenBased collecting stats for open based \n"+
+                "CollectThresholdBased    collecting stats for threshold based \n"+
+                "RunOracle    running Oracle \n"+
+                "RunAll    RUN ALL EXPERIMENTS \n\n");
+        System.out.print("");
+        Scanner sc = new Scanner(System.in);
+        String arg = sc.nextLine();
+
+
 
         Class[] domains=runner.getClassesFromCommandLine(args);
         Class[] pacConditions = runner.getPACConditionsFromCommandLine(args);
         double[] epsilonValues = runner.getEpsilonValuesFromCommandLine(args);
-//        if(args.length > 0 &&args[0].equals("RunOpenBased")){
+        if(arg.equals("RunOpenBased")){
             logger.info("********** OPEN BASED CONDITION");
             runner.runOpenBased(domains,epsilonValues,DEFAULT_DELTAS);
-//        }
+        }
         
-        if(args.length > 0 &&args[0].equals("MLPac")){
+        if(arg.equals("MLPac")){
             logger.info("********** ML-PAC CONDITION");
             runner.runMLPac(domains,epsilonValues,DEFAULT_DELTAS);
         }
 
-        if(args.length > 0 && args[0].equals("BoundedCostBased")){
+        if(arg.equals("BoundedCostBased")){
             logger.info("********** Bounded Cost Based Search");
             runner.runBoundedCostBased(domains,epsilonValues);
         }
 
 
-        if(args.length > 0 &&args[0].equals("CollectOpenBased")) {
+        if(arg.equals("CollectOpenBased")) {
             logger.info("****************************** collecting stats for open based ");
             runner.collectStatisticsForOpenBased(domains);
         }
-        if(args.length > 0 &&args[0].equals("CollectThresholdBased")) {
+        if(arg.equals("CollectThresholdBased")) {
             logger.info("****************************** collecting stats for threshold based ");
             runner.collectStatisticsForThresholdBased(domains);
         }
-        if(args[0].equals("Run")) {
+        if(arg.equals("Run")) {
             logger.info("****************************** running threshold based ");
             runner.runThresholdBasedConditions(domains,pacConditions,epsilonValues);
         }
 
-        if(args.length > 0 &&args[0].equals("RunOracle")) {
+        if(arg.equals("RunOracle")) {
             logger.info("****************************** running Oracle ");
             runner.runOracleCondition(domains,epsilonValues);
         }
@@ -366,15 +379,17 @@ public class PACExperimentRunner {
             runner.runFMinConditions(domains,epsilonValues);
         }
 
-        if(args.length > 0 &&args[0].equals("RunDPS")){
+        if(arg.equals("RunDPS")){
             logger.info("****************************** running DPS ");
             runner.runDPS(domains,epsilonValues);
         }
 
-        if(args.length > 0 &&args[0].equals("RunAll")){
+        if(arg.equals("RunAll")){
             logger.info("RUN ALL EXPERIMENTS");
             runParalel();
         }
+
+
 
     }
 }

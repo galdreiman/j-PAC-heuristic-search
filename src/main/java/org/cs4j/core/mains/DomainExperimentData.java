@@ -76,7 +76,7 @@ public class DomainExperimentData {
 						"."+File.separator+"preprocessResults"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						"."+File.separator+"results"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						1,
-						90,
+						NUM_OF_INSTANCES,
 						"",
 						""));
 
