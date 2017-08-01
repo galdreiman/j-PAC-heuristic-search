@@ -49,6 +49,31 @@ public class MLPacFeatureExtractor {
 		return b.toString();
 	}
 
+	public static String getFeaturesCSVHeaderForPredictedStats(boolean withTarget) {
+		StringBuilder b = new StringBuilder();
+
+		b.append("initialH,");
+		b.append("DomainLevel,");
+
+		for(int i =0; i < 3; i++) {
+			b.append(String.format("childH-%d  NUMERIC,", i));
+			b.append(String.format("childG-%d  NUMERIC,", i));
+			b.append(String.format("childDepth-%d  NUMERIC,", i));
+
+			for(int j =0; j < 3; j++) {
+				b.append(String.format("grandchildH-%d-%d,", i,j));
+				b.append(String.format("grandchildG-%d-%d,", i,j));
+				b.append(String.format("grandchildDepth-%d-%d,", i,j));
+			}
+		}
+
+		if(withTarget) {
+			b.append("opt-cost");
+		}
+
+		return b.toString();
+	}
+
 	public enum PacFeature{
 		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,W,IS_W_OPT;
 		

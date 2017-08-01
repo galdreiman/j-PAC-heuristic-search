@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
+import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.PACUtils;
@@ -40,7 +41,7 @@ public class MLPacStatisticsPredictor {
 
         int numOfFeaturesPerNode = 3;
 
-        int trainLevelLow = 10, trainLevelHigh = 30, trainLevelDelta = 5;
+        int trainLevelLow = 10, trainLevelHigh = 20, trainLevelDelta = 5;
 
         int testLevel = trainLevelHigh + trainLevelDelta;
 
@@ -116,7 +117,7 @@ public class MLPacStatisticsPredictor {
                 // 1. load PAC statistics (to get optimal solutions
                 // -------------------------------------------------
 
-                PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,testLevel);
+//                PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,testLevel);
 
                 // --------------------------------------------------------------
                 // 2. for each problem from train: extract features
@@ -243,53 +244,59 @@ public class MLPacStatisticsPredictor {
     private static void train(Class domainClass, int trainLevelLow, int trainLevelHigh, int trainLevelDelta,int numOfFeaturesPerNode, PacClassifierType classifierType) {
         String outfilePostfix = ".arff";
 
+        OutputResult output = null;
+        OutputResult csvOutput = null;
+        String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+        try {
+            output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType+"_" +trainFormat, true,outfilePostfix);
+            csvOutput = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType+"_" +trainFormat, true,".csv");
+        } catch (IOException e1) {
+            logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
+        }
 
-                OutputResult output = null;
-                String trainFormat = trainLevelLow + "-" + trainLevelHigh;
-                String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
-                try {
-                    output = new OutputResult(outFile, "MLPacStatsPreprocess_" + classifierType+"_" +trainFormat, true,outfilePostfix);
-                } catch (IOException e1) {
-                    logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
-                }
+        String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderForPredictedStats(true);
+        String csvTableHeader = MLPacFeatureExtractor.getFeaturesCSVHeaderForPredictedStats(true);
+        try {
+            output.writeln(tableHeader);
+            csvOutput.writeln(csvTableHeader);
+        } catch (IOException e1) {
+            logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
+        }
 
-                String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderForPredictedStats(true);
-                try {
-                    output.writeln(tableHeader);
-                } catch (IOException e1) {
-                    logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
-                }
+        logger.info("Running anytime for domain " + domainClass.getName());
+        try {
 
-                logger.info("Running anytime for domain " + domainClass.getName());
-                try {
+            for(int trainLevel = trainLevelLow; trainLevel <= trainLevelHigh; trainLevel += trainLevelDelta) {
+                String tableForDomainLevel = extractTableOfFeatures(domainClass, trainLevel, numOfFeaturesPerNode);
 
-                    for(int trainLevel = trainLevelLow; trainLevel <= trainLevelHigh; trainLevel += trainLevelDelta) {
-                        String tableForDomainLevel = extractTableOfFeatures(domainClass, trainLevel, numOfFeaturesPerNode);
+                output.writeln(tableForDomainLevel.toString());
+                csvOutput.writeln(tableForDomainLevel.toString());
+            }
+            output.close();
+            csvOutput.close();
 
-                        output.writeln(tableForDomainLevel.toString());
-                    }
-                    output.close();
-
-                    // -------------------------------------------------
-                    // 3. train + save the model to file
-                    // -------------------------------------------------
-                    AbstractClassifier cls =
-                            MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".arff");
-                    String outputModel = outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".model";
-                    ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
-                    oos.writeObject(cls);
-                    oos.flush();
+            // -------------------------------------------------
+            // 3. train + save the model to file
+            // -------------------------------------------------
+            AbstractClassifier cls =
+                    MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".arff");
+            String outputModel = outFile+ File.separator + "MLPacStatsPreprocess_"+classifierType+"_"+trainFormat+".model";
+            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
+            oos.writeObject(cls);
+            oos.flush();
 
 
 
 
-                } catch (Exception e) {
-                    logger.error(e);
-                } finally {
-                    if (output != null) {
-                        output.close();
-                    }
-                }
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            if (output != null) {
+                output.close();
+                csvOutput.close();
+            }
+        }
 
     }
 
@@ -300,7 +307,7 @@ public class MLPacStatisticsPredictor {
         // 1. load PAC statistics (to get optimal solutions
         // -------------------------------------------------
 
-        PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,trainLevel);
+//        PACUtils.getPACStatistics(domainClass,DomainExperimentData.RunType.ALL,trainLevel);
 
         // --------------------------------------------------------------
         // 2. for each problem from train: extract features
@@ -324,7 +331,8 @@ public class MLPacStatisticsPredictor {
             logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
             domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 
-            double optimalCost = PACUtils.getOptimalSolution(domainClass, i);
+            SearchResult searchResult = optimalSolver.search(domain);
+            double optimalCost = searchResult.getBestSolution().getCost();
 
             //--------------------------------------------
             // extract features from all first nodes:
