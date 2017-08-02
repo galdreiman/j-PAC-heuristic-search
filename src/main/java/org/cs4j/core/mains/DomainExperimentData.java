@@ -64,21 +64,21 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(VacuumRobot.class,
 				new DomainExperimentData(
 				"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-10-dirt",
-						"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-%d-dirt",
+						"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-for-pac-stats-%d-dirt",
 						"."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator,
 						"."+File.separator+"results"+File.separator+"VacuumRobot"+File.separator,
 						1, NUM_OF_INSTANCES,
-						"."+File.separator+"input"+File.separator+"vacuumrobot"+File.separator+"generated-%d-dirt",
-						""));
+						"."+File.separator+"input"+File.separator+"vacuumrobot" + File.separator + "generated-for-pac-stats-%s-dirt",
+						"."+File.separator+"preprocessResults"+File.separator+"VacuumRobot"+File.separator+"generated-for-pac-stats-%s-dirt"));
 		domainToExperimentDataAll.put(DockyardRobot.class,
 				new DomainExperimentData("."+File.separator+"input"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30",
-						"."+File.separator+"input"+File.separator+"dockyard-robot-max-edge-2-out-of-place-%d",
+						"."+File.separator+"input"+File.separator+"dockyardrobot" + File.separator + "generated-%s-boxes",
 						"."+File.separator+"preprocessResults"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						"."+File.separator+"results"+File.separator+"dockyard-robot-max-edge-2-out-of-place-30"+File.separator,
 						1,
 						NUM_OF_INSTANCES,
-						"",
-						""));
+						"."+File.separator+"input"+File.separator+"dockyardrobot" + File.separator + "generated-%s-boxes",
+						"."+File.separator+"preprocessResults"+File.separator+"dockyardrobot"+File.separator+"predicted-stats_%s"));
 
 		// Training set configuration
 		int trainEndIndex = (int) (NUM_OF_INSTANCES * TRAIN_PRESENTAGE);

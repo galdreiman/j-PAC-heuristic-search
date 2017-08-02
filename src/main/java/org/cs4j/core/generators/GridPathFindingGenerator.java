@@ -29,7 +29,7 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
      * This class represents a grid on which the agent is moving
      * The grid must be a rectangle (and can contain obstacles)
      */
-    private class GridMap {
+    protected class GridMap {
 
         private int mapWidth;
         private int mapHeight;
@@ -601,7 +601,7 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
             GridPathFindingGenerator.mainGenerateInstaceFromPreparedMap();
 //            GridPathFindingGenerator.mainGenerateMazesFromExistingMazesWithObstaclesTuning();

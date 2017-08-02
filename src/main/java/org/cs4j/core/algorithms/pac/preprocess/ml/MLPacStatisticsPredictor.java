@@ -1,5 +1,6 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.OutputResult;
@@ -10,6 +11,9 @@ import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
+import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.Pancakes;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.PacConfig;
@@ -21,8 +25,9 @@ import weka.core.Instances;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * Created by Gal Dreiman on 22/05/2017.
@@ -30,22 +35,62 @@ import java.util.TreeMap;
 public class MLPacStatisticsPredictor {
     private final static Logger logger = Logger.getLogger(MLPacStatisticsPredictor.class);
 
+    protected static Map<Class, Consumer<List<Integer>>> domainToGenerator;
+    static{
+        domainToGenerator = new HashMap<>();
+        domainToGenerator.put(DockyardRobot.class,(lst) -> {
+            try {
+                DockyardRobotGeneratorForMLPac.generate(lst.get(0), lst.get(1) + lst.get(2), lst.get(2));
+            } catch(Exception e){
+                logger.error(e);
+            }
+        });
+        domainToGenerator.put(VacuumRobot.class,(lst) -> {
+            try {
+                VacuumRobotGeneratorForMLPac.generateVacuum(lst.get(0), lst.get(1) +lst.get(2), lst.get(2));
+            } catch(Exception e){
+                logger.error(e);
+            }
+        });
+        domainToGenerator.put(Pancakes.class,(lst) -> {
+            try {
+                PancakesGeneratorForMLPac.generatePancakes(lst.get(0), lst.get(1) + lst.get(2), lst.get(2));
+            } catch(Exception e){
+                logger.error(e);
+            }
+        });
+    }
 
+    protected static Map<Class,List<Integer>> domainToLevelParams;
+    static {
+        domainToLevelParams = new HashMap<>();
+        // map domain class to low,high,delta
+        domainToLevelParams.put(DockyardRobot.class, Arrays.asList(4,6,1));
+        domainToLevelParams.put(Pancakes.class, Arrays.asList(10,20,5));
+        domainToLevelParams.put(VacuumRobot.class, Arrays.asList(4,12,4));
+    }
 
 
     public static void main(String[] args){
 
 
-        Class[] domains = PacConfig.instance.pacPreProcessDomains();//{  VacuumRobot.class};//, VacuumRobot.class,  Pancakes.class};
+        Class[] domains = PacConfig.instance.pacPreProcessDomains();
         PacClassifierType[] clsTypes = {PacClassifierType.SMO_REG, PacClassifierType.REGRESSION};
 
         int numOfFeaturesPerNode = 3;
 
-        int trainLevelLow = 10, trainLevelHigh = 20, trainLevelDelta = 5;
 
-        int testLevel = trainLevelHigh + trainLevelDelta;
 
         for(Class domainClass : domains) {
+
+            List<Integer> domainParams = domainToLevelParams.get(domainClass);
+
+            //generate instances:
+            domainToGenerator.get(domainClass).accept(domainParams);
+
+            int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
+
+            int testLevel = trainLevelHigh + trainLevelDelta;
 
             OutputResult output = initOutputResultTable(domainClass,testLevel,trainLevelLow ,trainLevelHigh);
 
