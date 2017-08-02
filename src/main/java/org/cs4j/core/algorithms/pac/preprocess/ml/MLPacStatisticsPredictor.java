@@ -178,12 +178,16 @@ public class MLPacStatisticsPredictor {
 
                 int size = 39; // calculate automatically
 
+                WAStar optimalSolver = new WAStar();
+                optimalSolver.setAdditionalParameter("weight","1.0");
+
                 // go over all training set and extract features:
                 for (int i = fromInstance; i <= toInstance; ++i) {
                     logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
                     domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 
-                    double optimalCost = PACUtils.getOptimalSolution(domainClass, i);
+                    SearchResult searchResult = optimalSolver.search(domain);
+                    double optimalCost = searchResult.getBestSolution().getCost();
 
                     //--------------------------------------------
                     // extract features from all first nodes:
