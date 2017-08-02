@@ -38,7 +38,7 @@ public class PacRocCurveEvaluator {
     public static void main(String[] args) throws Exception {
 
         double[] epsilons = {0.0,0.05,0.1,0.2,0.3};
-        Class[] domains = {Pancakes.class}; //{VacuumRobot.class, Pancakes.class, GridPathFinding.class};
+        Class[] domains = {DockyardRobot.class}; //{VacuumRobot.class, Pancakes.class, GridPathFinding.class};
 
         ArrayList<String> outputTable = new ArrayList<>();
 

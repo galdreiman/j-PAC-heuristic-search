@@ -64,7 +64,7 @@ public class MLPacStatisticsPredictor {
     protected static Map<Class,List<Integer>> domainToLevelParams;
     static {
         domainToLevelParams = new HashMap<>();
-        // map domain class to low,high,delta
+        // map domain class to <low> , <high> , <delta>
         domainToLevelParams.put(DockyardRobot.class, Arrays.asList(4,6,1));
         domainToLevelParams.put(Pancakes.class, Arrays.asList(10,20,5));
         domainToLevelParams.put(VacuumRobot.class, Arrays.asList(4,12,4));

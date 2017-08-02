@@ -34,7 +34,7 @@ public class PancakesGeneratorForMLPac extends PancakesGenerator{
 
             System.out.println("[WARNING] Using local arguments");
             // Output directory
-            String outDir = "input"+ File.separator+"pancakes"+File.separator+"generated-" + pancakesNum;
+            String outDir = "input"+ File.separator+"pancakes"+File.separator+"generated-for-pac-stats-" + pancakesNum + "-dirts";
             // Count of pancakes (number of instances)
             int instancesCount = PacConfig.instance.numInstances();
             // Size of problem
