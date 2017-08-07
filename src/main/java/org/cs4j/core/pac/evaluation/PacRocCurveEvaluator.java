@@ -98,6 +98,7 @@ public class PacRocCurveEvaluator {
                     }
                     row.add(domain.getSimpleName());
                     row.add(""+epsilon);
+                    row.add(""+ThresholdCurve.getROCArea(curve));
 
                     outputTable.add(row.stream().collect(Collectors.joining(",")));
 
