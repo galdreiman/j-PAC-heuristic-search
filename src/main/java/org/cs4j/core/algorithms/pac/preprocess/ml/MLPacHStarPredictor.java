@@ -1,6 +1,5 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
-import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.OutputResult;
@@ -8,7 +7,6 @@ import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.WAStar;
-import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.domains.DockyardRobot;
@@ -27,13 +25,12 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 /**
  * Created by Gal Dreiman on 22/05/2017.
  */
-public class MLPacStatisticsPredictor {
-    private final static Logger logger = Logger.getLogger(MLPacStatisticsPredictor.class);
+public class MLPacHStarPredictor {
+    private final static Logger logger = Logger.getLogger(MLPacHStarPredictor.class);
 
     protected static Map<Class, Consumer<List<Integer>>> domainToGenerator;
     static{

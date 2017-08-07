@@ -29,9 +29,9 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 	private final static Logger logger = Logger.getLogger(MLPacCondition.class);
 
-	private AbstractClassifier classifier;
-	private ArrayList<Attribute> attributes;
-	private Instances dataset;
+	protected AbstractClassifier classifier;
+	protected ArrayList<Attribute> attributes;
+	protected Instances dataset;
 	protected static String clsType;
 	
 

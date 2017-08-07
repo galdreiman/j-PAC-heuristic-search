@@ -5,6 +5,8 @@ import org.cs4j.core.AnytimeSearchAlgorithm;
 import org.cs4j.core.SearchAlgorithm;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
+import org.cs4j.core.algorithms.pac.conditions.MLPacConditionForBoundSolPred;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
@@ -65,6 +67,12 @@ public class PACSearchFramework implements SearchAlgorithm {
             } catch (NoSuchMethodException e) {
                 throw new RuntimeException(e);
             }
+        }
+    }
+
+    public void setDomainLevel(String domainLevel){
+        if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
+            ((MLPacConditionForBoundSolPred)this.pacCondition).setTrainLevel(domainLevel);
         }
     }
 

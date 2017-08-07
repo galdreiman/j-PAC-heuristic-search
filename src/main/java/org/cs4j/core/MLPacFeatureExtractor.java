@@ -49,6 +49,43 @@ public class MLPacFeatureExtractor {
 		return b.toString();
 	}
 
+	public static String getFeaturesARFFHeaderForPredictedBoundedSol(boolean withTarget) {
+		StringBuilder b = new StringBuilder();
+		b.append("% Title: PAC MachineLearning dataset \n");
+		b.append("% \n");
+		b.append("% \n");
+
+		b.append("@RELATION ML-PAC-STATISTICS-PREDICTOR");
+		b.append("\n");
+		b.append("\n");
+
+		b.append("@ATTRIBUTE initialH  NUMERIC\n");
+		b.append("@ATTRIBUTE DomainLevel  NUMERIC\n");
+
+		for(int i =0; i < 3; i++) {
+			b.append(String.format("@ATTRIBUTE childH-%d  NUMERIC\n", i));
+			b.append(String.format("@ATTRIBUTE childG-%d  NUMERIC\n", i));
+			b.append(String.format("@ATTRIBUTE childDepth-%d  NUMERIC\n", i));
+
+			for(int j =0; j < 3; j++) {
+				b.append(String.format("@ATTRIBUTE grandchildH-%d-%d  NUMERIC\n", i,j));
+				b.append(String.format("@ATTRIBUTE grandchildG-%d-%d  NUMERIC\n", i,j));
+				b.append(String.format("@ATTRIBUTE grandchildDepth-%d-%d  NUMERIC\n", i,j));
+			}
+		}
+
+		if(withTarget) {
+			b.append("@ATTRIBUTE is-w-opt  {true,false}");
+		}
+		b.append("\n");
+		b.append("\n");
+		b.append("@DATA");
+		b.append("\n");
+
+
+		return b.toString();
+	}
+
 	public static String getFeaturesCSVHeaderForPredictedStats(boolean withTarget) {
 		StringBuilder b = new StringBuilder();
 
@@ -69,6 +106,31 @@ public class MLPacFeatureExtractor {
 
 		if(withTarget) {
 			b.append("opt-cost");
+		}
+
+		return b.toString();
+	}
+
+	public static String getFeaturesCSVHeaderForPredictedBoundedSol(boolean withTarget) {
+		StringBuilder b = new StringBuilder();
+
+		b.append("initialH,");
+		b.append("DomainLevel,");
+
+		for(int i =0; i < 3; i++) {
+			b.append(String.format("childH-%,", i));
+			b.append(String.format("childG-%d,", i));
+			b.append(String.format("childDepth-%d,", i));
+
+			for(int j =0; j < 3; j++) {
+				b.append(String.format("grandchildH-%d-%d,", i,j));
+				b.append(String.format("grandchildG-%d-%d,", i,j));
+				b.append(String.format("grandchildDepth-%d-%d,", i,j));
+			}
+		}
+
+		if(withTarget) {
+			b.append("is-w-opt");
 		}
 
 		return b.toString();
@@ -135,7 +197,115 @@ public class MLPacFeatureExtractor {
 //		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
 		return b.toString();
 	}
-	
+
+	public static String getFeaturesARFFHeaderBoundSolPred(){
+		StringBuilder b = new StringBuilder();
+		b.append("% Title: PAC MachineLearning dataset \n");
+		b.append("% \n");
+		b.append("% \n");
+
+		b.append("@RELATION ML-PAC");
+		b.append("\n");
+		b.append("\n");
+		b.append("@ATTRIBUTE generated  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE expanded  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE reopened  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE domainLevel  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE cost  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g1  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h1  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g2  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h2  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE g3  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE h3  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE w  NUMERIC");
+		b.append("\n");
+		b.append("@ATTRIBUTE is-W-opt  {true,false}");
+		b.append("\n");
+		b.append("\n");
+		b.append("@DATA");
+		b.append("\n");
+//		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		return b.toString();
+	}
+
+	public static String getFeaturesCsvHeader(){
+		StringBuilder b = new StringBuilder();
+
+		b.append("generated ");
+		b.append(",");
+		b.append("expanded");
+		b.append(",");
+		b.append("reopened");
+		b.append(",");
+		b.append("cost");
+		b.append(",");
+		b.append("g1");
+		b.append(",");
+		b.append("h1");
+		b.append(",");
+		b.append("g2 ");
+		b.append(",");
+		b.append("h2 ");
+		b.append(",");
+		b.append("g3 ");
+		b.append(",");
+		b.append("h3 ");
+		b.append(",");
+		b.append("w ");
+		b.append(",");
+		b.append("is-W-opt");
+
+		b.append("\n");
+//		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		return b.toString();
+	}
+
+	public static String getFeaturesCsvHeaderBoundSolPred(){
+		StringBuilder b = new StringBuilder();
+
+		b.append("generated ");
+		b.append(",");
+		b.append("expanded");
+		b.append(",");
+		b.append("reopened");
+		b.append(",");
+		b.append("domainLevel");
+		b.append(",");
+		b.append("cost");
+		b.append(",");
+		b.append("g1");
+		b.append(",");
+		b.append("h1");
+		b.append(",");
+		b.append("g2 ");
+		b.append(",");
+		b.append("h2 ");
+		b.append(",");
+		b.append("g3 ");
+		b.append(",");
+		b.append("h3 ");
+		b.append(",");
+		b.append("w ");
+		b.append(",");
+		b.append("is-W-opt");
+
+		b.append("\n");
+//		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		return b.toString();
+	}
+
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResultIncludeTarget(SearchResult result, double optimalCost, double inputEpsilon){
 		logger.debug("MLPacFeatureExtractor:extractFeaturesFromSearchResult");
 		Map<PacFeature,Double> features = extractFeaturesFromSearchResult(result);

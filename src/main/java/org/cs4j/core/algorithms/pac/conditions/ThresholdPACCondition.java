@@ -42,6 +42,9 @@ public abstract class ThresholdPACCondition extends AbstractPACCondition {
     protected void prepareStatistics(){
         // Load statistics
         PACStatistics statistics = PACUtils.getStatisticsFile(this, domain.getClass());
+        if(statistics == null){
+            return;
+        }
 
         // 1. Process the statistics
         // Building the PDF (  cost -> prob. that optimal is less than or equal to cost)
