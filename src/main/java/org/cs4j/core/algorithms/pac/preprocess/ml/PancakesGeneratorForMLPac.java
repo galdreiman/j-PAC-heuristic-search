@@ -1,5 +1,6 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
+import org.apache.log4j.Logger;
 import org.cs4j.core.domains.Utils;
 import org.cs4j.core.generators.PancakesGenerator;
 import org.cs4j.core.pac.conf.PacConfig;
@@ -14,6 +15,8 @@ import java.util.Set;
  * Created by Gal Dreiman on 01/08/2017.
  */
 public class PancakesGeneratorForMLPac extends PancakesGenerator{
+
+    private final static Logger logger = Logger.getLogger(PancakesGeneratorForMLPac.class);
 
     public static void main(String[] args) throws IOException{
         int pancakesNumLow = 20;
@@ -44,6 +47,12 @@ public class PancakesGeneratorForMLPac extends PancakesGenerator{
             File outputDirectory = new File(outDir);
             if (!outputDirectory.isDirectory()) {
                 outputDirectory.mkdir();
+            }
+
+            //verify if actually needs to generate:
+            if(needToGenerateInstances(outDir,outputDirectory, instancesCount )){
+                logger.info("No need to generate new instances. There is enough for the experiment.");
+                return;
             }
 
             // The size must be at least 2

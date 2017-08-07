@@ -1,5 +1,6 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
+import org.apache.log4j.Logger;
 import org.cs4j.core.generators.VacuumRobotGenerator;
 import org.cs4j.core.pac.conf.PacConfig;
 
@@ -11,6 +12,7 @@ import java.io.IOException;
  * Created by Gal Dreiman on 01/08/2017.
  */
 public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
+    private final static Logger logger = Logger.getLogger(VacuumRobotGeneratorForMLPac.class);
 
     public static void main(String[] args)throws IOException {
         int dirtyCountLow = 4, dirtyCountyHigh = 16, dirtyCountDelta = 4;
@@ -34,6 +36,13 @@ public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
                 outputDirectory.mkdir();
 
             }
+
+            //verify if actually needs to generate:
+            if(needToGenerateInstances(outFileDirStr,outputDirectory, instancesCount )){
+                logger.info("No need to generate new instances. There is enough for the experiment.");
+                return;
+            }
+
             VacuumRobotGenerator generator = new VacuumRobotGenerator();
 
             for (int i = 0; i < instancesCount; ++i) {

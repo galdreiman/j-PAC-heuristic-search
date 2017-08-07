@@ -2,26 +2,17 @@ package org.cs4j.core.algorithms.pac.preprocess.ml;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.*;
-import org.cs4j.core.algorithms.AnytimePTS;
-import org.cs4j.core.algorithms.AnytimeSearchNode;
-import org.cs4j.core.algorithms.AnytimeWAStar;
 import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
-import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
 import org.cs4j.core.algorithms.pac.conditions.MLPacConditionForBoundSolPredNN;
-import org.cs4j.core.algorithms.pac.conditions.MLPacConditionNN;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.domains.DockyardRobot;
-import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
-import weka.core.Attribute;
-import weka.core.DenseInstance;
-import weka.core.Instance;
 import weka.core.Instances;
 
 import java.io.*;
@@ -31,7 +22,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Created by user on 05/08/2017.
+ * Created by Gal Dreiman on 05/08/2017.
  */
 public class MLPacBoundedSolPredictor {
     private final static Logger logger = Logger.getLogger(MLPacBoundedSolPredictor.class);
@@ -39,18 +30,17 @@ public class MLPacBoundedSolPredictor {
     public static void main(String[] args) {
 
 
-        Class[] domains = {DockyardRobot.class};// PacConfig.instance.pacPreProcessDomains();
+        Class[] domains =  PacConfig.instance.pacDomains();
         PacClassifierType[] clsTypes = {PacClassifierType.NN};
-        double[] epsilons = {0.1}; // PacConfig.instance.inputPreprocessEpsilons();
+        double[] epsilons = PacConfig.instance.inputPreprocessEpsilons();
 
-        int numOfFeaturesPerNode = 3;
 
         for(Class domainClass : domains) {
             for (double epsilon : epsilons) {
 
                 List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
                 //generate instances:
-//                MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
+                MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
 
                 int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
 
@@ -59,9 +49,9 @@ public class MLPacBoundedSolPredictor {
                 OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh, epsilon);
 
                 for (PacClassifierType type : clsTypes) {
-//                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, numOfFeaturesPerNode, type);
+                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
 
-                    predict(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, numOfFeaturesPerNode, type, output);
+                    predict(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
 
                 }
                 if (output != null) {
@@ -73,11 +63,12 @@ public class MLPacBoundedSolPredictor {
 
     }
 
-    private static void predict(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int testLevel, int numOfFeaturesPerNode, PacClassifierType classifierType,OutputResult output) {
+    private static void predict(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int testLevel, PacClassifierType classifierType,OutputResult output) {
 
         AbstractClassifier classifier = null;
         Instances dataset = null;
 
+        double[] deltas = PacConfig.instance.inputOnlineDeltas();
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
 
         String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
@@ -94,10 +85,6 @@ public class MLPacBoundedSolPredictor {
             logger.error("Failed to load model for input file [" +
                     inputDataPath + "]", e);
         }
-
-
-
-
 
         logger.info("Running anytime for domain " + domainClass.getName());
         try {
@@ -116,130 +103,62 @@ public class MLPacBoundedSolPredictor {
             WAStar optimalSolver = new WAStar();
             optimalSolver.setAdditionalParameter("weight","1.0");
 
-            PACSearchFramework psf = new PACSearchFramework();
-            psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
-            psf.setPACConditionClass(MLPacConditionForBoundSolPredNN.class);
-            psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());
-            psf.setDomainLevel(trainLevelLow +"-"+ trainLevelHigh);
-            psf.setAdditionalParameter("epsilon", epsilon+"");
+            for(double delta : deltas) {
+                PACSearchFramework psf = new PACSearchFramework();
+                psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
+                psf.setPACConditionClass(MLPacConditionForBoundSolPredNN.class);
+                psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());
+                psf.setDomainLevel(trainLevelLow + "-" + trainLevelHigh);
+                psf.setAdditionalParameter("epsilon", epsilon + "");
+                psf.setAdditionalParameter("delta", delta + "");
 
-            // go over all training set and extract features:
-            for (int i = fromInstance; i <= toInstance; ++i) {
-                logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
-                domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
+                // go over all training set and extract features:
+                for (int i = fromInstance; i <= toInstance; ++i) {
+                    logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
+                    domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 
-                SearchResult searchResult = optimalSolver.search(domain);
-                double optimalCost = searchResult.getBestSolution().getCost();
+                    SearchResult searchResult = optimalSolver.search(domain);
+                    double optimalCost = searchResult.getBestSolution().getCost();
 
-                SearchResult result = psf.search(domain);
-                for(SearchResult.Solution solution: result.getSolutions()){
+                    SearchResult result = psf.search(domain);
 
-                    double cost = solution.getCost();
-
-                    //--------------------------------------------
-                    // extract features from all first nodes:
-                    SearchDomain.Operator op;
-                    AnytimeSearchNode childNode;
-
-                    SearchDomain.State initialState = domain.initialState();
-                    AnytimeSearchNode initialNode = new AnytimeSearchNode(domain, initialState);
-
-                    SearchDomain.State unpackedInitialState = domain.unpack(initialNode.packed);
-
-                    double initialH = initialNode.getH();
-
-                    int indx = 0;
-                    Instance ins = new DenseInstance(size);
-                    if (dataset == null) {
-                        return;
-                    }
-
-                    ins.setValue(new Attribute("initialH", indx++), initialH);
-                    ins.setValue(new Attribute("DomainLevel", indx++), testLevel);
-
-                    for (int opIndx = 0; opIndx < numOfFeaturesPerNode/*domain.getNumOperators(unpackedInitialState)*/; ++opIndx) {
-                        // Get the current operator
-                        op = domain.getOperator(unpackedInitialState, opIndx);
-                        // Don't apply the previous operator on the state - in order not to enter a loop
-                        if (op.equals(initialNode.pop)) {
-                            continue;
-                        }
-                        // Get it by applying the operator on the parent state
-                        SearchDomain.State childState = domain.applyOperator(initialState, op);
-                        // Create a search node for this state
-                        childNode = new AnytimeSearchNode(domain,
-                                childState,
-                                initialNode,
-                                initialState,
-                                op, op.reverse(initialState));
-
-                        double childH = childNode.getH();
-                        double childG = childNode.getG();
-                        double childDepth = childNode.getDepth();
+                    SearchResult.Solution bestSolution = result.getBestSolution();
+                    bestSolution.getCost();
+                    bestSolution.getStates();
 
 
-                        ins.setValue(new Attribute("childH-" + opIndx, indx++), childH);
-                        ins.setValue(new Attribute("childG-" + opIndx, indx++), childG);
-                        ins.setValue(new Attribute("childDepth-" + opIndx, indx++), childDepth);
+                    String instanceID = i + ",";
+                    String found = result.hasSolution() ? "1," : "0,";
+                    String depth = bestSolution.getOperators().size() + ",";
+                    String cost = bestSolution.getCost() + ",";
+                    String iterations = result.getSolutions().size() + ",";
+                    String generated = result.getGenerated() + ",";
+                    String expanded = result.getExpanded() + ",";
+                    String cpuTime = result.getCpuTimeMillis() + ",";
+                    String wallTime = result.getWallTimeMillis() + ",";
+                    String Delta = delta + ",";
+                    String Epsilon = epsilon + ",";
+                    String TrainLevelLow = trainLevelLow + ",";
+                    String TrainLevelHigh = trainLevelHigh + ",";
+                    String TestLevel = testLevel + ",";
+                    String pacCondition = classifier.getClass().getSimpleName() + ",";
+                    String Domain = domainClass.getSimpleName() + ",";
+                    String OPT = optimalCost + ",";
+                    String isEpsilon = optimalCost * (1 + epsilon) >= bestSolution.getCost() == true ? "1" : "0";
 
-                        // go over gran-children:
-                        for (int childOpIndx = 0; childOpIndx < numOfFeaturesPerNode /*domain.getNumOperators(childState)*/; childOpIndx++) {
-
-                            op = domain.getOperator(childState, opIndx);
-                            SearchDomain.State grandchildState = domain.applyOperator(childState, op);
-                            // Create a search node for this state
-                            AnytimeSearchNode grandchildNode = new AnytimeSearchNode(domain,
-                                    grandchildState,
-                                    childNode,
-                                    childState,
-                                    op, op.reverse(childState));
-
-                            double grandchildH = grandchildNode.getH();
-                            double grandchildG = grandchildNode.getG();
-                            double grandchildDepth = grandchildNode.getDepth();
-
-                            ins.setValue(new Attribute("grandchildH-" + opIndx + "-" + childOpIndx, indx++), grandchildH);
-                            ins.setValue(new Attribute("grandchildG-" + opIndx + "-" + childOpIndx, indx++), grandchildG);
-                            ins.setValue(new Attribute("grandchildDepth-" + opIndx + "-" + childOpIndx, indx++), grandchildDepth);
-
-                        }
-
-
-                    }
-                    boolean isWOpt = optimalCost * (1 + epsilon) >= cost;
-                    logger.info("Optimal cost: " + optimalCost + " current cost: " + cost + " is-w-opt? " + isWOpt);
-
-                    ins.setValue(new Attribute("is-w-opt", indx++), isWOpt+"");
-
-                    // Classify
-                    ins.setDataset(dataset);
-                    double classificationResult = -1;
-                    if (classifier == null) {
-                        return;
-                    }
-                    try {
-                        logger.info(ins.toString());
-                        classificationResult = classifier.classifyInstance(ins);
-                    } catch (Exception e) {
-                        logger.error("ERROR: Failed to classify instance: ", e);
-                    }
-
-                    logger.info(classificationResult);
-
-                    output.writeln(i + "," + classificationResult + "," + optimalCost + "," + trainLevelLow + "," + trainLevelHigh + "," + testLevel + "," + classifier.getClass().getSimpleName() + "," + domainClass.getSimpleName());
-
+                    // InstanceID	Found	Depth	Cost	Iterations	Generated	Expanded	Cpu Time	Wall Time	delta	epsilon TrainLevelLow TrainLevelHigh  TestLevel	pacCondition	Domain	OPT	is_epsilon
+                    output.writeln(instanceID + found + depth + cost + iterations + generated + expanded + cpuTime + wallTime + Delta + Epsilon + TrainLevelLow + TrainLevelHigh + TestLevel + pacCondition + Domain + OPT + isEpsilon);
                 }
             }
 
         } catch (Exception e) {
-            logger.error(e);
         }
 
 
     }
 
 
-    private static void train(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int trainLevelDelta,int numOfFeaturesPerNode, PacClassifierType classifierType) {
+    private static void train(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int trainLevelDelta, PacClassifierType classifierType) {
         String outfilePostfix = ".arff";
 
         OutputResult output = null;
@@ -377,7 +296,8 @@ public class MLPacBoundedSolPredictor {
             logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
         }
 
-        String tableHeader = "instance_id, h*_prediction, h*_actual, trainLevelLow, trainLevelHigh, testLevel, classifier, domain";
+        //instanceID+found+depth+cost+iterations+generated+expanded+cpuTime+wallTime+delta+Epsilon+TrainLevelLow+TrainLevelHigh+TestLevel+pacCondition+Domain+OPT+isEpsilon
+        String tableHeader = "InstanceID,Found,Depth,Cost,Iterations,generated,Expanded,Cpu-Time,Wall-Time,delta,epsilon,TrainLevelLow,TrainLevelHigh,TestLevel,pacCondition,Domain,OPT,is_epsilon";
         try {
             output.writeln(tableHeader);
         } catch (IOException e1) {

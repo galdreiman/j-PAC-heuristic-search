@@ -1,5 +1,7 @@
 package org.cs4j.core.algorithms.pac.preprocess.ml;
 
+import org.apache.log4j.Logger;
+import org.cs4j.core.algorithms.pac.conditions.MLPacCondition;
 import org.cs4j.core.generators.DockyardRobotGenerator;
 import org.cs4j.core.pac.conf.PacConfig;
 
@@ -13,6 +15,8 @@ import java.util.Set;
  * Created by Gal Dreiman on 01/08/2017.
  */
 public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
+    private final static Logger logger = Logger.getLogger(DockyardRobotGeneratorForMLPac.class);
+
 
     public static void main(String[] args) throws IOException{
         int boxesCountLow = 4, boxesCountHigh = 7, boxesCountDelta =1;
@@ -38,9 +42,16 @@ public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
 
         for(boxesCount = boxesCountLow; boxesCount <= boxesCountHigh; boxesCount += boxesCountDelta) {
             String outputDirectoryPath = "input" + File.separator + "dockyardrobot" + File.separator + "generated-" + boxesCount + "-boxes";
+
             File outputDirectory = new File(outputDirectoryPath);
             if (!outputDirectory.isDirectory()) {
                 outputDirectory.mkdir();
+            }
+
+            //verify if actually needs to generate:
+            if(needToGenerateInstances(outputDirectoryPath,outputDirectory, instancesCount )){
+                logger.info("No need to generate new instances. There is enough for the experiment.");
+                return;
             }
 
             // This set is used in order to avoid duplicates

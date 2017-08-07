@@ -1,5 +1,6 @@
 package org.cs4j.core.generators;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
@@ -28,6 +29,16 @@ public class GeneralInstancesGenerator {
         sb.append(": ");
         sb.append(value);
         this._appendNewLine(sb);
+    }
+
+    protected static boolean needToGenerateInstances(String outputDirectoryPath, File outputDirectory, int instancesCount){
+        if(outputDirectory.listFiles().length >= instancesCount){
+            File maxIndexedFile = new File(outputDirectoryPath +File.separator + instancesCount+".in");
+            if(maxIndexedFile.exists()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
