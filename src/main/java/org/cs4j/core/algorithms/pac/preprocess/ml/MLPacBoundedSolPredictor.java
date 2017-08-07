@@ -44,20 +44,30 @@ public class MLPacBoundedSolPredictor {
 
                 int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
 
-                int testLevel = trainLevelHigh + trainLevelDelta;
-
-                OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh, epsilon);
-
                 for (PacClassifierType type : clsTypes) {
                     train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
 
-                    predict(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
+
 
                 }
-                if (output != null) {
-                    output.close();
-                }
 
+
+            }
+        }
+
+        for(Class domainClass : domains) {
+            List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
+            int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
+            int testLevel = trainLevelHigh + trainLevelDelta;
+            OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
+
+            for (double epsilon : epsilons) {
+                for (PacClassifierType type : clsTypes) {
+                    predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
+                    if (output != null) {
+                        output.close();
+                    }
+                }
             }
         }
 
@@ -285,13 +295,13 @@ public class MLPacBoundedSolPredictor {
         return sb.toString();
     }
 
-    private static OutputResult initOutputResultTable(Class domainClass, int testLevel, int trainLevelLow, int trainLevelHigh, double epsilon) {
+    private static OutputResult initOutputResultTable(Class domainClass, int testLevel, int trainLevelLow, int trainLevelHigh) {
 
         OutputResult output = null;
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
         String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
         try {
-            output = new OutputResult(outFile, "MLPacBoundedSolPredictionResults_e" +epsilon +"_tl_"+ testLevel, true, ".csv");
+            output = new OutputResult(outFile, "MLPacBoundedSolPredictionResults_tl_"+ testLevel, true, ".csv");
         } catch (IOException e1) {
             logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
         }
