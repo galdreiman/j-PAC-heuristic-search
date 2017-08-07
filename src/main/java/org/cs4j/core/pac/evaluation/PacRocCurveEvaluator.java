@@ -59,7 +59,7 @@ public class PacRocCurveEvaluator {
 
 
         String headerTable = fv.stream().map(att -> att.name()).collect(Collectors.joining(","));
-        headerTable += ",Delta,Epsilon";
+        headerTable += ",Delta,Epsilon,AUC";
         outputTable.add(headerTable);
 
 
