@@ -81,7 +81,7 @@ public class VacuumRobotGenerator extends GeneralInstancesGenerator {
             dirtyCount = Integer.parseInt(args[5]);
         } catch (Exception e) {
         //            throw new IOException("Invalid count of dirty locations: " + args[5]);
-            dirtyCount = 15;
+            dirtyCount = 10;
         }
 
         String outFileDirStr = /*args[0] != null ? args[0] :*/ "input"+File.separator+"vacuumrobot"+File.separator+"generated-"+dirtyCount+"-dirt";

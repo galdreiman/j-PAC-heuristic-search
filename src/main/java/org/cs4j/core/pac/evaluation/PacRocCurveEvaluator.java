@@ -37,7 +37,7 @@ public class PacRocCurveEvaluator {
 
     public static void main(String[] args) throws Exception {
 
-        double[] epsilons = {0.0,0.05,0.1,0.2,0.3};
+        double[] epsilons = {0.0,0.05,0.1,0.2,0.3,0.4};
         Class[] domains = {DockyardRobot.class}; //{VacuumRobot.class, Pancakes.class, GridPathFinding.class};
 
         ArrayList<String> outputTable = new ArrayList<>();
@@ -67,7 +67,7 @@ public class PacRocCurveEvaluator {
         for(Class domain : domains) {
             for (double epsilon : epsilons) {
                 // load data
-                String inputArffFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\TenK\\MLPacPreprocess_e" + epsilon +"_"+ domain.getSimpleName()+ ".arff";
+                String inputArffFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\8-8-2017\\vacuumRobot\\MLPacPreprocess_e" + epsilon +".arff";
                 Instances data = ConverterUtils.DataSource.read(inputArffFile);
                 data.setClassIndex(data.numAttributes() - 1);
 
@@ -143,7 +143,7 @@ public class PacRocCurveEvaluator {
     }
 
     private static void saveInstancesToFile( ArrayList<String> outputTable) throws IOException {
-        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\TenK\\Out_MLPacPreprocess_Evaluation.csv";
+        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\8-8-2017\\vacuumRobot\\Out_MLPacPreprocess_Evaluation.csv";
 
         String table = outputTable.stream().collect(Collectors.joining("\n"));
 
