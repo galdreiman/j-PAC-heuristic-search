@@ -8,7 +8,6 @@ import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.conditions.MLPacConditionForBoundSolPredNN;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
-import org.cs4j.core.domains.DockyardRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.PacConfig;
