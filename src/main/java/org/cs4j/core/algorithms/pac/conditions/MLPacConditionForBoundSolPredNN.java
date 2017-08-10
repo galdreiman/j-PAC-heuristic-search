@@ -7,6 +7,7 @@ import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.mains.DomainExperimentData;
 import weka.classifiers.AbstractClassifier;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.ObjectInputStream;
 
@@ -23,14 +24,17 @@ public class MLPacConditionForBoundSolPredNN extends  MLPacConditionForBoundSolP
 
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
-        super.setup(domain, epsilon, delta);
+        this.initialH = domain.initialState().getH();
+        this.domain=domain;
+        this.epsilon=epsilon;
+        this.delta=delta;
 
         // read ML_PAC_Condition_Preprocess.csv and train the model (the output
         // of the training process)
-        String inputModelPath = DomainExperimentData.get(domain.getClass(),
-                DomainExperimentData.RunType.TRAIN).outputPreprocessPathFormat + "MLPacPreprocess_e"+epsilon+"_"+ this.clsType+".model";
-        String inputDataPath = DomainExperimentData.get(domain.getClass(),
-                DomainExperimentData.RunType.TRAIN).outputPreprocessPathFormat + "MLPacPreprocess_e"+epsilon+".arff";
+        String inputModelPath = String.format(DomainExperimentData.get(domain.getClass(),
+                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat)+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_"+ this.clsType+ "_tl_"+this.trainFormat +".model";
+        String inputDataPath = String.format(DomainExperimentData.get(domain.getClass(),
+                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat) + File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_"+ this.clsType+ "_tl_"+this.trainFormat+".arff";
         this.setupAttributes();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
