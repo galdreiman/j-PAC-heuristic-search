@@ -35,11 +35,13 @@ public class MLPacBoundedSolPredictor {
 
 
         for(Class domainClass : domains) {
+
+            //generate instances:
+            List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
+            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
+
             for (double epsilon : epsilons) {
 
-                List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
-                //generate instances:
-                MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
 
                 int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
 
