@@ -26,6 +26,9 @@ import java.util.TreeMap;
 public class MLPacBoundedSolPredictor {
     private final static Logger logger = Logger.getLogger(MLPacBoundedSolPredictor.class);
 
+    private static final String modelFileFormat ="MLPacBoundedSolPreprocess_e%s_c_%s_tl_%s.model"; // <epsilon>,<classifierType>,<trainFormat>
+    private static final String dataFileFormat ="MLPacBoundedSolPreprocess_e%s_c_%s_tl_%s.arff"; // <epsilon>,<classifierType>,<trainFormat>
+
     public static void main(String[] args) {
 
 
@@ -41,18 +44,10 @@ public class MLPacBoundedSolPredictor {
             MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
 
             for (double epsilon : epsilons) {
-
-
                 int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
-
                 for (PacClassifierType type : clsTypes) {
                     train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
-
-
-
                 }
-
-
             }
         }
 
@@ -65,12 +60,15 @@ public class MLPacBoundedSolPredictor {
             for (double epsilon : epsilons) {
                 for (PacClassifierType type : clsTypes) {
                     predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
-                    if (output != null) {
-                        output.close();
-                    }
                 }
             }
+
+            if (output != null) {
+                output.close();
+            }
         }
+
+        logger.info("Done!");
 
     }
 
@@ -83,8 +81,8 @@ public class MLPacBoundedSolPredictor {
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
 
         String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
-        String inputModelPath = inFile+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat+".model";
-        String inputDataPath = inFile + File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat+".arff";
+        String inputModelPath = inFile+ File.separator + String.format(modelFileFormat,epsilon,classifierType,trainFormat);
+        String inputDataPath = inFile + File.separator + String.format(dataFileFormat,epsilon,classifierType,trainFormat);
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
             classifier = (AbstractClassifier) ois.readObject();
