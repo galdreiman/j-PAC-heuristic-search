@@ -271,18 +271,21 @@ public class MLPacBoundedSolPredictor {
 
                 double g1 = features.get(MLPacFeatureExtractor.PacFeature.G_0);
                 double h1 = features.get(MLPacFeatureExtractor.PacFeature.H_0);
+                double h1ToLevel = h1/trainLevel;
 
                 double g2 = features.get(MLPacFeatureExtractor.PacFeature.G_2);
                 double h2 = features.get(MLPacFeatureExtractor.PacFeature.H_2);
+                double h2ToLevel = h2/trainLevel;
 
                 double g3 = features.get(MLPacFeatureExtractor.PacFeature.G_2);
                 double h3 = features.get(MLPacFeatureExtractor.PacFeature.H_2);
+                double h3ToLevel = h3/trainLevel;
 
                 double w = 1.0 + (Double) searchResult.getExtras().get("epsilon");
 
                 boolean isWOptimal =  optimalCost * (1 + epsilon) >= cost;
 
-                String[] lineParts = {generated+"",expanded+"",reopened+"", trainLevel+"",U+"",g1+"",h1+"",g2+"",h2+"",g3+"",h3+"",w+"",isWOptimal+"\n"};
+                String[] lineParts = {generated+"",expanded+"",reopened+"", trainLevel+"",U+"",g1+"",h1+"",h1ToLevel+"",g2+"",h2+"",h2ToLevel+"",g3+"",h3+"",h3ToLevel+"",w+"",isWOptimal+"\n"};
                 String line = String.join(",", lineParts);
                 sb.append(line);
 

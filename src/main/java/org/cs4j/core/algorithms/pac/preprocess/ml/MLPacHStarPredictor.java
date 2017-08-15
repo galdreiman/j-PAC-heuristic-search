@@ -63,7 +63,7 @@ public class MLPacHStarPredictor {
         domainToLevelParams = new HashMap<>();
         // map domain class to <low> , <high> , <delta>
         domainToLevelParams.put(DockyardRobot.class, Arrays.asList(4,6,1));
-        domainToLevelParams.put(Pancakes.class, Arrays.asList(8,10,1));
+        domainToLevelParams.put(Pancakes.class, Arrays.asList(15,17,1));
         domainToLevelParams.put(VacuumRobot.class, Arrays.asList(4,6,1));
     }
 
