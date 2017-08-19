@@ -105,7 +105,7 @@ public class MLPacBoundedSolPredictor {
 
             int fromInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).fromInstance;
             int toInstance = DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).toInstance;
-            String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, testLevel);
+            String inputPath = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).pacInputPathFormat, ((int)testLevel));
 
             int size = 13; // calculate automatically
 
@@ -252,6 +252,9 @@ public class MLPacBoundedSolPredictor {
 
             // get optimal solution:
             SearchResult optSearchResult = optimalSolver.search(domain);
+            if(!optSearchResult.hasSolution()){
+                continue;
+            }
             double optimalCost = optSearchResult.getBestSolution().getCost();
 
             // get anytime solution:

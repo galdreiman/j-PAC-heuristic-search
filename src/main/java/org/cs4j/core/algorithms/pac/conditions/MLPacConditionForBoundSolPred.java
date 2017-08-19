@@ -71,7 +71,7 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
 
         //Extract features from an incumbent solution
         Map<MLPacFeatureExtractor.PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(incumbentSolution);
-        int size = features.size() + 1;
+        int size = features.size() + 4;
 
         // Init a classifier input instance
         Instance ins = new DenseInstance(size + 1);

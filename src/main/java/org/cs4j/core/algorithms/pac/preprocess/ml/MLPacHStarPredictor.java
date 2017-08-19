@@ -10,6 +10,7 @@ import org.cs4j.core.algorithms.WAStar;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.domains.DockyardRobot;
+import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
 import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
@@ -56,6 +57,13 @@ public class MLPacHStarPredictor {
                 logger.error(e);
             }
         });
+        domainToGenerator.put(GridPathFinding.class,(lst) -> {
+            try {
+                GridPathFindingGeneratorForMLPac.generateMLPacInstances(lst.get(0), lst.get(1) + lst.get(2), lst.get(2));
+            } catch(Exception e){
+                logger.error(e);
+            }
+        });
     }
 
     protected static Map<Class,List<Integer>> domainToLevelParams;
@@ -65,6 +73,7 @@ public class MLPacHStarPredictor {
         domainToLevelParams.put(DockyardRobot.class, Arrays.asList(4,6,1));
         domainToLevelParams.put(Pancakes.class, Arrays.asList(15,17,1));
         domainToLevelParams.put(VacuumRobot.class, Arrays.asList(4,6,1));
+        domainToLevelParams.put(GridPathFinding.class, Arrays.asList(70,85,5));
     }
 
 
