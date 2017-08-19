@@ -2,6 +2,7 @@ package org.cs4j.core.algorithms.pac.conditions;
 
 import org.apache.log4j.Logger;
 import org.cs4j.core.MLPacFeatureExtractor;
+import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
@@ -11,6 +12,7 @@ import weka.core.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Map;
@@ -24,6 +26,8 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
 
     protected static String trainFormat;
     protected static double domainLevel;
+    protected static OutputResult output;
+    protected static double currentOptimalCost;
 
 
 
@@ -38,7 +42,7 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
                 DomainExperimentData.RunType.ALL).outputPreprocessPathFormat,trainFormat)+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_" + clsType+"_tl_" + trainFormat+".model";
         String inputDataPath = String.format(DomainExperimentData.get(domain.getClass(),
                 DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat)+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_" + clsType+"_tl_" +trainFormat+".arff";
-        this.setupAttributes();
+
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));
             this.classifier = (AbstractClassifier) ois.readObject();
@@ -52,23 +56,15 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
         }
     }
 
-    private void setupAttributes() {
-        if(this.attributes == null){
-            this.attributes = new ArrayList<>();
-        }
-        String[] lables = { "domain", "instance", "index", "generated", "expanded", "reopened","domainLevel", "cost", "g1",
-                "h1","g2", "h2", "g3","h3","oprimal_cost", "w", "is-W-opt" };
-        for(int i = 3; i < lables.length -1; ++i){
-            this.attributes.add(new Attribute(lables[i]));
-        }
-
-    }
-
     public void setTrainLevel(String trainFormat){
         this.trainFormat = trainFormat;
     }
     public void setDomainLevel(double domainLevel){
         this.domainLevel = domainLevel;
+    }
+    public void setOutputResult(OutputResult output){ this.output = output; }
+    public void setCurrentOptimalCost(double currentOptimalCost){
+        this.currentOptimalCost = currentOptimalCost;
     }
 
     @Override
@@ -80,6 +76,7 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
 
         // Init a classifier input instance
         Instance ins = new DenseInstance(size + 1);
+        StringBuilder sb = new StringBuilder();
 
         // Add features to the input instance
         int indx = 0;
@@ -87,11 +84,13 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
         this.dataset.setClassIndex(this.dataset.numAttributes() - 1);
         ins.setDataset(this.dataset);
 
+
         double generated = features.get(MLPacFeatureExtractor.PacFeature.GENERATED);
-//		Attribute generated = new Attribute("generated");
         ins.setValue(new Attribute("generated",indx++),generated);
+
         double expanded = features.get(MLPacFeatureExtractor.PacFeature.EXPANDED);
         ins.setValue(new Attribute("expanded",indx++),expanded);
+
         double reopened = features.get(MLPacFeatureExtractor.PacFeature.ROPENED);
         ins.setValue(new Attribute("reopened",indx++),reopened);
 
@@ -108,6 +107,7 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
 
         double h1ToLevel = h1/this.domainLevel;
         ins.setValue(new Attribute("h1ToLevel",indx++),h1ToLevel);
+        sb.append(generated); sb.append(",");
 
         double g2 = features.get(MLPacFeatureExtractor.PacFeature.G_2);
         ins.setValue(new Attribute("g2",indx++),g2);
@@ -134,11 +134,17 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
         fvNominalVal.addElement("true");
         fvNominalVal.addElement("false");
         Attribute classAtt = new Attribute("is-W-opt", fvNominalVal,indx++);
-        ins.setValue( classAtt,"false");
+        boolean isEpsilon = this.currentOptimalCost * (1 + epsilon) >= U;
+        ins.setValue( classAtt,isEpsilon+"");
 
-        logger.info("instance to classify: "+ins.toString());
+        String instanceFeatures = ins.toString();
+        logger.info("instance to classify: "+instanceFeatures);
 
-
+        try {
+            this.output.writeln(instanceFeatures);
+        } catch (IOException e) {
+            logger.error("Failed to write instance features: " + instanceFeatures, e);
+        }
 
 
         double[] distributeResult = {};

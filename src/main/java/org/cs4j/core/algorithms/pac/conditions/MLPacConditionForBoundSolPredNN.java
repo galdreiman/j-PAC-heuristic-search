@@ -32,9 +32,9 @@ public class MLPacConditionForBoundSolPredNN extends  MLPacConditionForBoundSolP
         // read ML_PAC_Condition_Preprocess.csv and train the model (the output
         // of the training process)
         String inputModelPath = String.format(DomainExperimentData.get(domain.getClass(),
-                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat)+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_"+ this.clsType+ "_tl_"+this.trainFormat +".model";
+                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat)+ File.separator + "MLPacBoundedSolPreprocess_c_"+ this.clsType+ "_tl_"+this.trainFormat +".model";
         String inputDataPath = String.format(DomainExperimentData.get(domain.getClass(),
-                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat) + File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_"+ this.clsType+ "_tl_"+this.trainFormat+".arff";
+                DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, this.trainFormat) + File.separator + "MLPacBoundedSolPreprocess_c_"+ this.clsType+ "_tl_"+this.trainFormat+".arff";
         this.setupAttributes();
         try {
             ObjectInputStream ois = new ObjectInputStream(new FileInputStream(inputModelPath));

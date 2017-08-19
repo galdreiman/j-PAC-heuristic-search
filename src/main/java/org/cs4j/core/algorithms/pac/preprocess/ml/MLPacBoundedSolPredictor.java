@@ -13,7 +13,12 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.pac.conf.MLPacPreprocessExperimentValues;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
+import weka.classifiers.Classifier;
+import weka.classifiers.evaluation.Evaluation;
+import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.trees.J48;
 import weka.core.Instances;
+import weka.core.converters.ConverterUtils;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -45,22 +50,66 @@ public class MLPacBoundedSolPredictor {
             MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
 
             // feature extraction + training:
-            for (double epsilon : epsilons) {
-                int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
-                for (PacClassifierType type : clsTypes) {
-                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
+
+            int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
+            for (PacClassifierType type : clsTypes) {
+
+                //-----------------------------------------------------------------
+                String outfilePostfix = ".arff";
+
+                OutputResult output = null;
+                OutputResult csvOutput = null;
+                String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+                String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+                try {
+                    output = new OutputResult(outFile, "MLPacBoundedSolPreprocess_c_" + type+"_tl_" +trainFormat, true,outfilePostfix);
+                    csvOutput = new OutputResult(outFile, "MLPacBoundedSolPreprocess_c_"+ type+"_tl_" +trainFormat, true,".csv");
+                } catch (IOException e1) {
+                    logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
+                }
+
+                String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderBoundSolPred();
+                String csvTableHeader = MLPacFeatureExtractor.getFeaturesCsvHeaderBoundSolPred();
+                try {
+                    output.writeln(tableHeader);
+                    csvOutput.writeln(csvTableHeader);
+                } catch (IOException e1) {
+                    logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
+                }
+                //-----------------------------------------------------------------
+                for (double epsilon : epsilons) {
+                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type,output,csvOutput,outFile);
+                }
+                try {
+                trainClassifier(type, output, outFile, trainFormat);
+                }catch (Exception e){
+                    logger.error("Failed to trainClassifier:   type: "+type+ "  trainFormat: " + trainFormat, e);
+                }
+
+                if (output != null) {
+                    output.close();
+                }
+                if(csvOutput != null){
+                    csvOutput.close();
                 }
             }
 
 
             // prediction:
-            int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
             int testLevel = trainLevelHigh + trainLevelDelta;
             OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
 
+
                 for (double epsilon : epsilons) {
                     for (PacClassifierType type : clsTypes) {
-                        predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
+                        OutputResult outputRawPredictions = initOutputRawResultTable(domainClass, trainLevelLow, trainLevelHigh, testLevel, type);
+                        predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output,outputRawPredictions);
+                        outputRawPredictions.close();
+                        try {
+                            evaluatePrediction(domainClass, trainLevelLow, trainLevelHigh, testLevel, type);
+                        }catch (Exception e){
+                            logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel);
+                        }
                     }
                 }
 
@@ -72,12 +121,32 @@ public class MLPacBoundedSolPredictor {
 
     }
 
-    private static void predict(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int testLevel, PacClassifierType classifierType,OutputResult output) {
+    private static void evaluatePrediction(Class domainClass, int trainLevelLow, int trainLevelHigh, int testLevel, PacClassifierType type) throws Exception{
+//        String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+//        String inputTestDataDir = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+//        String inputTestDataFile = "MLPacBoundedSolPreprocessRawPredictions_c_" + type+"_train_"+trainFormat+"_test_" +testLevel +".arff";
+//        String inputTrainDataFile =
+//
+//        Instances testData = ConverterUtils.DataSource.read(inputTestDataDir +File.separator+ inputTestDataFile);
+//        Classifier classifier;
+//        if(type.equals(PacClassifierType.NN)) {
+//            classifier = new MultilayerPerceptron();
+//            ((MultilayerPerceptron) classifier).setLearningRate(0.1);
+//            ((MultilayerPerceptron) classifier).setMomentum(0.2);
+//            ((MultilayerPerceptron) classifier).setTrainingTime(2000);
+//            ((MultilayerPerceptron) classifier).setHiddenLayers("3");
+//        }
+//        else {
+//            return;
+//        }
+//
+//        Evaluation eval = new Evaluation(testData);
+    }
+
+    private static void predict(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int testLevel, PacClassifierType classifierType,OutputResult output,OutputResult outputRawPredictions) {
 
         AbstractClassifier classifier = null;
         Instances dataset = null;
-
-        OutputResult outputRawPredictions = initOutputRawResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh, epsilon, classifierType);
 
         double[] deltas = PacConfig.instance.inputPredictionDeltas();
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
@@ -121,6 +190,7 @@ public class MLPacBoundedSolPredictor {
                 psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());
                 psf.setTrainLevel(trainLevelLow + "-" + trainLevelHigh);
                 psf.setDomainLevel(testLevel);
+                psf.setOutputResult(outputRawPredictions);
                 psf.setAdditionalParameter("epsilon", epsilon + "");
                 psf.setAdditionalParameter("delta", delta + "");
 
@@ -141,6 +211,7 @@ public class MLPacBoundedSolPredictor {
                     }
                     double optimalCost = searchResult.getBestSolution().getCost();
 
+                    psf.setCurrentOptimalCost(optimalCost);
                     SearchResult result = psf.search(domain);
                     SearchResult.Solution bestSolution = result.getBestSolution();
 
@@ -170,35 +241,12 @@ public class MLPacBoundedSolPredictor {
 
         } catch (Exception e) {
         }
-
-        outputRawPredictions.close();
-
     }
 
 
-    private static void train(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int trainLevelDelta, PacClassifierType classifierType) {
-        String outfilePostfix = ".arff";
+    private static void train(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int trainLevelDelta, PacClassifierType classifierType,OutputResult output,OutputResult csvOutput,String outFile) {
 
-        OutputResult output = null;
-        OutputResult csvOutput = null;
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
-        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
-        try {
-            output = new OutputResult(outFile, "MLPacBoundedSolPreprocess_e"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat, true,outfilePostfix);
-            csvOutput = new OutputResult(outFile, "MLPacBoundedSolPreprocess_e" +epsilon+"_c_"+ classifierType+"_tl_" +trainFormat, true,".csv");
-        } catch (IOException e1) {
-            logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
-        }
-
-        String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderBoundSolPred();
-        String csvTableHeader = MLPacFeatureExtractor.getFeaturesCsvHeaderBoundSolPred();
-        try {
-            output.writeln(tableHeader);
-            csvOutput.writeln(csvTableHeader);
-        } catch (IOException e1) {
-            logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
-        }
-
         logger.info("Running anytime for domain " + domainClass.getName());
         try {
 
@@ -208,31 +256,25 @@ public class MLPacBoundedSolPredictor {
                 output.writeln(tableForDomainLevel.toString());
                 csvOutput.writeln(tableForDomainLevel.toString());
             }
-            output.close();
-            csvOutput.close();
-
-            // -------------------------------------------------
-            // 3. train + save the model to file
-            // -------------------------------------------------
-            AbstractClassifier cls =
-                    MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacBoundedSolPreprocess_"+classifierType+"_"+trainFormat+".arff");
-            String outputModel = outFile+ File.separator + "MLPacBoundedSolPreprocess_e"+epsilon+"_c_"+classifierType+"_tl_"+trainFormat+".model";
-            ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
-            oos.writeObject(cls);
-            oos.flush();
-
 
 
 
         } catch (Exception e) {
             logger.error(e);
-        } finally {
-            if (output != null) {
-                output.close();
-                csvOutput.close();
-            }
         }
 
+    }
+
+    private static void trainClassifier(PacClassifierType classifierType, OutputResult output, String outFile, String trainFormat) throws IOException {
+        // -------------------------------------------------
+        // 3. train + save the model to file
+        // -------------------------------------------------
+        AbstractClassifier cls =
+                MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,outFile+ File.separator + "MLPacBoundedSolPreprocess_"+classifierType+"_"+trainFormat+".arff");
+        String outputModel = outFile+ File.separator + "MLPacBoundedSolPreprocess_c_"+classifierType+"_tl_"+trainFormat+".model";
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
+        oos.writeObject(cls);
+        oos.flush();
     }
 
     private static String extractTableOfFeatures(Class domainClass, int trainLevel, double epsilon){
@@ -330,13 +372,13 @@ public class MLPacBoundedSolPredictor {
         return output;
     }
 
-    private static OutputResult initOutputRawResultTable(Class domainClass, int testLevel, int trainLevelLow, int trainLevelHigh, double epsilon,PacClassifierType classifierType) {
+    private static OutputResult initOutputRawResultTable(Class domainClass, int trainLevelLow, int trainLevelHigh, int domainLevel,PacClassifierType classifierType) {
 
         OutputResult output = null;
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
         String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
         try {
-            output = new OutputResult(outFile, "MLPacBoundedSolPreprocessRawPredictions_e"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat, true,".arff");
+            output = new OutputResult(outFile, "MLPacBoundedSolPreprocessRawPredictions_c_" + classifierType+"_train_"+trainFormat+"_test_" +domainLevel, true,".arff");
         } catch (IOException e1) {
             logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
         }

@@ -1,10 +1,7 @@
 package org.cs4j.core.algorithms.pac;
 
 import org.apache.log4j.Logger;
-import org.cs4j.core.AnytimeSearchAlgorithm;
-import org.cs4j.core.SearchAlgorithm;
-import org.cs4j.core.SearchDomain;
-import org.cs4j.core.SearchResult;
+import org.cs4j.core.*;
 import org.cs4j.core.algorithms.pac.conditions.MLPacConditionForBoundSolPred;
 
 import java.lang.reflect.Constructor;
@@ -79,6 +76,18 @@ public class PACSearchFramework implements SearchAlgorithm {
     public void setDomainLevel(double domainLevel){
         if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
             ((MLPacConditionForBoundSolPred)this.pacCondition).setDomainLevel(domainLevel);
+        }
+    }
+
+    public void setOutputResult(OutputResult output){
+        if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
+            ((MLPacConditionForBoundSolPred)this.pacCondition).setOutputResult(output);
+        }
+    }
+
+    public void setCurrentOptimalCost(double currentOptimalCost){
+        if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
+            ((MLPacConditionForBoundSolPred)this.pacCondition).setCurrentOptimalCost(currentOptimalCost);
         }
     }
 
