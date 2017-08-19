@@ -75,6 +75,30 @@ public interface PacConfig extends Config {
     @ConverterClass(PacConditionConverter.class)
     Class[] onlinePacConditions();
 
+    //-----------------------------------------
+    // ML PAC for hard domains
+    //-----------------------------------------
+    String PREDICTION = ".prediction";
+
+    @Key(PAC + PREDICTION +".numInstances")
+    @DefaultValue("100")
+    int PredictionNumInstances();
+
+    @Key(PAC + PREDICTION +".inputEpsilons")
+    @Separator(",")
+    @DefaultValue("0.0,0.05,0.1,0.2,0.3")
+    double[] inputPredictionEpsilons();
+
+    @Key(PAC + PREDICTION +".inputDeltas")
+    @Separator(",")
+    @DefaultValue("0.0,0.1,0.2,0.3,0.8")
+    double[] inputPredictionDeltas();
+
+    @Key(PAC + PREDICTION +".domainsAndExpValues")
+    @DefaultValue("GridPathFinding:70:85:5,Pancakes:15:17:1,VacuumRobot:4:6:1,DockyardRobot:4:6:1")
+    @ConverterClass(ExperimentConverter.class)
+    MLPacPreprocessExperimentValues[] predictionDomainsAndExpValues();
+
 
 
 }

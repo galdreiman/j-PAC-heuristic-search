@@ -24,7 +24,7 @@ public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
     }
 
     public static void generate(int boxesCountLow, int boxesCountHigh, int boxesCountDelta) throws IOException {
-        int instancesCount = PacConfig.instance.pacPreprocessNumInstances();
+        int instancesCount = PacConfig.instance.PredictionNumInstances();
         int locationsCount = 4;
         int cranesCount = 4;
         int pilesCount = 4;

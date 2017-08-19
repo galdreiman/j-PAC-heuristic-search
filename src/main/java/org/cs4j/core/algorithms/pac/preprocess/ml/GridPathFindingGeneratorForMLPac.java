@@ -45,7 +45,7 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
         for (int i = 0; i < outputPaths.length; ++i) {
             localArgs[0] = outputPaths[i];
             localArgs[1] = mapFiles[i];
-            localArgs[2] = PacConfig.instance.pacPreprocessNumInstances() +"";
+            localArgs[2] = PacConfig.instance.PredictionNumInstances() +"";
 
 
             // Read the map file

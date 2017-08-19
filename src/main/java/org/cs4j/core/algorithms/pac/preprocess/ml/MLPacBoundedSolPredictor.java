@@ -10,13 +10,13 @@ import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.pac.conf.MLPacPreprocessExperimentValues;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
 import weka.core.Instances;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,28 +32,29 @@ public class MLPacBoundedSolPredictor {
     public static void main(String[] args) {
 
 
-        Class[] domains =  PacConfig.instance.pacDomains();
-        PacClassifierType[] clsTypes = {PacClassifierType.NN};
-        double[] epsilons = PacConfig.instance.inputPreprocessEpsilons();
+        MLPacPreprocessExperimentValues[] experimentValuesList = PacConfig.instance.predictionDomainsAndExpValues();
 
+        for(MLPacPreprocessExperimentValues experimentValues : experimentValuesList) {
 
-        for(Class domainClass : domains) {
+            PacClassifierType[] clsTypes = {PacClassifierType.NN};
+            double[] epsilons = PacConfig.instance.inputPredictionEpsilons();
+            Class domainClass = experimentValues.getDomainClass();
+
 
             //generate instances:
-            List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
-            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(domainParams);
+            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
 
+            // feature extraction + training:
             for (double epsilon : epsilons) {
-                int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
+                int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
                 for (PacClassifierType type : clsTypes) {
                     train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
                 }
             }
-        }
 
-        for(Class domainClass : domains) {
-            List<Integer> domainParams = MLPacHStarPredictor.domainToLevelParams.get(domainClass);
-            int trainLevelLow = domainParams.get(0), trainLevelHigh = domainParams.get(1), trainLevelDelta = domainParams.get(2);
+
+            // prediction:
+            int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
             int testLevel = trainLevelHigh + trainLevelDelta;
             OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
 
@@ -67,7 +68,6 @@ public class MLPacBoundedSolPredictor {
                 output.close();
             }
         }
-
         logger.info("Done!");
 
     }
@@ -77,7 +77,7 @@ public class MLPacBoundedSolPredictor {
         AbstractClassifier classifier = null;
         Instances dataset = null;
 
-        double[] deltas = PacConfig.instance.inputOnlineDeltas();
+        double[] deltas = PacConfig.instance.inputPredictionDeltas();
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
 
         String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
@@ -112,7 +112,8 @@ public class MLPacBoundedSolPredictor {
             WAStar optimalSolver = new WAStar();
             optimalSolver.setAdditionalParameter("weight","1.0");
 
-            for(double delta : deltas) {
+            for(int d = 0; d < deltas.length; ++d) {
+                double delta = deltas[d];
                 PACSearchFramework psf = new PACSearchFramework();
                 psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
                 psf.setPACConditionClass(MLPacConditionForBoundSolPredNN.class);
@@ -126,15 +127,20 @@ public class MLPacBoundedSolPredictor {
                     logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
                     domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 
-                    SearchResult searchResult = optimalSolver.search(domain);
+                    SearchResult searchResult = null;
+                    try {
+                        searchResult = optimalSolver.search(domain);
+                    } catch(Exception e){
+                        logger.error("Failed to solve "+ domainClass.getSimpleName()+" instance #"+ i +" optimally. got: " +e);
+                        continue;
+                    }
+                    if(!searchResult.hasSolution()){
+                        continue;
+                    }
                     double optimalCost = searchResult.getBestSolution().getCost();
 
                     SearchResult result = psf.search(domain);
-
                     SearchResult.Solution bestSolution = result.getBestSolution();
-                    bestSolution.getCost();
-                    bestSolution.getStates();
-
 
                     String instanceID = i + ",";
                     String found = result.hasSolution() ? "1," : "0,";

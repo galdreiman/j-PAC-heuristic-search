@@ -39,7 +39,7 @@ public class PancakesGeneratorForMLPac extends PancakesGenerator{
             // Output directory
             String outDir = "input"+ File.separator+"pancakes"+File.separator+"generated-for-pac-stats-" + pancakesNum + "-dirts";
             // Count of pancakes (number of instances)
-            int instancesCount = PacConfig.instance.numInstances();
+            int instancesCount = PacConfig.instance.PredictionNumInstances();
             // Size of problem
             size = pancakesNum;
 

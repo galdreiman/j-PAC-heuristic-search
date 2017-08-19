@@ -21,7 +21,7 @@ public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
     }
 
     public static void generateVacuum(int dirtyCountLow,int dirtyCountyHigh,int dirtyCountDelta) throws IOException {
-        int instancesCount = PacConfig.instance.pacPreprocessNumInstances();
+        int instancesCount = PacConfig.instance.PredictionNumInstances();
         int mapWidth = 200;
         int mapHeight = 200;
         double obstaclesPercentage = 0.9;
