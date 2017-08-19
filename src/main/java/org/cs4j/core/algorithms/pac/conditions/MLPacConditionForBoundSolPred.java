@@ -26,6 +26,8 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
     protected static double domainLevel;
 
 
+
+
     @Override
     public void setup(SearchDomain domain, double epsilon, double delta) {
         super.setup(domain, epsilon, delta);
@@ -65,6 +67,9 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
     public void setTrainLevel(String trainFormat){
         this.trainFormat = trainFormat;
     }
+    public void setDomainLevel(double domainLevel){
+        this.domainLevel = domainLevel;
+    }
 
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
@@ -94,18 +99,34 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
 
         double U = features.get(MLPacFeatureExtractor.PacFeature.COST);
         ins.setValue(new Attribute("cost",indx++),U);
+
         double g1 = features.get(MLPacFeatureExtractor.PacFeature.G_0);
         ins.setValue(new Attribute("g1",indx++),g1);
+
         double h1 = features.get(MLPacFeatureExtractor.PacFeature.H_0);
         ins.setValue(new Attribute("h1",indx++),h1);
+
+        double h1ToLevel = h1/this.domainLevel;
+        ins.setValue(new Attribute("h1ToLevel",indx++),h1ToLevel);
+
         double g2 = features.get(MLPacFeatureExtractor.PacFeature.G_2);
         ins.setValue(new Attribute("g2",indx++),g2);
+
         double h2 = features.get(MLPacFeatureExtractor.PacFeature.H_2);
         ins.setValue(new Attribute("h2",indx++),h2);
+
+        double h2ToLevel = h2/this.domainLevel;
+        ins.setValue(new Attribute("h2ToLevel",indx++),h2ToLevel);
+
         double g3 = features.get(MLPacFeatureExtractor.PacFeature.G_2);
         ins.setValue(new Attribute("g3",indx++),g3);
+
         double h3 = features.get(MLPacFeatureExtractor.PacFeature.H_2);
         ins.setValue(new Attribute("h3",indx++),h3);
+
+        double h3ToLevel = h3/this.domainLevel;
+        ins.setValue(new Attribute("h3ToLevel",indx++),h3ToLevel);
+
         double w = 1.0 + (Double) incumbentSolution.getExtras().get("epsilon");
         ins.setValue(new Attribute("w",indx++),w);
 

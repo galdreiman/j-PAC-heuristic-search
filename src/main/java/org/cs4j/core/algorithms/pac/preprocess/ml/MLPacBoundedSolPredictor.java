@@ -58,15 +58,15 @@ public class MLPacBoundedSolPredictor {
             int testLevel = trainLevelHigh + trainLevelDelta;
             OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
 
-            for (double epsilon : epsilons) {
-                for (PacClassifierType type : clsTypes) {
-                    predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
+                for (double epsilon : epsilons) {
+                    for (PacClassifierType type : clsTypes) {
+                        predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output);
+                    }
                 }
-            }
 
-            if (output != null) {
-                output.close();
-            }
+                if (output != null) {
+                    output.close();
+                }
         }
         logger.info("Done!");
 
@@ -76,6 +76,8 @@ public class MLPacBoundedSolPredictor {
 
         AbstractClassifier classifier = null;
         Instances dataset = null;
+
+        OutputResult outputRawPredictions = initOutputRawResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh, epsilon, classifierType);
 
         double[] deltas = PacConfig.instance.inputPredictionDeltas();
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
@@ -112,13 +114,13 @@ public class MLPacBoundedSolPredictor {
             WAStar optimalSolver = new WAStar();
             optimalSolver.setAdditionalParameter("weight","1.0");
 
-            for(int d = 0; d < deltas.length; ++d) {
-                double delta = deltas[d];
+            for(double delta : deltas) {
                 PACSearchFramework psf = new PACSearchFramework();
                 psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
                 psf.setPACConditionClass(MLPacConditionForBoundSolPredNN.class);
                 psf.setAdditionalParameter("anytimeSearch", AnytimePTS4PAC.class.getName());
-                psf.setDomainLevel(trainLevelLow + "-" + trainLevelHigh);
+                psf.setTrainLevel(trainLevelLow + "-" + trainLevelHigh);
+                psf.setDomainLevel(testLevel);
                 psf.setAdditionalParameter("epsilon", epsilon + "");
                 psf.setAdditionalParameter("delta", delta + "");
 
@@ -169,6 +171,7 @@ public class MLPacBoundedSolPredictor {
         } catch (Exception e) {
         }
 
+        outputRawPredictions.close();
 
     }
 
@@ -319,6 +322,26 @@ public class MLPacBoundedSolPredictor {
 
         //instanceID+found+depth+cost+iterations+generated+expanded+cpuTime+wallTime+delta+Epsilon+TrainLevelLow+TrainLevelHigh+TestLevel+pacCondition+Domain+OPT+isEpsilon
         String tableHeader = "InstanceID,Found,Depth,Cost,Iterations,generated,Expanded,Cpu-Time,Wall-Time,delta,epsilon,TrainLevelLow,TrainLevelHigh,TestLevel,pacCondition,Domain,OPT,is_epsilon";
+        try {
+            output.writeln(tableHeader);
+        } catch (IOException e1) {
+            logger.error("Failed to write header to output ML preprocess table: " + tableHeader, e1);
+        }
+        return output;
+    }
+
+    private static OutputResult initOutputRawResultTable(Class domainClass, int testLevel, int trainLevelLow, int trainLevelHigh, double epsilon,PacClassifierType classifierType) {
+
+        OutputResult output = null;
+        String trainFormat = trainLevelLow + "-" + trainLevelHigh;
+        String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+        try {
+            output = new OutputResult(outFile, "MLPacBoundedSolPreprocessRawPredictions_e"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat, true,".arff");
+        } catch (IOException e1) {
+            logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
+        }
+
+        String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderBoundSolPred();
         try {
             output.writeln(tableHeader);
         } catch (IOException e1) {

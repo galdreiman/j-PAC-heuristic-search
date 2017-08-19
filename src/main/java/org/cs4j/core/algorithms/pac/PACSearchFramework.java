@@ -70,9 +70,15 @@ public class PACSearchFramework implements SearchAlgorithm {
         }
     }
 
-    public void setDomainLevel(String domainLevel){
+    public void setTrainLevel(String trainLevel){
         if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
-            ((MLPacConditionForBoundSolPred)this.pacCondition).setTrainLevel(domainLevel);
+            ((MLPacConditionForBoundSolPred)this.pacCondition).setTrainLevel(trainLevel);
+        }
+    }
+
+    public void setDomainLevel(double domainLevel){
+        if(this.pacCondition instanceof MLPacConditionForBoundSolPred){
+            ((MLPacConditionForBoundSolPred)this.pacCondition).setDomainLevel(domainLevel);
         }
     }
 
