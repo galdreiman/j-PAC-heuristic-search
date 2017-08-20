@@ -51,16 +51,16 @@ public class MLPacBoundedSolPredictor {
 
 
             //generate instances:
-            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
+//            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
 
             // feature extraction + training:
 
             int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
-            for (PacClassifierType type : clsTypes) {
-                for (double epsilon : epsilons) {
-                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
-                }
-            }
+//            for (PacClassifierType type : clsTypes) {
+//                for (double epsilon : epsilons) {
+//                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
+//                }
+//            }
 
 
             // prediction:
@@ -75,6 +75,7 @@ public class MLPacBoundedSolPredictor {
                     outputRawPredictions.close();
                     try {
                         evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, type,evaluationOutput);
+                        evaluationOutput.writeln("");
                     }catch (Exception e){
                         logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel, e);
                     }
@@ -121,7 +122,7 @@ public class MLPacBoundedSolPredictor {
         System.out.println(eval.toSummaryString("\nResults\n======\n", false));
 
         ThresholdCurve tc = new ThresholdCurve();
-        Instances curve = tc.getCurve(eval.predictions(), classIndex);
+        Instances curve = tc.getCurve(eval.predictions(), 0);
 
         for(int i = 0; i < curve.numInstances(); ++i){
 
