@@ -74,7 +74,7 @@ public class MLPacBoundedSolPredictor {
                     predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output,outputRawPredictions);
                     outputRawPredictions.close();
                     try {
-                        evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, type,evaluationOutput);
+                        evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh,trainLevelDelta, testLevel, type,evaluationOutput);
                         evaluationOutput.writeln("");
                     }catch (Exception e){
                         logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel, e);
@@ -93,7 +93,7 @@ public class MLPacBoundedSolPredictor {
 
     }
 
-    public static void evaluatePrediction(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int testLevel, PacClassifierType type,OutputResult evaluationOutput) throws Exception{
+    public static void evaluatePrediction(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh,int trainLevelDelta, int testLevel, PacClassifierType type,OutputResult evaluationOutput) throws Exception{
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
         String inputTestDataDir = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
         String inputTestDataFile = "MLPacBoundedSolPreprocessRawPredictions_e_"+epsilon+"_c_" + type+"_train_"+trainFormat+"_test_" +testLevel +".arff";
@@ -134,6 +134,9 @@ public class MLPacBoundedSolPredictor {
             row.add(domainClass.getSimpleName());
             row.add(""+epsilon);
             row.add(""+ThresholdCurve.getROCArea(curve));
+            row.add(trainFormat);
+            row.add(trainLevelDelta+"");
+
 
             evaluationOutput.writeln(row.stream().collect(Collectors.joining(",")));
 
@@ -177,7 +180,7 @@ public class MLPacBoundedSolPredictor {
 
 
         String headerTable = fv.stream().map(att -> att.name()).collect(Collectors.joining(","));
-        headerTable += ",Delta,Epsilon,AUC";
+        headerTable += ",Delta,Epsilon,AUC,trainFormat,trainLevelDelta";
         try {
             output.writeln(headerTable);
         } catch (IOException e) {
