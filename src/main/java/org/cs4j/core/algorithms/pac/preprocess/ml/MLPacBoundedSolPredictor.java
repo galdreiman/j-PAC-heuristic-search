@@ -51,16 +51,16 @@ public class MLPacBoundedSolPredictor {
 
 
             //generate instances:
-//            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
+            MLPacHStarPredictor.domainToGenerator.get(domainClass).accept(experimentValues);
 
             // feature extraction + training:
 
             int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
-//            for (PacClassifierType type : clsTypes) {
-//                for (double epsilon : epsilons) {
-//                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
-//                }
-//            }
+            for (PacClassifierType type : clsTypes) {
+                for (double epsilon : epsilons) {
+                    train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
+                }
+            }
 
 
             // prediction:
