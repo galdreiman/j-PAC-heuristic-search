@@ -45,7 +45,7 @@ public class DomainExperimentData {
 				"",
 				""));
 		domainToExperimentDataAll.put(Pancakes.class,
-				new DomainExperimentData("."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-20",
+				new DomainExperimentData("."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-35",
 						"."+File.separator+"input"+File.separator+"pancakes"+File.separator+"generated-%d",
 						"."+File.separator+"preprocessResults"+File.separator+"pancakes"+File.separator,
 						"."+File.separator+"results"+File.separator+"pancakes"+File.separator,
