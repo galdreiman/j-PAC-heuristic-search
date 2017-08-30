@@ -16,6 +16,7 @@ import weka.classifiers.functions.*;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.filters.Filter;
+import weka.filters.supervised.instance.Resample;
 import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
@@ -183,6 +184,18 @@ public class MLPacPreprocess {
 					convert.setInputFormat(dataset);
 					dataset = Filter.useFilter(dataset, convert);
 
+					if(PacConfig.instance.pacPreProcessUseResampleFilter()){
+						final Resample filter = new Resample();
+						filter.setBiasToUniformClass(1.0);
+						try {
+							filter.setInputFormat(dataset);
+							filter.setNoReplacement(false);
+							filter.setSampleSizePercent(100);
+                            dataset = Filter.useFilter(dataset, filter);
+						} catch (Exception e) {
+							logger.error("Error when resampling input data!",e);
+						}
+					}
 					// save the new dataset to file and overwrite the previous one
 					if(datasetOtFile != null && !datasetOtFile.isEmpty()){
 						BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));

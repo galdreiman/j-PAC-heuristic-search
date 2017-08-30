@@ -51,6 +51,10 @@ public interface PacConfig extends Config {
     @ConverterClass(ClassConverter.class)
     Class[] pacPreProcessDomains();
 
+    @Key(PAC + PREPROCESS +".useResampleFilter")
+    @DefaultValue("true")
+    boolean pacPreProcessUseResampleFilter();
+
     //-----------------------------------------
     // PAC online search
     //-----------------------------------------

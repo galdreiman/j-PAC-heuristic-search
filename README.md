@@ -32,4 +32,4 @@ Run ML PAC experiment
 java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.generators.PancakesGenerator 30 30 
 
 
-java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.algorithms.pac.preprocess.StatisticsGenerator && echo "donse statistics for 50K" > done_static.log && java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess && echo "donse statistics for 50K" > done_PAC_preprocess.log && java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.experiments.MLPacExperiment
+java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.algorithms.pac.preprocess.StatisticsGenerator && echo "donse statistics for 50K" > done_static.log && java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess && echo "donse statistics for 50K" > done_PAC_preprocess.log && java -cp build/libs/pac-search-1.0-all.jar org.cs4j.core.experiments.MLPacExperiment | tee run.log
