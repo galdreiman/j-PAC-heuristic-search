@@ -1,6 +1,7 @@
 package org.cs4j.core.generators;
 
 import org.cs4j.core.domains.Utils;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -186,7 +187,7 @@ public class DockyardRobotGenerator extends GeneralInstancesGenerator {
             args = new String[7];
             args[0] = "input"+File.separator+"dockyardrobot"+File.separator+"generated";
             // Count of Problems
-            args[1] = 10000 + "";
+            args[1] = PacConfig.instance.pacPreprocessNumInstances() + "";
             // Count of Locations
             args[2] = 4 + "";
             // Count of Cranes
