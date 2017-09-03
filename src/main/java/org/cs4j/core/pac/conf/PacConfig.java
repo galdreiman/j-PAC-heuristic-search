@@ -55,6 +55,10 @@ public interface PacConfig extends Config {
     @DefaultValue("true")
     boolean pacPreProcessUseResampleFilter();
 
+    @Key(PAC + PREPROCESS +".biasToUniformClass")
+    @DefaultValue("0.7")
+    double pacPreProcessBiasToUniformClass();
+
     //-----------------------------------------
     // PAC online search
     //-----------------------------------------

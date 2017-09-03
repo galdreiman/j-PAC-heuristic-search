@@ -12,12 +12,13 @@ import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
 import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
-import weka.classifiers.functions.*;
+import weka.classifiers.functions.MultilayerPerceptron;
+import weka.classifiers.functions.SMOreg;
+import weka.classifiers.functions.SimpleLinearRegression;
 import weka.classifiers.trees.J48;
 import weka.core.Instances;
 import weka.filters.Filter;
 import weka.filters.supervised.instance.Resample;
-import weka.filters.unsupervised.attribute.NumericToNominal;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
@@ -126,7 +127,8 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
                     for(PacClassifierType clsType: clsTypes) {
 
-                        AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType);
+                        AbstractClassifier cls = setupAndGetClassifier(inputDataPath,clsType, true, DomainExperimentData.get(domainClass,
+                                RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e" + epsilon + "_"+clsType+".arff");
                         ObjectOutputStream oos = new ObjectOutputStream(
                                     new FileOutputStream(DomainExperimentData.get(domainClass,
                                             RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e" + epsilon + "_"+clsType+".model"));
@@ -180,24 +182,31 @@ public class MLPacPreprocess {
 			try {
 				Instances dataset = getInputInstance(inputDataPath);
 				if(enableDataPreperation){
-					NumericToNominal convert= new NumericToNominal();
-					convert.setInputFormat(dataset);
-					dataset = Filter.useFilter(dataset, convert);
 
 					if(PacConfig.instance.pacPreProcessUseResampleFilter()){
-						final Resample filter = new Resample();
-						filter.setBiasToUniformClass(1.0);
+                        Instances tempTraining = new Instances(dataset);
+                        tempTraining.setClassIndex(tempTraining.numAttributes()-1);
+						final Resample resample = new Resample();
 						try {
-							filter.setInputFormat(dataset);
-							filter.setNoReplacement(false);
-							filter.setSampleSizePercent(100);
-                            dataset = Filter.useFilter(dataset, filter);
+						    double biasToUniformClass = PacConfig.instance.pacPreProcessBiasToUniformClass();
+                            resample.setBiasToUniformClass(biasToUniformClass);
+                            resample.setInvertSelection(false);
+                            resample.setNoReplacement(false);
+
+                            resample.setRandomSeed(1);
+                            resample.setSampleSizePercent(100.0);
+                            resample.setInputFormat(tempTraining);
+
+
+                            dataset = Filter.useFilter(tempTraining, resample);
+//                            saveDatasetToFile(datasetOtFile, filteredDataset);
 						} catch (Exception e) {
 							logger.error("Error when resampling input data!",e);
 						}
 					}
 					// save the new dataset to file and overwrite the previous one
 					if(datasetOtFile != null && !datasetOtFile.isEmpty()){
+					    logger.info("writing filtered balances data set to file: " + datasetOtFile);
 						BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
 						writer.write(dataset.toString());
 						writer.flush();
@@ -216,6 +225,16 @@ public class MLPacPreprocess {
 		return classifier;
 	}
 
+	public static void saveDatasetToFile(String filename, Instances dataset){
+        try {
+            BufferedWriter writer = new BufferedWriter(new FileWriter(filename));
+            writer.write(dataset.toString());
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            logger.error("ERROR: Failed to write dataset for classifier: " + filename,e);
+        }
+    }
 
 	public static Instances getInputInstance(String inputDataPath) {
 		logger.debug("getInputInstance | input file: " + inputDataPath);
