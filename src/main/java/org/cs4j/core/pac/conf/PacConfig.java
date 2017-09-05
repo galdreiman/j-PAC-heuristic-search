@@ -103,7 +103,7 @@ public interface PacConfig extends Config {
     double[] inputPredictionDeltas();
 
     @Key(PAC + PREDICTION +".domainsAndExpValues")
-    @DefaultValue("GridPathFinding:70:85:5,Pancakes:15:17:1,VacuumRobot:4:6:1,DockyardRobot:4:6:1")
+    @DefaultValue("GridPathFinding:80:84:2:85,Pancakes:15:17:1:18,VacuumRobot:4:6:1:7,DockyardRobot:4:6:1:7")
     @ConverterClass(ExperimentConverter.class)
     MLPacPreprocessExperimentValues[] predictionDomainsAndExpValues();
 

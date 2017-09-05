@@ -59,8 +59,8 @@ public class DomainExperimentData {
 				"."+ File.separator+"preprocessResults"+File.separator+"gridpathfinding"+File.separator,
 				"."+File.separator+"results"+File.separator+"gridpathfinding"+File.separator,
 				1, NUM_OF_INSTANCES,
-						"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map" +File.separator + "grid-obs-presentage-%s",
-						"."+ File.separator+"preprocessResults"+File.separator+"gridpathfinding"+File.separator + "grid-obs-presentage-%s"
+						"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map" +File.separator + "grid-distance-presentage-%s",
+						"."+ File.separator+"preprocessResults"+File.separator+"gridpathfinding"+File.separator + "grid-distance-presentage-%s"
 				));
 		domainToExperimentDataAll.put(VacuumRobot.class,
 				new DomainExperimentData(

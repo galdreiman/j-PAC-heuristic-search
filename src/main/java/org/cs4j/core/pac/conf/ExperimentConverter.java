@@ -2,6 +2,7 @@ package org.cs4j.core.pac.conf;
 
 import org.aeonbits.owner.Converter;
 import org.cs4j.core.domains.*;
+import sun.security.jca.GetInstance;
 
 import java.lang.reflect.Method;
 
@@ -16,7 +17,7 @@ public class ExperimentConverter implements Converter<MLPacPreprocessExperimentV
 
         String[] parts = input.split(":");
 
-        if(parts.length != 4){
+        if(parts.length != 5){
             throw new MLPacPreprocessExperimentValuesException("Not enough parts in experiment values. Got: "+ input);
         }
 
@@ -24,8 +25,9 @@ public class ExperimentConverter implements Converter<MLPacPreprocessExperimentV
         int trainLevelLow = Integer.parseInt(parts[1]);
         int trainLevelHigh = Integer.parseInt(parts[2]);
         int trainLevelDelta = Integer.parseInt(parts[3]);
+        int testLevel = Integer.parseInt(parts[4]);
 
-        return new MLPacPreprocessExperimentValues(domainClass,trainLevelLow,trainLevelHigh,trainLevelDelta);
+        return new MLPacPreprocessExperimentValues(domainClass,trainLevelLow,trainLevelHigh,trainLevelDelta,testLevel);
     }
 
     private Class getDomainClass(String className) {

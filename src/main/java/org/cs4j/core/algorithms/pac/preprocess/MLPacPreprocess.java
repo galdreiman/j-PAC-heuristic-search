@@ -181,37 +181,37 @@ public class MLPacPreprocess {
 
 			try {
 				Instances dataset = getInputInstance(inputDataPath);
-				if(enableDataPreperation){
-
-					if(PacConfig.instance.pacPreProcessUseResampleFilter()){
-                        Instances tempTraining = new Instances(dataset);
-                        tempTraining.setClassIndex(tempTraining.numAttributes()-1);
-						final Resample resample = new Resample();
-						try {
-						    double biasToUniformClass = PacConfig.instance.pacPreProcessBiasToUniformClass();
-                            resample.setBiasToUniformClass(biasToUniformClass);
-                            resample.setInvertSelection(false);
-                            resample.setNoReplacement(false);
-
-                            resample.setRandomSeed(1);
-                            resample.setSampleSizePercent(100.0);
-                            resample.setInputFormat(tempTraining);
 
 
-                            dataset = Filter.useFilter(tempTraining, resample);
+                if(PacConfig.instance.pacPreProcessUseResampleFilter()){
+                    Instances tempTraining = new Instances(dataset);
+                    tempTraining.setClassIndex(tempTraining.numAttributes()-1);
+                    final Resample resample = new Resample();
+                    try {
+                        double biasToUniformClass = PacConfig.instance.pacPreProcessBiasToUniformClass();
+                        resample.setBiasToUniformClass(biasToUniformClass);
+                        resample.setInvertSelection(false);
+                        resample.setNoReplacement(false);
+
+                        resample.setRandomSeed(1);
+                        resample.setSampleSizePercent(100.0);
+                        resample.setInputFormat(tempTraining);
+
+
+                        dataset = Filter.useFilter(tempTraining, resample);
 //                            saveDatasetToFile(datasetOtFile, filteredDataset);
-						} catch (Exception e) {
-							logger.error("Error when resampling input data!",e);
-						}
-					}
-					// save the new dataset to file and overwrite the previous one
-					if(datasetOtFile != null && !datasetOtFile.isEmpty()){
-					    logger.info("writing filtered balances data set to file: " + datasetOtFile);
-						BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
-						writer.write(dataset.toString());
-						writer.flush();
-						writer.close();
-					}
+                    } catch (Exception e) {
+                        logger.error("Error when resampling input data!",e);
+                    }
+
+                // save the new dataset to file and overwrite the previous one
+                if(datasetOtFile != null && !datasetOtFile.isEmpty()){
+                    logger.info("writing filtered balances data set to file: " + datasetOtFile);
+                    BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
+                    writer.write(dataset.toString());
+                    writer.flush();
+                    writer.close();
+                }
 
 
 				}
