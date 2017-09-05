@@ -19,11 +19,11 @@ public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
 
 
     public static void main(String[] args) throws IOException{
-        int boxesCountLow = 4, boxesCountHigh = 7, boxesCountDelta =1;
-        generate(boxesCountLow,boxesCountHigh,boxesCountDelta);
+        int boxesCountLow = 4, boxesCountHigh = 7, boxesCountDelta =1, boxesCountTest = 8;
+        generate(boxesCountLow,boxesCountHigh,boxesCountDelta,boxesCountTest);
     }
 
-    public static void generate(int boxesCountLow, int boxesCountHigh, int boxesCountDelta) throws IOException {
+    public static void generate(int boxesCountLow, int boxesCountHigh, int boxesCountDelta, int boxesCountTest) throws IOException {
         int instancesCount = PacConfig.instance.PredictionNumInstances();
         int locationsCount = 4;
         int cranesCount = 4;
@@ -41,39 +41,45 @@ public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
 
 
         for(boxesCount = boxesCountLow; boxesCount <= boxesCountHigh; boxesCount += boxesCountDelta) {
-            String outputDirectoryPath = "input" + File.separator + "dockyardrobot" + File.separator + "generated-" + boxesCount + "-boxes";
-
-            File outputDirectory = new File(outputDirectoryPath);
-            if (!outputDirectory.isDirectory()) {
-                outputDirectory.mkdir();
-            }
-
-            //verify if actually needs to generate:
-            if(needToGenerateInstances(outputDirectoryPath,outputDirectory, instancesCount )){
-                logger.info("No need to generate new instances. There is enough for the experiment.");
-                return;
-            }
-
-            // This set is used in order to avoid duplicates
-            Set<String> instances = new HashSet<>();
-            // Now, create the problems
-            DockyardRobotGenerator generator = new DockyardRobotGenerator();
-            // Loop over the required number of instances
-            for (int i = 0; i < instancesCount; ++i) {
-                int problemNumber = i + 1;
-                System.out.println("[INFO] Generating instance # " + problemNumber + " ...");
-                FileWriter fw = new FileWriter(new File(outputDirectory, problemNumber + ".in"));
-                String instance = null;
-                while (instance == null || instances.contains(instance)) {
-                    instance = generator.generateInstance(locationsCount, cranesCount, boxesCount, pilesCount, robotsCount);
-                }
-                instances.add(instance);
-                fw.write(instance);
-                fw.close();
-                System.out.println(" Done.");
-            }
-            assert instances.size() == instancesCount;
+            _generate(instancesCount, locationsCount, cranesCount, pilesCount, robotsCount, boxesCount);
         }
+        _generate(instancesCount, locationsCount, cranesCount, pilesCount, robotsCount, boxesCountTest);
+    }
+
+    protected static boolean _generate(int instancesCount, int locationsCount, int cranesCount, int pilesCount, int robotsCount, int boxesCount) throws IOException {
+        String outputDirectoryPath = "input" + File.separator + "dockyardrobot" + File.separator + "generated-" + boxesCount + "-boxes";
+
+        File outputDirectory = new File(outputDirectoryPath);
+        if (!outputDirectory.isDirectory()) {
+            outputDirectory.mkdir();
+        }
+
+        //verify if actually needs to generate:
+        if(needToGenerateInstances(outputDirectoryPath,outputDirectory, instancesCount )){
+            logger.info("No need to generate new instances. There is enough for the experiment.");
+            return true;
+        }
+
+        // This set is used in order to avoid duplicates
+        Set<String> instances = new HashSet<>();
+        // Now, create the problems
+        DockyardRobotGenerator generator = new DockyardRobotGenerator();
+        // Loop over the required number of instances
+        for (int i = 0; i < instancesCount; ++i) {
+            int problemNumber = i + 1;
+            System.out.println("[INFO] Generating instance # " + problemNumber + " ...");
+            FileWriter fw = new FileWriter(new File(outputDirectory, problemNumber + ".in"));
+            String instance = null;
+            while (instance == null || instances.contains(instance)) {
+                instance = generator.generateInstance(locationsCount, cranesCount, boxesCount, pilesCount, robotsCount);
+            }
+            instances.add(instance);
+            fw.write(instance);
+            fw.close();
+            System.out.println(" Done.");
+        }
+        assert instances.size() == instancesCount;
+        return false;
     }
 
 }

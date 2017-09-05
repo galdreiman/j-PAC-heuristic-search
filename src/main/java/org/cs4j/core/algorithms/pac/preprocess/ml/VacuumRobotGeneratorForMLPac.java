@@ -15,12 +15,12 @@ public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
     private final static Logger logger = Logger.getLogger(VacuumRobotGeneratorForMLPac.class);
 
     public static void main(String[] args)throws IOException {
-        int dirtyCountLow = 4, dirtyCountyHigh = 16, dirtyCountDelta = 4;
-        generateVacuum(dirtyCountLow, dirtyCountyHigh, dirtyCountDelta);
+        int dirtyCountLow = 4, dirtyCountyHigh = 16, dirtyCountDelta = 4, dirtyCountTest = 20;
+        generateVacuum(dirtyCountLow, dirtyCountyHigh, dirtyCountDelta,dirtyCountTest);
 
     }
 
-    public static void generateVacuum(int dirtyCountLow,int dirtyCountyHigh,int dirtyCountDelta) throws IOException {
+    public static void generateVacuum(int dirtyCountLow,int dirtyCountyHigh,int dirtyCountDelta, int dirtyCountTest) throws IOException {
         int instancesCount = PacConfig.instance.PredictionNumInstances();
         int mapWidth = 200;
         int mapHeight = 200;
@@ -30,28 +30,34 @@ public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
 //        int dirtyCountLow = 4, dirtyCountyHigh = 16, dirtyCountDelta = 4;
 
         for(dirtyCount = dirtyCountLow; dirtyCount <= dirtyCountyHigh; dirtyCount += dirtyCountDelta) {
-            String outFileDirStr = /*args[0] != null ? args[0] :*/ "input" + File.separator + "vacuumrobot" + File.separator + "generated-for-pac-stats-" + dirtyCount + "-dirt";
-            File outputDirectory = new File(outFileDirStr);
-            if (!outputDirectory.isDirectory()) {
-                outputDirectory.mkdir();
-
-            }
-
-            //verify if actually needs to generate:
-            if(needToGenerateInstances(outFileDirStr,outputDirectory, instancesCount )){
-                logger.info("No need to generate new instances. There is enough for the experiment.");
-                return;
-            }
-
-            VacuumRobotGenerator generator = new VacuumRobotGenerator();
-
-            for (int i = 0; i < instancesCount; ++i) {
-                System.out.println("[INFO] Generating instance # " + (i + 1) + " ...");
-                FileWriter fw = new FileWriter(new File(outputDirectory, (i + 1) + ".in"));
-                fw.write(generator.generateInstance(mapWidth, mapHeight, obstaclesPercentage, dirtyCount));
-                fw.close();
-                System.out.println(" Done.");
-            }
+            _generate(instancesCount, mapWidth, mapHeight, obstaclesPercentage, dirtyCount);
         }
+        _generate(instancesCount, mapWidth, mapHeight, obstaclesPercentage, dirtyCountTest);
+    }
+
+    protected static boolean _generate(int instancesCount, int mapWidth, int mapHeight, double obstaclesPercentage, int dirtyCount) throws IOException {
+        String outFileDirStr = /*args[0] != null ? args[0] :*/ "input" + File.separator + "vacuumrobot" + File.separator + "generated-for-pac-stats-" + dirtyCount + "-dirt";
+        File outputDirectory = new File(outFileDirStr);
+        if (!outputDirectory.isDirectory()) {
+            outputDirectory.mkdir();
+
+        }
+
+        //verify if actually needs to generate:
+        if(needToGenerateInstances(outFileDirStr,outputDirectory, instancesCount )){
+            logger.info("No need to generate new instances. There is enough for the experiment.");
+            return true;
+        }
+
+        VacuumRobotGenerator generator = new VacuumRobotGenerator();
+
+        for (int i = 0; i < instancesCount; ++i) {
+            System.out.println("[INFO] Generating instance # " + (i + 1) + " ...");
+            FileWriter fw = new FileWriter(new File(outputDirectory, (i + 1) + ".in"));
+            fw.write(generator.generateInstance(mapWidth, mapHeight, obstaclesPercentage, dirtyCount));
+            fw.close();
+            System.out.println(" Done.");
+        }
+        return false;
     }
 }

@@ -15,11 +15,11 @@ import java.util.Set;
 public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
 
     public static void main(String[] args) throws IOException{
-        double obstaclesPercentageLow = 0.75, obstaclesPercentageHigh = 0.80, obstaclesPercentageDelta = 0.05;
-        generateMLPacInstances(obstaclesPercentageLow,obstaclesPercentageHigh,obstaclesPercentageDelta);
+        double minDistPercentageLow = 75, minDistPercentageHigh =80, minDistPercentageDelta = 5, minDistPercentageTest = 85;
+        generateMLPacInstances(minDistPercentageLow,minDistPercentageHigh,minDistPercentageDelta,minDistPercentageTest);
     }
 
-    public static void generateMLPacInstances(double minDistPercentageLow, double minDistPercentageHigh, double minDistPercentageDelta) throws IOException {
+    public static void generateMLPacInstances(double minDistPercentageLow, double minDistPercentageHigh, double minDistPercentageDelta, double minDistPercentageTest) throws IOException {
         Random rand = new Random();
         String localArgs[] = new String[3];
 
@@ -55,47 +55,51 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
             }
 
             for(minDistPercentage = minDistPercentageLow; minDistPercentage <= minDistPercentageHigh; minDistPercentage += minDistPercentageDelta) {
-
-                // Read the output directory
-                String outputDir = "input" + File.separator + "gridpathfinding" + File.separator + "brc202d.map"+ File.separator + "grid-distance-presentage-" + minDistPercentage;
-                File outputDirectory = new File(outputDir);
-                if (!outputDirectory.isDirectory()) {
-                    outputDirectory.mkdir();
-                }
-
-                // Read required count of instances
-                // Required number of instances
-                int instancesCount = GridPathFindingGenerator.readIntNumber(localArgs[2], 1, -1, "# of instances");
-
-                GridPathFindingGenerator generator = new GridPathFindingGenerator();
-
-                // Read the map
-                GridMap map = generator.readMap(new BufferedReader(new InputStreamReader(new FileInputStream(mapFile))));
-
-                int obstaclesCount = map.countObstacles();
-                int requiredObstaclesCount = (int) Math.ceil((obstaclesCount * 0.9) / 100.0d);
-                generator.fitObstaclesRandomly(map, obstaclesCount, requiredObstaclesCount, rand);
-
-
-                // This set is used in order to avoid duplicates
-                Set<String> instances = new HashSet<>();
-
-                // Loop over the required number of instances
-                for (int j = 0; j < instancesCount; ++j) {
-                    int problemNumber = j + 1;
-                    System.out.println("[INFO] Generating instance # " + problemNumber + " ...");
-                    FileWriter fw = new FileWriter(new File(outputDirectory, problemNumber + ".in"));
-                    String instance = null;
-                    while (instance == null || instances.contains(instance)) {
-                        instance = generator.generateInstance(mapFile, map,(minDistPercentage/100));
-                    }
-                    instances.add(instance);
-                    fw.write(instance);
-                    fw.close();
-                    System.out.println(" Done.");
-                }
-                assert instances.size() == instancesCount;
+                _generate(rand, localArgs[2], minDistPercentage, mapFile);
             }
+            _generate(rand, localArgs[2], minDistPercentageTest, mapFile);
         }
+    }
+
+    protected static void _generate(Random rand, String localArg, double minDistPercentage, String mapFile) throws IOException {
+        // Read the output directory
+        String outputDir = "input" + File.separator + "gridpathfinding" + File.separator + "brc202d.map"+ File.separator + "grid-distance-presentage-" + ((int)minDistPercentage);
+        File outputDirectory = new File(outputDir);
+        if (!outputDirectory.isDirectory()) {
+            outputDirectory.mkdir();
+        }
+
+        // Read required count of instances
+        // Required number of instances
+        int instancesCount = GridPathFindingGenerator.readIntNumber(localArg, 1, -1, "# of instances");
+
+        GridPathFindingGenerator generator = new GridPathFindingGenerator();
+
+        // Read the map
+        GridMap map = generator.readMap(new BufferedReader(new InputStreamReader(new FileInputStream(mapFile))));
+
+        int obstaclesCount = map.countObstacles();
+        int requiredObstaclesCount = (int) Math.ceil((obstaclesCount * 0.9) / 100.0d);
+        generator.fitObstaclesRandomly(map, obstaclesCount, requiredObstaclesCount, rand);
+
+
+        // This set is used in order to avoid duplicates
+        Set<String> instances = new HashSet<>();
+
+        // Loop over the required number of instances
+        for (int j = 0; j < instancesCount; ++j) {
+            int problemNumber = j + 1;
+            System.out.println("[INFO] Generating instance # " + problemNumber + " ...");
+            FileWriter fw = new FileWriter(new File(outputDirectory, problemNumber + ".in"));
+            String instance = null;
+            while (instance == null || instances.contains(instance)) {
+                instance = generator.generateInstance(mapFile, map,(minDistPercentage/100));
+            }
+            instances.add(instance);
+            fw.write(instance);
+            fw.close();
+            System.out.println(" Done.");
+        }
+        assert instances.size() == instancesCount;
     }
 }

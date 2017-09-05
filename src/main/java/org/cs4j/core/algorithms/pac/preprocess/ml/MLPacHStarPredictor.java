@@ -39,28 +39,28 @@ public class MLPacHStarPredictor {
         domainToGenerator = new HashMap<>();
         domainToGenerator.put(DockyardRobot.class,(experimentValues) -> {
             try {
-                DockyardRobotGeneratorForMLPac.generate(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh()+experimentValues.getTrainLevelDelta(), experimentValues.getTrainLevelDelta());
+                DockyardRobotGeneratorForMLPac.generate(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh(), experimentValues.getTrainLevelDelta(),experimentValues.getTestLevel());
             } catch(Exception e){
                 logger.error(e);
             }
         });
         domainToGenerator.put(VacuumRobot.class,(experimentValues) -> {
             try {
-                VacuumRobotGeneratorForMLPac.generateVacuum(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh()+experimentValues.getTrainLevelDelta(), experimentValues.getTrainLevelDelta());
+                VacuumRobotGeneratorForMLPac.generateVacuum(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh(), experimentValues.getTrainLevelDelta(),experimentValues.getTestLevel());
             } catch(Exception e){
                 logger.error(e);
             }
         });
         domainToGenerator.put(Pancakes.class,(experimentValues) -> {
             try {
-                PancakesGeneratorForMLPac.generatePancakes(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh()+experimentValues.getTrainLevelDelta(), experimentValues.getTrainLevelDelta());
+                PancakesGeneratorForMLPac.generatePancakes(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh(), experimentValues.getTrainLevelDelta(),experimentValues.getTestLevel());
             } catch(Exception e){
                 logger.error(e);
             }
         });
         domainToGenerator.put(GridPathFinding.class,(experimentValues) -> {
             try {
-                GridPathFindingGeneratorForMLPac.generateMLPacInstances(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh()+experimentValues.getTrainLevelDelta(), experimentValues.getTrainLevelDelta());
+                GridPathFindingGeneratorForMLPac.generateMLPacInstances(experimentValues.getTrainLevelLow(), experimentValues.getTrainLevelHigh(), experimentValues.getTrainLevelDelta(),experimentValues.getTestLevel());
             } catch(Exception e){
                 logger.error(e);
             }

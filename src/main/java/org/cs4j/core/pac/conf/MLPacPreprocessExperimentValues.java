@@ -9,6 +9,7 @@ public class MLPacPreprocessExperimentValues {
     private int trainLevelLow;
     private int trainLevelHigh;
     private int trainLevelDelta;
+    private int testLevel;
 
     @Override
     public String toString() {
@@ -17,14 +18,16 @@ public class MLPacPreprocessExperimentValues {
                 ", trainLevelLow=" + trainLevelLow +
                 ", trainLevelHigh=" + trainLevelHigh +
                 ", trainLevelDelta=" + trainLevelDelta +
+                ", testLevel=" + testLevel +
                 '}';
     }
 
-    public MLPacPreprocessExperimentValues(Class domainClass, int trainLevelLow, int trainLevelHigh, int trainLevelDelta) {
+    public MLPacPreprocessExperimentValues(Class domainClass, int trainLevelLow, int trainLevelHigh, int trainLevelDelta, int testLevel) {
         this.domainClass = domainClass;
         this.trainLevelLow = trainLevelLow;
         this.trainLevelHigh = trainLevelHigh;
         this.trainLevelDelta = trainLevelDelta;
+        this.testLevel = testLevel;
     }
 
     public void setDomainClass(Class domainClass) {
@@ -43,6 +46,8 @@ public class MLPacPreprocessExperimentValues {
         this.trainLevelDelta = trainLevelDelta;
     }
 
+    public void setTestLevel(int testLevel) { this.testLevel = testLevel; }
+
     public Class getDomainClass() {
         return domainClass;
     }
@@ -58,4 +63,6 @@ public class MLPacPreprocessExperimentValues {
     public int getTrainLevelDelta() {
         return trainLevelDelta;
     }
+
+    public int getTestLevel() { return  this.testLevel;}
 }

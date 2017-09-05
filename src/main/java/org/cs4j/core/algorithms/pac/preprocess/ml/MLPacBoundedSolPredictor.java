@@ -56,6 +56,7 @@ public class MLPacBoundedSolPredictor {
             // feature extraction + training:
 
             int trainLevelLow = experimentValues.getTrainLevelLow(), trainLevelHigh = experimentValues.getTrainLevelHigh(), trainLevelDelta = experimentValues.getTrainLevelDelta();
+            int testLevel = experimentValues.getTestLevel();
             for (PacClassifierType type : clsTypes) {
                 for (double epsilon : epsilons) {
                     train(domainClass, epsilon, trainLevelLow, trainLevelHigh, trainLevelDelta, type);
@@ -64,7 +65,6 @@ public class MLPacBoundedSolPredictor {
 
 
             // prediction:
-            int testLevel = trainLevelHigh + trainLevelDelta;
             OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
             OutputResult evaluationOutput = getEvaluationOutputResult(domainClass,trainLevelLow + "-" + trainLevelHigh);
 
@@ -73,14 +73,16 @@ public class MLPacBoundedSolPredictor {
                     OutputResult outputRawPredictions = initOutputRawResultTable(domainClass,epsilon, trainLevelLow, trainLevelHigh, testLevel, type);
                     predict(domainClass, epsilon, trainLevelLow, trainLevelHigh, testLevel, type, output,outputRawPredictions);
                     outputRawPredictions.close();
-                    try {
-                        evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh,trainLevelDelta, testLevel, type,evaluationOutput);
-                        if(PacConfig.instance.PredictionApplyEvaluation()) {
+
+                    if(PacConfig.instance.PredictionApplyEvaluation()) {
+                        try {
+                            evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh,trainLevelDelta, testLevel, type,evaluationOutput);
                             evaluationOutput.writeln("");
+                        }catch (Exception e){
+                            logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel, e);
                         }
-                    }catch (Exception e){
-                        logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel, e);
                     }
+
                 }
             }
             if (output != null) {
