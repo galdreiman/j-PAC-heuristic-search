@@ -75,7 +75,9 @@ public class MLPacBoundedSolPredictor {
                     outputRawPredictions.close();
                     try {
                         evaluatePrediction(domainClass,epsilon, trainLevelLow, trainLevelHigh,trainLevelDelta, testLevel, type,evaluationOutput);
-                        evaluationOutput.writeln("");
+                        if(PacConfig.instance.PredictionApplyEvaluation()) {
+                            evaluationOutput.writeln("");
+                        }
                     }catch (Exception e){
                         logger.error("Failed to evaluate classifier for: epsilon"+ epsilon +", classifier type "+type +",  domain level " + testLevel, e);
                     }

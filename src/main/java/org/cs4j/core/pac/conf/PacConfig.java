@@ -107,6 +107,10 @@ public interface PacConfig extends Config {
     @ConverterClass(ExperimentConverter.class)
     MLPacPreprocessExperimentValues[] predictionDomainsAndExpValues();
 
+    @Key(PAC + PREDICTION +".applyEvaluation")
+    @DefaultValue("false")
+    boolean PredictionApplyEvaluation();
+
 
 
 }
