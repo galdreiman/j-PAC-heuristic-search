@@ -2,7 +2,6 @@ package org.cs4j.core.pac.conf;
 
 import org.aeonbits.owner.Converter;
 import org.cs4j.core.domains.*;
-import sun.security.jca.GetInstance;
 
 import java.lang.reflect.Method;
 
