@@ -306,7 +306,11 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         return toReturn;
     }
 
-    public String generateInstance(String path, GridMap map) {
+    public String generateInstance(String path, GridMap map){
+        return generateInstance(path, map, (2 / 3.0)); // default implementation for backward compatible
+    }
+
+    public String generateInstance(String path, GridMap map, double minDistancePrecentage) {
         int triesNumber = 0;
 
         StringBuilder sb = new StringBuilder();
@@ -315,7 +319,7 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         this._appendNewLine(sb);
 
         int minDistance = Math.min(
-                (int) ((2 / 3.0) * Math.max(map.mapWidth, map.mapHeight)),
+                (int) (minDistancePrecentage * Math.max(map.mapWidth, map.mapHeight)),
                 MIN_START_GOAL_MANHATTAN_DISTANCE);
         Set<PairInt> existing = new HashSet<>();
 

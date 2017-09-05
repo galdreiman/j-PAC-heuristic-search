@@ -15,16 +15,16 @@ import java.util.Set;
 public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
 
     public static void main(String[] args) throws IOException{
-        double obstaclesPercentageLow = 75, obstaclesPercentageHigh = 85, obstaclesPercentageDelta = 5;
+        double obstaclesPercentageLow = 0.75, obstaclesPercentageHigh = 0.80, obstaclesPercentageDelta = 0.05;
         generateMLPacInstances(obstaclesPercentageLow,obstaclesPercentageHigh,obstaclesPercentageDelta);
     }
 
-    public static void generateMLPacInstances(double obstaclesPercentageLow, double obstaclesPercentageHigh, double obstaclesPercentageDelta) throws IOException {
+    public static void generateMLPacInstances(double minDistPercentageLow, double minDistPercentageHigh, double minDistPercentageDelta) throws IOException {
         Random rand = new Random();
         String localArgs[] = new String[3];
 
 
-        double obstaclesPercentage;
+        double minDistPercentage;
 
 
 
@@ -54,10 +54,10 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
                 System.out.println("Map file " + mapFile + " doesn't exist");
             }
 
-            for(obstaclesPercentage = obstaclesPercentageLow; obstaclesPercentage <= obstaclesPercentageHigh; obstaclesPercentage += obstaclesPercentageDelta) {
+            for(minDistPercentage = minDistPercentageLow; minDistPercentage <= minDistPercentageHigh; minDistPercentage += minDistPercentageDelta) {
 
                 // Read the output directory
-                String outputDir = "input" + File.separator + "gridpathfinding" + File.separator + "brc202d.map"+ File.separator + "grid-obs-presentage-" + ((int)obstaclesPercentage);
+                String outputDir = "input" + File.separator + "gridpathfinding" + File.separator + "brc202d.map"+ File.separator + "grid-distance-presentage-" + minDistPercentage;
                 File outputDirectory = new File(outputDir);
                 if (!outputDirectory.isDirectory()) {
                     outputDirectory.mkdir();
@@ -73,7 +73,7 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
                 GridMap map = generator.readMap(new BufferedReader(new InputStreamReader(new FileInputStream(mapFile))));
 
                 int obstaclesCount = map.countObstacles();
-                int requiredObstaclesCount = (int) Math.ceil((obstaclesCount * obstaclesPercentage) / 100.0d);
+                int requiredObstaclesCount = (int) Math.ceil((obstaclesCount * 0.9) / 100.0d);
                 generator.fitObstaclesRandomly(map, obstaclesCount, requiredObstaclesCount, rand);
 
 
@@ -87,7 +87,7 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
                     FileWriter fw = new FileWriter(new File(outputDirectory, problemNumber + ".in"));
                     String instance = null;
                     while (instance == null || instances.contains(instance)) {
-                        instance = generator.generateInstance(mapFile, map);
+                        instance = generator.generateInstance(mapFile, map,(minDistPercentage/100));
                     }
                     instances.add(instance);
                     fw.write(instance);
