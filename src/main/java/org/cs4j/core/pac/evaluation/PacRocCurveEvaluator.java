@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Random;
 import java.util.stream.Collectors;
 
@@ -37,8 +38,8 @@ public class PacRocCurveEvaluator {
 
     public static void main(String[] args) throws Exception {
 
-        double[] epsilons = {0.0,0.05,0.1,0.2,0.3,0.4};
-        Class[] domains = {DockyardRobot.class}; //{VacuumRobot.class, Pancakes.class, GridPathFinding.class};
+        double[] epsilons = {0.0,0.05,0.1,0.2,0.3};
+        Class[] domains = {DockyardRobot.class,VacuumRobot.class, Pancakes.class, GridPathFinding.class};
 
         ArrayList<String> outputTable = new ArrayList<>();
 
@@ -59,7 +60,7 @@ public class PacRocCurveEvaluator {
 
 
         String headerTable = fv.stream().map(att -> att.name()).collect(Collectors.joining(","));
-        headerTable += ",Delta,Epsilon,AUC";
+        headerTable += ",Domain,Epsilon,AUC,ImbalanceRatio";
         outputTable.add(headerTable);
 
 
@@ -67,9 +68,16 @@ public class PacRocCurveEvaluator {
         for(Class domain : domains) {
             for (double epsilon : epsilons) {
                 // load data
-                String inputArffFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\5K_9-8-2017\\VacuumRobot\\MLPacPreprocess_e" + epsilon +".arff";
+                String inputArffFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\FinalResults\\Resampling\\1K-Instances\\preprocess\\"+domain.getSimpleName()+"\\MLPacPreprocess_e"+epsilon+"_J48.arff";
                 Instances data = ConverterUtils.DataSource.read(inputArffFile);
                 data.setClassIndex(data.numAttributes() - 1);
+                int trueCounter = 0;
+                for(Instance i : data){
+                    if(i.value(data.numAttributes() - 1) == 1.){
+                        trueCounter++;
+                    }
+                }
+                int totalInstancesCount = data.size();
 
                 // evaluate classifier
                 Classifier cl = new J48();
@@ -99,6 +107,8 @@ public class PacRocCurveEvaluator {
                     row.add(domain.getSimpleName());
                     row.add(""+epsilon);
                     row.add(""+ThresholdCurve.getROCArea(curve));
+                    double imbalancesRatio = ((double)trueCounter)/((double)totalInstancesCount);
+                    row.add(""+ imbalancesRatio);
 
                     outputTable.add(row.stream().collect(Collectors.joining(",")));
 
@@ -143,7 +153,7 @@ public class PacRocCurveEvaluator {
     }
 
     private static void saveInstancesToFile( ArrayList<String> outputTable) throws IOException {
-        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\ML-Trained-Data\\5K_9-8-2017\\VacuumRobot\\Out_MLPacPreprocess_Evaluation.csv";
+        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\FinalResults\\Resampling\\1K-Instances\\preprocess\\Out_MLPacPreprocess_Evaluation_All.csv";
 
         String table = outputTable.stream().collect(Collectors.joining("\n"));
 
