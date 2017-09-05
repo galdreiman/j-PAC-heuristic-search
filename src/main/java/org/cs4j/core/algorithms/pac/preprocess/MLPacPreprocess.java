@@ -118,7 +118,7 @@ public class MLPacPreprocess {
 					// -------------------------------------------------
 					// 3. train a model
 					// -------------------------------------------------
-                    List<PacClassifierType> clsTypes = Arrays.asList(PacClassifierType.J48, PacClassifierType.NN);
+                    List<PacClassifierType> clsTypes = Arrays.asList(/*PacClassifierType.J48,*/ PacClassifierType.NN);
 					String inputDataPath = DomainExperimentData.get(domainClass,
 							RunType.TRAIN).outputPreprocessPath + "MLPacPreprocess_e"+epsilon+outfilePostfix;
 

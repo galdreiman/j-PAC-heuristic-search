@@ -185,17 +185,17 @@ public class DockyardRobotGenerator extends GeneralInstancesGenerator {
 
         if (args.length == 0) {
             args = new String[7];
-            args[0] = "input"+File.separator+"dockyardrobot"+File.separator+"generated";
+            args[0] = "input"+File.separator+"DockyardRobot";
             // Count of Problems
             args[1] = PacConfig.instance.pacPreprocessNumInstances() + "";
             // Count of Locations
-            args[2] = 4 + "";
+            args[2] = 5 + "";
             // Count of Cranes
-            args[3] = 4 + "";
+            args[3] = 5 + "";
             // Count of Containers (Boxes)
-            args[4] = 3 + "";
+            args[4] = 6 + "";
             // Count of Piles
-            args[5] = 4 + "";
+            args[5] = 5 + "";
             // Count of Robots
             args[6] = 1 + "";
         }
@@ -207,7 +207,7 @@ public class DockyardRobotGenerator extends GeneralInstancesGenerator {
 
         File outputDirectory = new File(args[0]);
         if (!outputDirectory.isDirectory()) {
-            throw new IOException("Invalid directory: " + args[0]);
+            outputDirectory.mkdir();
         }
         // Required number of instances
         instancesCount = DockyardRobotGenerator.readIntNumber(args[1], -1, -1, "# of instances");
