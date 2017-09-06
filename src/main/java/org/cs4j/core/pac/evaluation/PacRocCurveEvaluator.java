@@ -2,6 +2,7 @@ package org.cs4j.core.pac.evaluation;
 
 
 import org.apache.log4j.Logger;
+import org.cs4j.core.algorithms.pac.preprocess.PacClassifierType;
 import org.cs4j.core.domains.DockyardRobot;
 import org.cs4j.core.domains.GridPathFinding;
 import org.cs4j.core.domains.Pancakes;
@@ -9,6 +10,7 @@ import org.cs4j.core.domains.VacuumRobot;
 import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
 import weka.classifiers.evaluation.ThresholdCurve;
+import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.*;
 import weka.core.converters.ArffSaver;
@@ -38,8 +40,10 @@ public class PacRocCurveEvaluator {
 
     public static void main(String[] args) throws Exception {
 
-        double[] epsilons = {0.0,0.05,0.1,0.2,0.3};
-        Class[] domains = {DockyardRobot.class,VacuumRobot.class, Pancakes.class, GridPathFinding.class};
+        double[] epsilons = {0,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.5};
+        Class[] domains = {/*DockyardRobot.class,VacuumRobot.class, Pancakes.class,*/ GridPathFinding.class};
+
+        PacClassifierType classifierType = PacClassifierType.NN;
 
         ArrayList<String> outputTable = new ArrayList<>();
 
@@ -68,7 +72,9 @@ public class PacRocCurveEvaluator {
         for(Class domain : domains) {
             for (double epsilon : epsilons) {
                 // load data
-                String inputArffFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\FinalResults\\Resampling\\1K-Instances\\preprocess\\"+domain.getSimpleName()+"\\MLPacPreprocess_e"+epsilon+"_J48.arff";
+                String baseDir = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\gridpathfinding_resampling\\";
+                String resamplingPostfix = "_"+classifierType.toString();
+                String inputArffFile = baseDir + domain.getSimpleName()+"\\MLPacPreprocess_e"+epsilon+ resamplingPostfix +".arff";
                 Instances data = ConverterUtils.DataSource.read(inputArffFile);
                 data.setClassIndex(data.numAttributes() - 1);
                 int trueCounter = 0;
@@ -80,7 +86,21 @@ public class PacRocCurveEvaluator {
                 int totalInstancesCount = data.size();
 
                 // evaluate classifier
-                Classifier cl = new J48();
+                Classifier cl;
+                switch (classifierType) {
+                    case NN:
+                        cl = new MultilayerPerceptron();
+                        ((MultilayerPerceptron) cl).setLearningRate(0.1);
+                        ((MultilayerPerceptron) cl).setMomentum(0.2);
+                        ((MultilayerPerceptron) cl).setTrainingTime(2000);
+                        ((MultilayerPerceptron) cl).setHiddenLayers("3");
+                        break;
+                    case J48:
+                    default:
+                        cl = new J48();
+                        break;
+                }
+                logger.info("Initialize classifier: " + classifierType.toString() +" succeeded");
                 Evaluation eval = new Evaluation(data);
                 eval.crossValidateModel(cl, data, 10, new Random(1));
 
@@ -149,11 +169,11 @@ public class PacRocCurveEvaluator {
         }
 
 
-        saveInstancesToFile(outputTable);
+        saveInstancesToFile(outputTable,classifierType);
     }
 
-    private static void saveInstancesToFile( ArrayList<String> outputTable) throws IOException {
-        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\FinalResults\\Resampling\\1K-Instances\\preprocess\\Out_MLPacPreprocess_Evaluation_All.csv";
+    private static void saveInstancesToFile( ArrayList<String> outputTable, PacClassifierType classifierType) throws IOException {
+        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\gridpathfinding_resampling\\Out_MLPacPreprocess_Evaluation_"+classifierType.toString()+".csv";
 
         String table = outputTable.stream().collect(Collectors.joining("\n"));
 
