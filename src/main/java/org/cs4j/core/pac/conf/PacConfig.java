@@ -115,4 +115,8 @@ public interface PacConfig extends Config {
     @DefaultValue("56,58,60")
     int[] PredictiondomainLevelsForRatioBased();
 
+    @Key(PAC + PREDICTION +".domainLevelTestForRatioBased")
+    @DefaultValue("60")
+    int PredictiondomainLevelTestForRatioBased();
+
 }

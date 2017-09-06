@@ -43,22 +43,24 @@ public class RatioBasedExperimentForDomainLevels extends PACOnlineExperimentRunn
 
 
         int[] domainLevels = PacConfig.instance.PredictiondomainLevelsForRatioBased();
+        int domainLevelTest = PacConfig.instance.PredictiondomainLevelTestForRatioBased();
 
         for (Class domainClass : domains) {
-            for (int domainLevel : domainLevels) {
+            for (int domainLevelTrain : domainLevels) {
                 logger.info("Running anytime for domain " + domainClass.getName());
                 try {
 
-                    runParams.put("domainLevel", domainLevel);
+                    runParams.put("domainLevel", domainLevelTrain);
+                    runParams.put("domainLevelTest", domainLevelTest);
 
                     // Prepare experiment for a new domain
                     String domainName = domainClass.getSimpleName();
-                    output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).outputOnlinePath, domainName + File.separator + "PAC_Output_RB-"+ domainLevel+"_" + experiment.getClass().getSimpleName(), -1, -1, null, false,
+                    output = new OutputResult(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TEST).outputOnlinePath, domainName + File.separator + "PAC_Output_RB-train"+ domainLevelTrain+"_test_"+ domainLevelTest+ "_" + experiment.getClass().getSimpleName(), -1, -1, null, false,
                             true);
                     this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
 
 
-                    String statisticsFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPathFormat, domainLevel)
+                    String statisticsFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.TRAIN).inputPathFormat, domainLevelTrain)
                             + File.separator + PACStatistics.STATISTICS_FILE_NAME;
                     PACStatistics statistics = PACUtils.parsePACStatisticsFile(statisticsFile);
                     PACUtils.setPacStatistics(domainClass, statistics);
@@ -94,7 +96,7 @@ public class RatioBasedExperimentForDomainLevels extends PACOnlineExperimentRunn
                     SortedMap<String, Object> runParams) {
         SearchDomain domain;
 
-        int domainLevel = Integer.parseInt(runParams.get("domainLevel").toString());
+        int domainLevel = Integer.parseInt(runParams.get("domainLevelTest").toString());
 
         Constructor<?> cons = ExperimentUtils.getSearchDomainConstructor(domainClass);
         logger.info("Solving " + domainClass.getName());

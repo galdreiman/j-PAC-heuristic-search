@@ -14,9 +14,7 @@ import org.cs4j.core.pac.conf.PacConfig;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by Gal Dreiman on 06/09/2017.
@@ -30,12 +28,21 @@ public class RatioBasedForHardBroblems extends StatisticsGenerator{
     public static void main(String[] args){
 
         Class[] domains = PacConfig.instance.pacDomains();
-        int[] domainLevel = PacConfig.instance.PredictiondomainLevelsForRatioBased();
+        int[] domainLevels = PacConfig.instance.PredictiondomainLevelsForRatioBased();
+        int domainLevelTest = PacConfig.instance.PredictiondomainLevelTestForRatioBased();
+
+        List<Integer> levels = new ArrayList<>();
+        for(int d : domainLevels){
+            levels.add(d);
+        }
+        levels.add(domainLevelTest);
+
+
         OutputResult output=null;
         RatioBasedForHardBroblems generator = new RatioBasedForHardBroblems();
 
         for(Class domainClass : domains) {
-            for(int level : domainLevel) {
+            for(int level : levels) {
                 logger.info("Running anytime for domain " + domainClass.getName());
                 try {
                     // Prepare experiment for a new domain
@@ -61,7 +68,7 @@ public class RatioBasedForHardBroblems extends StatisticsGenerator{
         double[] deltas = PacConfig.instance.inputOnlineDeltas();
         Class[] pacConditions = {RatioBasedPACCondition.class};
 
-        Experiment experiment = new MLPacExperiment();
+        Experiment experiment = new RatioBasedPacExperiment();
         RatioBasedExperimentForDomainLevels runner = new RatioBasedExperimentForDomainLevels();
         runner.runExperimentBatch(domains, pacConditions, epsilons, deltas, experiment);
 
