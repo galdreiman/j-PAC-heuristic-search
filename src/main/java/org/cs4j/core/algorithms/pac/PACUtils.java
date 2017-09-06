@@ -39,6 +39,10 @@ public class PACUtils {
         return statistics;
     }
 
+    public static void setPacStatistics(Class domainClass,PACStatistics statistics){
+        domainToPACStatistics.put(domainClass,statistics);
+    }
+
     public static PACStatistics getPACStatistics(Class domainClass, RunType rt, int domainParam)
     {
         // If already cached, no need to parse from disk
@@ -61,7 +65,7 @@ public class PACUtils {
      * Internal helper function that parses the file with the basic PAC statistics (h(s), h*(s))
      * @param inputFile input file for this domain
      */
-    private static PACStatistics parsePACStatisticsFile(String inputFile){
+    public static PACStatistics parsePACStatisticsFile(String inputFile){
         Map<Integer,Double> instanceToInitialH= new TreeMap<>();
         Map<Integer,Double> instanceToOptimal= new TreeMap<>();
         try{

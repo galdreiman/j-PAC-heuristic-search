@@ -55,7 +55,7 @@ public class DomainExperimentData {
 		domainToExperimentDataAll.put(GridPathFinding.class,
 				new DomainExperimentData(
 				"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",
-						"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map",
+						"."+File.separator+"input"+File.separator+"gridpathfinding"+File.separator+"brc202d.map"+File.separator+"grid-distance-presentage-%d",
 				"."+ File.separator+"preprocessResults"+File.separator+"gridpathfinding"+File.separator,
 				"."+File.separator+"results"+File.separator+"gridpathfinding"+File.separator,
 				1, NUM_OF_INSTANCES,

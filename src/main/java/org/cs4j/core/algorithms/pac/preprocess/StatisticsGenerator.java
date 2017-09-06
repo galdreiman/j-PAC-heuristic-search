@@ -37,7 +37,7 @@ public class StatisticsGenerator {
      * @return an h to optimal map generated from random states from the search space
      * of solving the given domain.
      */
-    private Map<Double,Double> runOnInstance(SearchDomain domain) throws IOException {
+    protected Map<Double,Double> runOnInstance(SearchDomain domain) throws IOException {
 
         Double optimal;
         PACSearchFramework psf = new PACSearchFramework();
