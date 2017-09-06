@@ -8,6 +8,7 @@ import org.cs4j.core.algorithms.pac.AnytimePTS4PAC;
 import org.cs4j.core.algorithms.pac.PACSearchFramework;
 import org.cs4j.core.algorithms.pac.PACUtils;
 import org.cs4j.core.algorithms.pac.conditions.OraclePACCondition;
+import org.cs4j.core.pac.conf.PacConfig;
 
 import java.util.SortedMap;
 
@@ -16,10 +17,24 @@ import java.util.SortedMap;
  *
  * Simply run DPS
  */
-public class DPSExperiment extends StandardExperiment  {
+public class DPSExperiment extends StandardExperiment {
     final static Logger logger = Logger.getLogger(DPSExperiment.class);
 
     public DPSExperiment() {
-        super(new DP("DPS",false,false,false));
+        super(new DP("DPS", false, false, false));
+    }
+
+
+    public static void main(String args[]) {
+
+        Class[] domains = PacConfig.instance.onlineDomains();
+
+        double[] epsilons = PacConfig.instance.inputOnlineEpsilons();
+
+
+        Experiment experiment = new DPSExperiment();
+        DPSExperimentRunner runner = new DPSExperimentRunner();
+        runner.runExperimentBatch(domains, epsilons);
+
     }
 }

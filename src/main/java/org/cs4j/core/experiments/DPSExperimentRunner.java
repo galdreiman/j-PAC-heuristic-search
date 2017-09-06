@@ -35,6 +35,9 @@ public class DPSExperimentRunner {
         for (String columnName : defaultColumnNames)
             columnNames.add(columnName);
         columnNames.addAll(runParamColumns);
+        columnNames.add("Domain");
+        columnNames.add("OPT");
+        columnNames.add("is_epsilon");
         String toPrint = String.join(",", columnNames);
         output.writeln(toPrint);
     }
@@ -60,6 +63,7 @@ public class DPSExperimentRunner {
                 this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
                 for (double epsilon : epsilons) {
                     runParams.put("weight", 1+epsilon);
+                    runParams.put("epsilon", epsilon);
                     this.run(experiment,domainClass, DomainExperimentData.RunType.TEST, output,
                                     domainParams, runParams);
                 }

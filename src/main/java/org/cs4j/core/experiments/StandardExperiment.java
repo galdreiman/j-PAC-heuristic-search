@@ -60,7 +60,7 @@ public class StandardExperiment implements Experiment
 
             // add isEpsilon: isEpsilon= W*OPT >= Cost
             double cost = Double.parseDouble(resultsData.get(3).toString());
-            double epsilon = Double.parseDouble(resultsData.get(10).toString());
+            double epsilon = Double.parseDouble(runParams.get("epsilon").toString());
             int isEpsilon = opt * (1+epsilon) >= cost == true? 1 : 0;
             resultsData.add(isEpsilon);
 
