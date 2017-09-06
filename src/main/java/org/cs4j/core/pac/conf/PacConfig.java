@@ -79,7 +79,7 @@ public interface PacConfig extends Config {
     Class[] onlineDomains();
 
     @Key(PAC + ONLINE +".pacConditions")
-    @DefaultValue("ML-NN,ML-J48,RatioBased")
+    @DefaultValue("ML-NN,ML-J48,RatioBased,f-min")
     @ConverterClass(PacConditionConverter.class)
     Class[] onlinePacConditions();
 

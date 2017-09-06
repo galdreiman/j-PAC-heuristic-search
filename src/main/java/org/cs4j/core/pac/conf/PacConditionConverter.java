@@ -1,6 +1,7 @@
 package org.cs4j.core.pac.conf;
 
 import org.aeonbits.owner.Converter;
+import org.cs4j.core.algorithms.pac.FMinCondition;
 import org.cs4j.core.algorithms.pac.conditions.*;
 
 import java.lang.reflect.Method;
@@ -18,6 +19,8 @@ public class PacConditionConverter implements Converter<Class> {
                 return MLPacConditionJ48.class;
             case "RatioBased":
                 return RatioBasedPACCondition.class;
+            case "f-min":
+                return FMinCondition.class;
             case "OpenBased":
                 return OpenBasedPACCondition.class;
             case "Trivial":
