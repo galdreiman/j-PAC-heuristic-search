@@ -47,7 +47,7 @@ public class DockyardRobotGeneratorForMLPac extends DockyardRobotGenerator {
     }
 
     protected static boolean _generate(int instancesCount, int locationsCount, int cranesCount, int pilesCount, int robotsCount, int boxesCount) throws IOException {
-        String outputDirectoryPath = "input" + File.separator + "dockyardrobot" + File.separator + "generated-" + boxesCount + "-boxes";
+        String outputDirectoryPath = "input" + File.separator + "DockyardRobot" + File.separator + "generated-" + boxesCount + "-boxes";
 
         File outputDirectory = new File(outputDirectoryPath);
         if (!outputDirectory.isDirectory()) {
