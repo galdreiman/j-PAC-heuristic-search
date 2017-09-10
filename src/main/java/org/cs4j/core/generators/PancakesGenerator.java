@@ -134,8 +134,8 @@ public class PancakesGenerator extends GeneralInstancesGenerator {
         int size;
         String previousInstancesDir = null;
         int previousInstancesCount = 0;
-        int pancakesNumLow = 40;
-        int pancakesNumHigh = 40;
+        int pancakesNumLow = 35;
+        int pancakesNumHigh = 35;
 
 
         if(args.length == 2){
