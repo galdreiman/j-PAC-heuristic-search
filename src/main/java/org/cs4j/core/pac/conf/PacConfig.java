@@ -70,7 +70,7 @@ public interface PacConfig extends Config {
 
     @Key(PAC + ONLINE +".inputDeltas")
     @Separator(",")
-    @DefaultValue("0.0,0.1,0.2,0.3,0.8")
+    @DefaultValue("0.0,0.1,0.2,0.3")
     double[] inputOnlineDeltas();
 
     @Key(PAC + ONLINE +".domains")
