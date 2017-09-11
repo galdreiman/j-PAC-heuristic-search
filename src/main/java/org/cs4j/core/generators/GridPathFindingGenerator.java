@@ -318,9 +318,18 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         sb.append(path);
         this._appendNewLine(sb);
 
-        int minDistance = Math.min(
-                (int) (minDistancePrecentage * Math.max(map.mapWidth, map.mapHeight)),
+        double minDistUpperBound = minDistancePrecentage + 0.1;
+        double minDistLowerBound = minDistancePrecentage - 0.1;
+
+        int minDistanceHigh = Math.min(
+                (int) (minDistUpperBound * Math.max(map.mapWidth, map.mapHeight)),
                 MIN_START_GOAL_MANHATTAN_DISTANCE);
+
+        int minDistanceLow = Math.min(
+                (int) (minDistLowerBound * Math.max(map.mapWidth, map.mapHeight)),
+                MIN_START_GOAL_MANHATTAN_DISTANCE);
+
+
         Set<PairInt> existing = new HashSet<>();
 
         PairInt start = this._generateLocationOnMap(map, existing);
@@ -333,11 +342,12 @@ public class GridPathFindingGenerator extends GeneralInstancesGenerator {
         PairInt goal;
         while (true) {
             goal = this._generateLocationOnMap(map, existing);
-            if (Utils.calcManhattanDistance(start, goal) < minDistance) {
-                ++triesNumber;
-            } else {
+            int currDistance = Utils.calcManhattanDistance(start, goal);
+            if (minDistanceLow < currDistance && currDistance < minDistanceHigh) {
                 existing.add(goal);
                 break;
+            } else {
+                ++triesNumber;
             }
         }
         if (triesNumber == GridPathFindingGenerator.MAX_TRIES_TO_SINGLE_INSTANCE) {

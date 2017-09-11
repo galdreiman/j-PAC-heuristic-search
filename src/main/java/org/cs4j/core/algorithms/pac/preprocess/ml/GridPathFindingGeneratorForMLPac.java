@@ -80,8 +80,8 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
         // Read the map
         GridMap map = generator.readMap(new BufferedReader(new InputStreamReader(new FileInputStream(mapFile))));
 
-        int obstaclesCount = map.countObstacles();
-        int requiredObstaclesCount = (int) Math.ceil((obstaclesCount * 0.7) / 100.0d);
+//        int obstaclesCount = map.countObstacles();
+//        int requiredObstaclesCount = (int) Math.ceil(obstaclesCount * minDistPercentage);
 //        generator.fitObstaclesRandomly(map, obstaclesCount, requiredObstaclesCount, rand);
 
 
