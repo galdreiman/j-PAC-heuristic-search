@@ -54,6 +54,12 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
     }
 
     protected static void _generate(Random rand, String localArg, double minDistPercentage, String mapFile) throws IOException {
+
+        // Read required count of instances
+        // Required number of instances
+        int instancesCount = GridPathFindingGenerator.readIntNumber(localArg, 1, -1, "# of instances");
+
+
         // Read the output directory
         String outputDir = "input" + File.separator + "gridpathfinding" + File.separator + "brc202d.map"+ File.separator + "grid-distance-presentage-" + ((int)minDistPercentage);
         File outputDirectory = new File(outputDir);
@@ -61,11 +67,13 @@ public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
             outputDirectory.mkdir();
         }
 
+        if(outputDirectory.listFiles().length >= instancesCount){
+            return;
+        }
+
         double minDist = minDistPercentage / ((double)100);
 
-        // Read required count of instances
-        // Required number of instances
-        int instancesCount = GridPathFindingGenerator.readIntNumber(localArg, 1, -1, "# of instances");
+
 
         GridPathFindingGenerator generator = new GridPathFindingGenerator();
 

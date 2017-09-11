@@ -247,7 +247,7 @@ public class MLPacBoundedSolPredictor {
 
                 // go over all training set and extract features:
                 for (int i = fromInstance; i <= toInstance; ++i) {
-                    logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i);
+                    logger.info("\rextracting features from " + domainClass.getName() + "\t instance " + i +"  |  epsilon: "+ epsilon + "  |   delta: " + delta);
                     domain = ExperimentUtils.getSearchDomain(inputPath, domainParams, cons, i);
 
                     SearchResult searchResult = null;
