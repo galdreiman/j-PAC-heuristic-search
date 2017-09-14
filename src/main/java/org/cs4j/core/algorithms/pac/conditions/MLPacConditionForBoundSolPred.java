@@ -6,7 +6,9 @@ import org.cs4j.core.OutputResult;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
+import org.cs4j.core.algorithms.pac.preprocess.ml.MLPacBoundedSolPredictor;
 import org.cs4j.core.mains.DomainExperimentData;
+import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
 import weka.core.*;
 
@@ -14,6 +16,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -146,6 +151,16 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
             logger.error("Failed to write instance features: " + instanceFeatures, e);
         }
 
+        if(PacConfig.instance.outputTestRawFeatures()){
+            try {
+                String outputDir = String.format(DomainExperimentData.get(this.domain.getClass(), DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, MLPacBoundedSolPredictor.trainFormatForPRedictionOutput);
+                String outFile = outputDir +File.separator + "MLPacPredictionForHardProbs_e"+epsilon +"d_"+delta+".arff";
+                String line = ins.toString() +"\n";
+                Files.write(Paths.get(outFile), line.toString().getBytes(), StandardOpenOption.APPEND);
+            }catch (IOException e) {
+                //exception handling left as an exercise for the reader
+            }
+        }
 
         double[] distributeResult = {};
         double classificationResult = -1;

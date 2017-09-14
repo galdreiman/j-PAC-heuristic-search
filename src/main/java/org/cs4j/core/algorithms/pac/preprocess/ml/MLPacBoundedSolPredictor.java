@@ -24,6 +24,9 @@ import weka.core.converters.ConverterUtils;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,6 +40,8 @@ public class MLPacBoundedSolPredictor {
 
     private static final String modelFileFormat ="MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.model"; // <epsilon>,<classifierType>,<trainFormat>
     private static final String dataFileFormat = "MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.arff"; // <epsilon>,<classifierType>,<trainFormat>
+
+    public static String trainFormatForPRedictionOutput = "";
 
     public static void main(String[] args) {
 
@@ -67,6 +72,8 @@ public class MLPacBoundedSolPredictor {
             // prediction:
             OutputResult output = initOutputResultTable(domainClass, testLevel, trainLevelLow, trainLevelHigh);
             OutputResult evaluationOutput = getEvaluationOutputResult(domainClass,trainLevelLow + "-" + trainLevelHigh);
+
+            trainFormatForPRedictionOutput = trainLevelLow + "-" + trainLevelHigh;
 
             for (double epsilon : epsilons) {
                 for (PacClassifierType type : clsTypes) {
@@ -202,6 +209,8 @@ public class MLPacBoundedSolPredictor {
         double[] deltas = PacConfig.instance.inputPredictionDeltas();
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
 
+
+
         String inFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
         String inputModelPath = inFile+ File.separator + String.format(modelFileFormat,epsilon,classifierType,trainFormat);
         String inputDataPath = inFile + File.separator + String.format(dataFileFormat,epsilon,classifierType,trainFormat);
@@ -235,6 +244,22 @@ public class MLPacBoundedSolPredictor {
             optimalSolver.setAdditionalParameter("weight","1.0");
 
             for(double delta : deltas) {
+
+                if(PacConfig.instance.outputTestRawFeatures()){
+                    String tableHeader = MLPacFeatureExtractor.getFeaturesARFFHeaderBoundSolPred();
+                    try {
+                        String outputDir = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, MLPacBoundedSolPredictor.trainFormatForPRedictionOutput);
+                        String outFile = outputDir +File.separator + "MLPacPredictionForHardProbs_e"+epsilon +"d_"+delta+".arff";
+                        File f = new File(outFile);
+                        if(f.exists()){
+                            f.delete();
+                        }
+                        Files.write(Paths.get(outFile), tableHeader.getBytes(), StandardOpenOption.CREATE_NEW);
+                    }catch (IOException e) {
+                        //exception handling left as an exercise for the reader
+                    }
+                }
+
                 PACSearchFramework psf = new PACSearchFramework();
                 psf.setAnytimeSearchClass(AnytimePTS4PAC.class);
                 psf.setPACConditionClass(MLPacConditionForBoundSolPredNN.class);

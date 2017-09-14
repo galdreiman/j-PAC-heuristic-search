@@ -111,6 +111,10 @@ public interface PacConfig extends Config {
     @DefaultValue("false")
     boolean PredictionApplyEvaluation();
 
+    @Key(PAC + PREDICTION +".outputTestRawFeatures")
+    @DefaultValue("false")
+    boolean outputTestRawFeatures();
+
     @Key(PAC + PREDICTION +".domainLevelsForRatioBased")
     @DefaultValue("56,58,60")
     int[] PredictiondomainLevelsForRatioBased();
