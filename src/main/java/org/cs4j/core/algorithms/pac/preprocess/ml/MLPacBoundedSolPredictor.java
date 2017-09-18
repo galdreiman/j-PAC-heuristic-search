@@ -369,7 +369,7 @@ public class MLPacBoundedSolPredictor {
         //  train + save the model to file
         // -------------------------------------------------
         try {
-            String datasetFilePath = outFile+ File.separator + "MLPacBoundedSolPreprocess_e_"+epsilon+"_c"+classifierType+"_"+trainFormat+".arff";
+            String datasetFilePath = outFile+ File.separator + "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+classifierType+"_"+trainFormat+".arff";
             AbstractClassifier cls =
                     MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,datasetFilePath);
             String outputModel = outFile+ File.separator + "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+classifierType+"_tl_"+trainFormat+".model";
