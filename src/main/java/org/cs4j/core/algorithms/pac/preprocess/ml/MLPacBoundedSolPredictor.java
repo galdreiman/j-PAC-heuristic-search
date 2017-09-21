@@ -38,8 +38,8 @@ import java.util.stream.Collectors;
 public class MLPacBoundedSolPredictor {
     private final static Logger logger = Logger.getLogger(MLPacBoundedSolPredictor.class);
 
-    private static final String modelFileFormat ="MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.model"; // <epsilon>,<classifierType>,<trainFormat>
-    private static final String dataFileFormat = "MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.arff"; // <epsilon>,<classifierType>,<trainFormat>
+    public static final String modelFileFormat ="MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.model"; // <epsilon>,<classifierType>,<trainFormat>
+    public static final String dataFileFormat = "MLPacBoundedSolPreprocess_e_%s_c_%s_tl_%s.arff"; // <epsilon>,<classifierType>,<trainFormat>
 
     public static String trainFormatForPRedictionOutput = "";
 
@@ -107,8 +107,11 @@ public class MLPacBoundedSolPredictor {
     public static void evaluatePrediction(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh,int trainLevelDelta, int testLevel, PacClassifierType type,OutputResult evaluationOutput) throws Exception{
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
         String inputTestDataDir = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+
+        String dateFileName = String.format(MLPacBoundedSolPredictor.dataFileFormat,epsilon,type, trainFormat);
+
         String inputTestDataFile = "MLPacBoundedSolPreprocessRawPredictions_e_"+epsilon+"_c_" + type+"_train_"+trainFormat+"_test_" +testLevel +".arff";
-        String inputTrainDataFile = "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+ type+"_tl_"+trainFormat+".arff";
+        String inputTrainDataFile = dateFileName;
 
         int classIndex = 15;
 
@@ -322,13 +325,13 @@ public class MLPacBoundedSolPredictor {
 
     private static void train(Class domainClass,double epsilon, int trainLevelLow, int trainLevelHigh, int trainLevelDelta, PacClassifierType classifierType) {
 
-        String outfilePostfix = ".arff";
         String trainFormat = trainLevelLow + "-" + trainLevelHigh;
         OutputResult output = null;
         OutputResult csvOutput = null;
         String outFile = String.format(DomainExperimentData.get(domainClass, DomainExperimentData.RunType.ALL).outputPreprocessPathFormat, trainFormat);
+        String dateFileName = String.format(MLPacBoundedSolPredictor.dataFileFormat,epsilon,classifierType, trainFormat);
         try {
-            output = new OutputResult(outFile, "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_" + classifierType+"_tl_" +trainFormat, true,outfilePostfix);
+            output = new OutputResult(outFile, dateFileName, true,"");
             csvOutput = new OutputResult(outFile, "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+ classifierType+"_tl_" +trainFormat, true,".csv");
         } catch (IOException e1) {
             logger.error("Failed to create output ML PAC preprocess output file at: " + outFile, e1);
@@ -369,10 +372,11 @@ public class MLPacBoundedSolPredictor {
         //  train + save the model to file
         // -------------------------------------------------
         try {
-            String datasetFilePath = outFile+ File.separator + "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+classifierType+"_"+trainFormat+".arff";
+            String modelFileName = String.format(MLPacBoundedSolPredictor.modelFileFormat,epsilon,classifierType, trainFormat);
+            String datasetFilePath = outFile+ File.separator + dateFileName;
             AbstractClassifier cls =
                     MLPacPreprocess.setupAndGetClassifier(output.getFname(), classifierType,false,datasetFilePath);
-            String outputModel = outFile+ File.separator + "MLPacBoundedSolPreprocess_e_"+epsilon+"_c_"+classifierType+"_tl_"+trainFormat+".model";
+            String outputModel = outFile+ File.separator + modelFileName;
             ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(outputModel));
             oos.writeObject(cls);
             oos.flush();
