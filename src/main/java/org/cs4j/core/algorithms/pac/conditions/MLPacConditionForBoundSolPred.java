@@ -75,6 +75,11 @@ public class MLPacConditionForBoundSolPred extends MLPacCondition {
     @Override
     public boolean shouldStop(SearchResult incumbentSolution) {
 
+        double fmin = (Double)incumbentSolution.getExtras().get("fmin");
+        double incumbent = incumbentSolution.getBestSolution().getCost();
+        if (incumbent/fmin <= 1+epsilon)
+            return true;
+
         //Extract features from an incumbent solution
         Map<MLPacFeatureExtractor.PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(incumbentSolution);
         int size = features.size() + 4;

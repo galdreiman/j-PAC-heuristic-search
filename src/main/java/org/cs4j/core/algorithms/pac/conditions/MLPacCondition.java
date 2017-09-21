@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,9 +17,11 @@ import org.cs4j.core.MLPacFeatureExtractor.PacFeature;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
+import org.cs4j.core.algorithms.pac.preprocess.ml.MLPacBoundedSolPredictor;
 import org.cs4j.core.experiments.MLPacExperiment;
 import org.cs4j.core.mains.DomainExperimentData;
 
+import org.cs4j.core.pac.conf.PacConfig;
 import weka.classifiers.AbstractClassifier;
 import weka.classifiers.Classifier;
 import weka.classifiers.evaluation.Evaluation;
@@ -85,6 +90,12 @@ public class MLPacCondition extends RatioBasedPACCondition {
 	@Override
 	public boolean shouldStop(SearchResult incumbentSolution) {
 
+	    //TODO: GAL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        double fmin = (Double)incumbentSolution.getExtras().get("fmin");
+        double incumbent = incumbentSolution.getBestSolution().getCost();
+        if (incumbent/fmin <= 1+epsilon)
+            return true;
+
 	    //Extract features from an incumbent solution
 		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(incumbentSolution);
 		int size = features.size();
@@ -129,8 +140,6 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		ins.setValue( classAtt,"false");
 
 		logger.info("instance to classify: "+ins.toString());
-
-
 
 
 		double[] distributeResult = {};

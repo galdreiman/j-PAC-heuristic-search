@@ -420,9 +420,13 @@ public class MLPacBoundedSolPredictor {
             SearchResult searchResult = solver.search(domain);
             while (searchResult.hasSolution()){
 
+                double fmin = (Double)searchResult.getExtras().get("fmin");
+                double incumbent = searchResult.getBestSolution().getCost();
+                if (incumbent/fmin <= 1+epsilon)
+                    break;
+
 
                 double cost = searchResult.getBestSolution().getCost();
-
                 Map<MLPacFeatureExtractor.PacFeature, Double> features = MLPacFeatureExtractor
                         .extractFeaturesFromSearchResultIncludeTarget(searchResult, optimalCost, epsilon);
 
