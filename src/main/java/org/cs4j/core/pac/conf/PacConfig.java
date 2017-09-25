@@ -123,4 +123,8 @@ public interface PacConfig extends Config {
     @DefaultValue("60")
     int PredictiondomainLevelTestForRatioBased();
 
+    @Key(PAC + PREDICTION +".trainUntilFMin")
+    @DefaultValue("false")
+    boolean trainUntilFMin();
+
 }

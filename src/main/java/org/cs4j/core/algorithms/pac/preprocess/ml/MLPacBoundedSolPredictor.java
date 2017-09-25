@@ -424,10 +424,12 @@ public class MLPacBoundedSolPredictor {
             SearchResult searchResult = solver.search(domain);
             while (searchResult.hasSolution()){
 
-                double fmin = (Double)searchResult.getExtras().get("fmin");
-                double incumbent = searchResult.getBestSolution().getCost();
-                if (incumbent/fmin <= 1+epsilon)
-                    break;
+                if(PacConfig.instance.trainUntilFMin()) {
+                    double fmin = (Double) searchResult.getExtras().get("fmin");
+                    double incumbent = searchResult.getBestSolution().getCost();
+                    if (incumbent / fmin <= 1 + epsilon)
+                        break;
+                }
 
 
                 double cost = searchResult.getBestSolution().getCost();
