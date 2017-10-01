@@ -24,7 +24,7 @@ public class VacuumRobotGeneratorForMLPac extends VacuumRobotGenerator {
         int instancesCount = PacConfig.instance.PredictionNumInstances();
         int mapWidth = 200;
         int mapHeight = 200;
-        double obstaclesPercentage = 0.9;
+        double obstaclesPercentage = 30;
         int dirtyCount;
 
 //        int dirtyCountLow = 4, dirtyCountyHigh = 16, dirtyCountDelta = 4;
