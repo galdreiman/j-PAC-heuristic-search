@@ -19,17 +19,17 @@ public class PACSearchFramework implements SearchAlgorithm {
     final static Logger logger = Logger.getLogger(PACSearchFramework.class);
 
 
-    private static final Map<String, Class> POSSIBLE_PARAMETERS;
-    private double epsilon; // Desired suboptimality
-    private double delta; // Required confidence
+    protected static final Map<String, Class> POSSIBLE_PARAMETERS;
+    protected double epsilon; // Desired suboptimality
+    protected double delta; // Required confidence
 
-    private Class pacConditionClass; // The stopping conditions used to verify a PAC solution
-    private Class anytimeSearchClass; // The class of the anytime search algorithm to use
+    protected Class pacConditionClass; // The stopping conditions used to verify a PAC solution
+    protected Class anytimeSearchClass; // The class of the anytime search algorithm to use
 
     // This allows the option to set manually the anytime search algorithm and the pac condition being used
     // instead of creating it on the fly by specifying its class
-    private AnytimeSearchAlgorithm anytimeSearchAlgorithm=null;
-    private PACCondition pacCondition=null;
+    protected AnytimeSearchAlgorithm anytimeSearchAlgorithm=null;
+    protected PACCondition pacCondition=null;
 
 
 

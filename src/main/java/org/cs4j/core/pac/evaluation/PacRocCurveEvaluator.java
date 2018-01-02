@@ -41,7 +41,7 @@ public class PacRocCurveEvaluator {
     public static void main(String[] args) throws Exception {
 
         double[] epsilons = {0,0.05,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0,1.5};
-        Class[] domains = {/*DockyardRobot.class,VacuumRobot.class, Pancakes.class,*/ DockyardRobot.class};
+        Class[] domains = {/*DockyardRobot.class,VacuumRobot.class, Pancakes.class,*/ Pancakes.class};
 
         PacClassifierType classifierType = PacClassifierType.NN;
 
@@ -72,7 +72,7 @@ public class PacRocCurveEvaluator {
         for(Class domain : domains) {
             for (double epsilon : epsilons) {
                 // load data
-                String baseDir = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\DockyardRobot\\";
+                String baseDir = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\Pancakes\\";
                 String resamplingPostfix = "_"+classifierType.toString();
                 String inputArffFile = baseDir + domain.getSimpleName()+"\\MLPacPreprocess_e"+epsilon+ resamplingPostfix +".arff";
                 Instances data = ConverterUtils.DataSource.read(inputArffFile);
@@ -173,7 +173,7 @@ public class PacRocCurveEvaluator {
     }
 
     private static void saveInstancesToFile( ArrayList<String> outputTable, PacClassifierType classifierType) throws IOException {
-        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\DockyardRobot\\Out_MLPacPreprocess_Evaluation_"+classifierType.toString()+".csv";
+        String outputCsvFile = "C:\\Users\\user\\Documents\\Gal\\PAC\\AAAI\\Evaluation\\Pancakes\\Out_MLPacPreprocess_Evaluation_"+classifierType.toString()+".csv";
 
         String table = outputTable.stream().collect(Collectors.joining("\n"));
 
