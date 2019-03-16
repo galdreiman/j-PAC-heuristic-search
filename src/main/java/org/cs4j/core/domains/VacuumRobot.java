@@ -2,6 +2,7 @@ package org.cs4j.core.domains;
 
 
 import org.cs4j.core.AbstractSearchDomain;
+import org.cs4j.core.MLPacFeatureExtractor;
 import org.cs4j.core.SearchDomain;
 import org.cs4j.core.collections.PackedElement;
 import org.cs4j.core.collections.PairInt;
@@ -1480,7 +1481,7 @@ public class VacuumRobot extends AbstractSearchDomain {
     /**
      * A VacuumRobot Cleaner World state
      */
-    private final class VacuumRobotState implements State {
+    public final class VacuumRobotState implements State {
         private double h;
         private double d;
 
@@ -1759,9 +1760,9 @@ public class VacuumRobot extends AbstractSearchDomain {
     private String dumpStateShort(VacuumRobotState state) {
         StringBuilder sb = new StringBuilder();
         PairInt robotLocation = this.map.getPosition(state.robotLocation);
-        sb.append("robot location: ");
+        sb.append("robotLocation:");
         sb.append(robotLocation.toString());
-        sb.append(", dirty vector: ");
+        sb.append("dirtyVector:");
         sb.append(state.dirt);
         return sb.toString();
     }
@@ -1799,6 +1800,17 @@ public class VacuumRobot extends AbstractSearchDomain {
         sb.append("\n");
         sb.append("********************************\n\n");
         return sb.toString();
+    }
+
+    public static Map<MLPacFeatureExtractor.PacFeature, Double> dumpStateArray(VacuumRobotState state){
+        int obstaclesAndDirtyCountArray[] = new int[2];
+        int remainingDirtyLocationsCount = state.remainingDirtyLocationsCount;
+
+        Map<MLPacFeatureExtractor.PacFeature, Double> res = new HashMap<>();
+        res.put(MLPacFeatureExtractor.PacFeature.remainingDirtyLocationsCount,(double) remainingDirtyLocationsCount);
+        res.put(MLPacFeatureExtractor.PacFeature.dirtyVector, (double) state.dirt);
+
+        return res;
     }
 
     public String dumpStatesCollection(State[] states) {

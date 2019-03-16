@@ -29,11 +29,12 @@ public class GreedyAndDPSExperiment extends StandardExperiment {
         Class[] domains = PacConfig.instance.onlineDomains();
 
         double[] epsilons = PacConfig.instance.inputOnlineEpsilons();
+        double[] deltas = PacConfig.instance.inputOnlineDeltas();
 
 
         Experiment experiment = new GreedyAndDPSExperiment();
         GreedyAndDPSExperimentRunner runner = new GreedyAndDPSExperimentRunner();
-        runner.runExperimentBatch(domains, epsilons,experiment);
+        runner.runExperimentBatch(domains, epsilons,deltas,experiment);
 
     }
 }

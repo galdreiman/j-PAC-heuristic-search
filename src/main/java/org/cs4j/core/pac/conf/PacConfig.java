@@ -28,6 +28,22 @@ public interface PacConfig extends Config {
     @ConverterClass(ClassConverter.class)
     Class[] pacDomains();
 
+    @Key(PAC + STATS_GEN +".gridMinDistLow")
+    @DefaultValue("66")
+    double gridMinDistLow();
+
+    @Key(PAC + STATS_GEN +".gridMinDistHigh")
+    @DefaultValue("66")
+    double gridMinDistHigh();
+
+    @Key(PAC + STATS_GEN +".gridMinDistDelta")
+    @DefaultValue("5")
+    double gridMinDistDelta();
+
+    @Key(PAC + STATS_GEN +".gridMinDistTest")
+    @DefaultValue("66")
+    double gridMinDistTest();
+
 
     //-----------------------------------------
     // PAC Preprocess
@@ -58,6 +74,10 @@ public interface PacConfig extends Config {
     @Key(PAC + PREPROCESS +".biasToUniformClass")
     @DefaultValue("0.7")
     double pacPreProcessBiasToUniformClass();
+
+    @Key(PAC + PREPROCESS +".useDomainFeatures")
+    @DefaultValue("false")
+    boolean useDomainFeatures();
 
     //-----------------------------------------
     // PAC online search

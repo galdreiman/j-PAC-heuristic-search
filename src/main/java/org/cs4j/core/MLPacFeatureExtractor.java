@@ -1,12 +1,10 @@
 package org.cs4j.core;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-
+import org.cs4j.core.pac.conf.PacConfig;
 import weka.core.Attribute;
+
+import java.util.*;
 
 public class MLPacFeatureExtractor {
 
@@ -39,6 +37,13 @@ public class MLPacFeatureExtractor {
 
 		if(withTarget) {
 			b.append("@ATTRIBUTE opt-cost  NUMERIC");
+		}
+
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_start  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_start  NUMERIC\n");
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_goal  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_goal  NUMERIC\n");
 		}
 		b.append("\n");
 		b.append("\n");
@@ -73,10 +78,19 @@ public class MLPacFeatureExtractor {
 				b.append(String.format("@ATTRIBUTE grandchildDepth-%d-%d  NUMERIC\n", i,j));
 			}
 		}
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_start  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_start  NUMERIC\n");
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_goal  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_goal  NUMERIC\n");
+		}
 
 		if(withTarget) {
 			b.append("@ATTRIBUTE is-w-opt  {true,false}");
 		}
+
+
+
 		b.append("\n");
 		b.append("\n");
 		b.append("@DATA");
@@ -104,6 +118,12 @@ public class MLPacFeatureExtractor {
 			}
 		}
 
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_start  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_start  NUMERIC\n");
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_goal  NUMERIC\n");
+			b.append("@ATTRIBUTE dirtyVector_goal  NUMERIC\n");
+		}
 		if(withTarget) {
 			b.append("opt-cost");
 		}
@@ -111,33 +131,13 @@ public class MLPacFeatureExtractor {
 		return b.toString();
 	}
 
-	public static String getFeaturesCSVHeaderForPredictedBoundedSol(boolean withTarget) {
-		StringBuilder b = new StringBuilder();
 
-		b.append("initialH,");
-		b.append("DomainLevel,");
-
-		for(int i =0; i < 3; i++) {
-			b.append(String.format("childH-%,", i));
-			b.append(String.format("childG-%d,", i));
-			b.append(String.format("childDepth-%d,", i));
-
-			for(int j =0; j < 3; j++) {
-				b.append(String.format("grandchildH-%d-%d,", i,j));
-				b.append(String.format("grandchildG-%d-%d,", i,j));
-				b.append(String.format("grandchildDepth-%d-%d,", i,j));
-			}
-		}
-
-		if(withTarget) {
-			b.append("is-w-opt");
-		}
-
-		return b.toString();
-	}
 
 	public enum PacFeature{
-		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,W,IS_W_OPT;
+		GENERATED, EXPANDED, ROPENED, COST, LENGTH, G_0,H_0,G_1,H_1,G_2,H_2,W,
+		remainingDirtyLocationsCount,
+		dirtyVector,
+		IS_W_OPT;
 		
 		public static PacFeature getPacFeature(String name){
 			switch (name){
@@ -155,7 +155,14 @@ public class MLPacFeatureExtractor {
 	}
 	
 	public static String getFeaturesHeader(){
-		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		if(PacConfig.instance.useDomainFeatures()) {
+			return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w," +
+					"remainingDirtyLocationCount_start,dirtyVector_start," +
+					"remainingDirtyLocationCount_goal,dirtyVector_goal," +
+					"is-W-opt";
+		} else{
+			return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
+		}
 	}
 
 	public static String getFeaturesARFFHeader(){
@@ -189,6 +196,16 @@ public class MLPacFeatureExtractor {
 		b.append("\n");
 		b.append("@ATTRIBUTE w  NUMERIC");
 		b.append("\n");
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_start  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE dirtyVector_start  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_goal  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE dirtyVector_goal  NUMERIC");
+			b.append("\n");
+		}
 		b.append("@ATTRIBUTE is-W-opt  {true,false}");
 		b.append("\n");
 		b.append("\n");
@@ -237,6 +254,16 @@ public class MLPacFeatureExtractor {
 		b.append("\n");
 		b.append("@ATTRIBUTE w  NUMERIC");
 		b.append("\n");
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_start  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE dirtyVector_start  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE remainingDirtyLocationCount_goal  NUMERIC");
+			b.append("\n");
+			b.append("@ATTRIBUTE dirtyVector_goal  NUMERIC");
+			b.append("\n");
+		}
 		b.append("@ATTRIBUTE is-W-opt  {true,false}");
 		b.append("\n");
 		b.append("\n");
@@ -271,6 +298,16 @@ public class MLPacFeatureExtractor {
 		b.append(",");
 		b.append("w ");
 		b.append(",");
+		if(PacConfig.instance.useDomainFeatures()) {
+			b.append("remainingDirtyLocationCount_start");
+			b.append(",");
+			b.append("dirtyVector_start");
+			b.append(",");
+			b.append("remainingDirtyLocationCount_goal");
+			b.append(",");
+			b.append("dirtyVector_goal");
+			b.append(",");
+		}
 		b.append("is-W-opt");
 
 		b.append("\n");
@@ -278,7 +315,7 @@ public class MLPacFeatureExtractor {
 		return b.toString();
 	}
 
-	public static String getFeaturesCsvHeaderBoundSolPred(){
+	public static String getFeaturesCsvHeaderBoundSolPred() {
 		StringBuilder b = new StringBuilder();
 
 		b.append("generated ");
@@ -311,38 +348,50 @@ public class MLPacFeatureExtractor {
 		b.append(",");
 		b.append("w ");
 		b.append(",");
+		if (PacConfig.instance.useDomainFeatures()) {
+
+				b.append("remainingDirtyLocationCount_start");
+				b.append(",");
+				b.append("dirtyVector_start");
+				b.append(",");
+				b.append("remainingDirtyLocationCount_goal");
+				b.append(",");
+				b.append("dirtyVector_goal");
+				b.append(",");
+			}
 		b.append("is-W-opt");
 
 		b.append("\n");
 //		return "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt";
-		return b.toString();
+			return b.toString();
 	}
+
 
 	public static Map<PacFeature,Double> extractFeaturesFromSearchResultIncludeTarget(SearchResult result, double optimalCost, double inputEpsilon){
 		logger.debug("MLPacFeatureExtractor:extractFeaturesFromSearchResult");
 		Map<PacFeature,Double> features = extractFeaturesFromSearchResult(result);
 		
 		Double U = result.getBestSolution().getCost();
-		
+
 		features.put(PacFeature.IS_W_OPT, new Double(isWOpttimal(U, optimalCost, inputEpsilon)==true? 1.0 : 0.0));
 		
 		return features;
 	}
 	
-	public static Map<PacFeature,Double> extractFeaturesFromSearchResult(SearchResult result){
+	public static Map<PacFeature,Double> extractFeaturesFromSearchResult(SearchResult b){
 		Map<PacFeature,Double> features = new HashMap<>();
 
 		// "generated,expanded,reopened,cost,g1,h1,g2,h2,g3,h3,w,is-W-opt"
 
-		features.put(PacFeature.GENERATED, new Double(result.getGenerated()));
-		features.put(PacFeature.EXPANDED, new Double(result.getExpanded()));
-		features.put(PacFeature.ROPENED, new Double(result.getReopened()));
+		features.put(PacFeature.GENERATED, new Double(b.getGenerated()));
+		features.put(PacFeature.EXPANDED, new Double(b.getExpanded()));
+		features.put(PacFeature.ROPENED, new Double(b.getReopened()));
 
-		Double U = result.getBestSolution().getCost();
+		Double U = b.getBestSolution().getCost();
 		features.put(PacFeature.COST, new Double(U));
 
 		// Get h and g values of the first nodes on the found path
-		SearchResult.Solution solution = result.getBestSolution();
+		SearchResult.Solution solution = b.getBestSolution();
 		double g=0.0;
 		SearchDomain.State parent = null;
 		SearchDomain.State current;
@@ -372,17 +421,26 @@ public class MLPacFeatureExtractor {
 			i++;
 		}
 
-		features.put(PacFeature.W, 1.0 + (Double) result.getExtras().get("epsilon"));
-
+		features.put(PacFeature.W, 1.0 + (Double) b.getExtras().get("epsilon"));
 
 		return features;
 	}
-	
-	
-	
+
 	public static String getHeaderLineFeatures() {
-		String[] attributes = { "domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
-				"h1","g2", "h2", "g3","h3","oprimal_cost", "w", "is-W-opt" };
+		List<String> attributes = null;
+		if(PacConfig.instance.useDomainFeatures()){
+			attributes = Arrays.asList("domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
+					"h1","g2", "h2", "g3","h3","oprimal_cost", "w",
+					"remainingDirtyLocationCount_start",
+					"dirtyVector_start",
+					"remainingDirtyLocationCount_goal",
+					"dirtyVector_goal",
+					"is-W-opt" );
+		} else{
+			attributes = Arrays.asList("domain", "instance", "index", "generated", "expanded", "reopened", "cost", "g1",
+					"h1","g2", "h2", "g3","h3","oprimal_cost", "w",
+					"is-W-opt" );
+		}
 		return String.join(",", attributes);
 	}
 

@@ -18,6 +18,7 @@ import org.cs4j.core.SearchDomain;
 import org.cs4j.core.SearchResult;
 import org.cs4j.core.algorithms.pac.preprocess.MLPacPreprocess;
 import org.cs4j.core.algorithms.pac.preprocess.ml.MLPacBoundedSolPredictor;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.MLPacExperiment;
 import org.cs4j.core.mains.DomainExperimentData;
 
@@ -98,7 +99,8 @@ public class MLPacCondition extends RatioBasedPACCondition {
 
 	    //Extract features from an incumbent solution
 		Map<PacFeature,Double> features = MLPacFeatureExtractor.extractFeaturesFromSearchResult(incumbentSolution);
-		int size = features.size();
+		int addedFeatures = PacConfig.instance.useDomainFeatures()? 4 : 0;
+		int size = features.size() + addedFeatures;
 
 		// Init a classifier input instance
 		Instance ins = new DenseInstance(size + 1);
@@ -133,6 +135,25 @@ public class MLPacCondition extends RatioBasedPACCondition {
 		double w = 1.0 + (Double) incumbentSolution.getExtras().get("epsilon");
 		ins.setValue(new Attribute("w",indx++),w);
 
+
+		if(PacConfig.instance.useDomainFeatures()) {
+			VacuumRobot.VacuumRobotState start = (VacuumRobot.VacuumRobotState) incumbentSolution.getBestSolution().getStates().get(0);
+			VacuumRobot.VacuumRobotState  goal = (VacuumRobot.VacuumRobotState) incumbentSolution.getBestSolution().getStates().get(incumbentSolution.getBestSolution().getStates().size() -1);
+
+			Map<PacFeature, Double> startMap = VacuumRobot.dumpStateArray(start);
+			double remainingDirtyLocationCount_start = startMap.get(PacFeature.remainingDirtyLocationsCount);
+			double dirtyVector_start = startMap.get(PacFeature.dirtyVector);
+
+			Map<PacFeature, Double> goaltMap = VacuumRobot.dumpStateArray(goal);
+			double remainingDirtyLocationCount_goal = goaltMap.get(PacFeature.remainingDirtyLocationsCount);
+			double dirtyVector_goal = goaltMap.get(PacFeature.dirtyVector);
+
+			ins.setValue(new Attribute("remainingDirtyLocationCount_start", indx++), dirtyVector_start);
+			ins.setValue(new Attribute("dirtyVector_start", indx++), dirtyVector_start);
+
+			ins.setValue(new Attribute("remainingDirtyLocationCount_goal", indx++), remainingDirtyLocationCount_goal);
+			ins.setValue(new Attribute("dirtyVector_goal", indx++), dirtyVector_goal);
+		}
 		FastVector fvNominalVal = new FastVector(2);
 		fvNominalVal.addElement("true");
 		fvNominalVal.addElement("false");

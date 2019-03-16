@@ -15,7 +15,8 @@ import java.util.Set;
 public class GridPathFindingGeneratorForMLPac extends GridPathFindingGenerator {
 
     public static void main(String[] args) throws IOException{
-        double minDistPercentageLow = 66, minDistPercentageHigh =66, minDistPercentageDelta = 5, minDistPercentageTest = 66;
+        double minDistPercentageLow = PacConfig.instance.gridMinDistLow(), minDistPercentageHigh =PacConfig.instance.gridMinDistHigh(),
+                minDistPercentageDelta = PacConfig.instance.gridMinDistDelta(), minDistPercentageTest = PacConfig.instance.gridMinDistTest();
         generateMLPacInstances(minDistPercentageLow,minDistPercentageHigh,minDistPercentageDelta,minDistPercentageTest);
     }
 

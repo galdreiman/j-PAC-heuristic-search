@@ -7,6 +7,7 @@ import org.cs4j.core.algorithms.AnytimePTS;
 import org.cs4j.core.algorithms.AnytimeSearchNode;
 import org.cs4j.core.algorithms.SearchResultImpl;
 import org.cs4j.core.algorithms.pac.PACUtils;
+import org.cs4j.core.domains.VacuumRobot;
 import org.cs4j.core.experiments.ExperimentUtils;
 import org.cs4j.core.mains.DomainExperimentData;
 import org.cs4j.core.mains.DomainExperimentData.RunType;
@@ -22,10 +23,7 @@ import weka.filters.supervised.instance.Resample;
 
 import java.io.*;
 import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class MLPacPreprocess {
 
@@ -183,6 +181,7 @@ public class MLPacPreprocess {
 				Instances dataset = getInputInstance(inputDataPath);
 
 
+
                 if(PacConfig.instance.pacPreProcessUseResampleFilter()){
                     Instances tempTraining = new Instances(dataset);
                     tempTraining.setClassIndex(tempTraining.numAttributes()-1);
@@ -202,16 +201,17 @@ public class MLPacPreprocess {
 //                            saveDatasetToFile(datasetOtFile, filteredDataset);
                     } catch (Exception e) {
                         logger.error("Error when resampling input data!",e);
+                        logger.error("Error when resampling input data!",e);
                     }
 
-                // save the new dataset to file and overwrite the previous one
-                if(datasetOtFile != null && !datasetOtFile.isEmpty()){
-                    logger.info("writing filtered balances data set to file: " + datasetOtFile);
-                    BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
-                    writer.write(dataset.toString());
-                    writer.flush();
-                    writer.close();
-                }
+					// save the new dataset to file and overwrite the previous one
+					if(datasetOtFile != null && !datasetOtFile.isEmpty()){
+						logger.info("writing filtered balances data set to file: " + datasetOtFile);
+						BufferedWriter writer = new BufferedWriter(new FileWriter(datasetOtFile));
+						writer.write(dataset.toString());
+						writer.flush();
+						writer.close();
+					}
 
 
 				}
@@ -287,7 +287,24 @@ public class MLPacPreprocess {
 
 		boolean isWOptimal =  features.get(PacFeature.IS_W_OPT).intValue() == 1? true : false;
 
-		String[] lineParts = {generated+"",expanded+"",reopened+"",U+"",g1+"",h1+"",g2+"",h2+"",g3+"",h3+"",w+"",isWOptimal+""};
+		List<String> lineParts = null;
+
+		if(PacConfig.instance.useDomainFeatures()) {
+			VacuumRobot.VacuumRobotState start = (VacuumRobot.VacuumRobotState) searchResult.getBestSolution().getStates().get(0);
+			VacuumRobot.VacuumRobotState  goal = (VacuumRobot.VacuumRobotState) searchResult.getBestSolution().getStates().get(searchResult.getBestSolution().getStates().size() -1);
+			Map<PacFeature, Double> startMap = VacuumRobot.dumpStateArray(start);
+			double remainingDirtyLocationCount_start = startMap.get(PacFeature.remainingDirtyLocationsCount);
+			double dirtyVector_start = startMap.get(PacFeature.dirtyVector);
+
+			Map<PacFeature, Double> goaltMap = VacuumRobot.dumpStateArray(goal);
+			double remainingDirtyLocationCount_goal = goaltMap.get(PacFeature.remainingDirtyLocationsCount);
+			double dirtyVector_goal = goaltMap.get(PacFeature.dirtyVector);
+
+			lineParts = Arrays.asList(generated+"",expanded+"",reopened+"",U+"",g1+"",h1+"",g2+"",h2+"",g3+"",h3+"",w+"",remainingDirtyLocationCount_start+""
+				,dirtyVector_start+"",remainingDirtyLocationCount_goal+"",dirtyVector_goal+"",isWOptimal+"");
+		} else{
+			lineParts = Arrays.asList(generated+"",expanded+"",reopened+"",U+"",g1+"",h1+"",g2+"",h2+"",g3+"",h3+"",w+"",isWOptimal+"");
+		}
 		String line = String.join(",", lineParts);
 		logger.debug("adding new features to table: " + line);
 		try {

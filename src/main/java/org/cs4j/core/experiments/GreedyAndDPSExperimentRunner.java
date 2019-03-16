@@ -47,6 +47,7 @@ public class GreedyAndDPSExperimentRunner {
      */
     public void runExperimentBatch(Class[] domains,
                                    double[] epsilons,
+                                   double[] deltas,
                                    Experiment experiment) {
         SortedMap<String, String> domainParams = new TreeMap<>();
         SortedMap<String, Object> runParams = new TreeMap<>();
@@ -60,10 +61,13 @@ public class GreedyAndDPSExperimentRunner {
                         DomainExperimentData.RunType.TEST).outputOnlinePath, "GreedyAndDPS", -1, -1, null, false,true);
                 this.printResultsHeaders(output, experiment.getResultsHeaders(), runParams);
                 for (double epsilon : epsilons) {
-                    runParams.put("weight", 1+epsilon);
-                    runParams.put("epsilon", epsilon);
-                    this.run(experiment,domainClass, DomainExperimentData.RunType.TEST, output,
-                            domainParams, runParams);
+                    for (double delta : deltas) {
+                        runParams.put("weight", 1 + epsilon);
+                        runParams.put("epsilon", epsilon);
+                        runParams.put("delta", delta);
+                        this.run(experiment, domainClass, DomainExperimentData.RunType.TEST, output,
+                                domainParams, runParams);
+                    }
                 }
             } catch (IOException e) {
                 logger.error(e);

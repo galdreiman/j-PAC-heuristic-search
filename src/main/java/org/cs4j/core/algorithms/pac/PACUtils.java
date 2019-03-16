@@ -39,6 +39,19 @@ public class PACUtils {
         return statistics;
     }
 
+    public static PACStatistics getPACMlStatistics(Class domainClass)
+    {
+        // If already cached, no need to parse from disk
+        if(domainToPACStatistics.containsKey(domainClass))
+            return domainToPACStatistics.get(domainClass);
+
+        String statisticsFile = DomainExperimentData.get(domainClass,RunType.TRAIN).inputPath
+                +File.separator+PACStatistics.STATISTICS_FILE_NAME;
+        PACStatistics statistics =  parsePACStatisticsFile(statisticsFile);
+        domainToPACStatistics.put(domainClass,statistics);
+        return statistics;
+    }
+
     public static void setPacStatistics(Class domainClass,PACStatistics statistics){
         domainToPACStatistics.put(domainClass,statistics);
     }
